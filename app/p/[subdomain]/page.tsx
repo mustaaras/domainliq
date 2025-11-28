@@ -2,6 +2,9 @@ import { db } from '@/lib/db';
 import { notFound } from 'next/navigation';
 import { Share2, MessageCircle, Check, Search, Globe, DollarSign, TrendingUp } from 'lucide-react';
 
+// Force dynamic rendering to avoid build-time database access
+export const dynamic = 'force-dynamic';
+
 interface PageProps {
     params: Promise<{
         subdomain: string;
