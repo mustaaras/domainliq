@@ -22,7 +22,8 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma Client
+# Generate Prisma Client (with placeholder DATABASE_URL for build time)
+ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
 RUN npx prisma generate
 
 # Next.js collects completely anonymous telemetry data about general usage.
