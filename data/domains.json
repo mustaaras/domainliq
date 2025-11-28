@@ -1,0 +1,1 @@
+[{"id": 1, "name": "example.com", "price": 500, "status": "available"}, {"id": 2, "name": "testdomain.org", "price": 200, "status": "available"}, {"id": 3, "name": "solddomain.net", "price": 300, "status": "sold"}]
