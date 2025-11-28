@@ -24,6 +24,7 @@ COPY . .
 
 # Generate Prisma Client (with placeholder DATABASE_URL for build time)
 ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
+ENV AUTH_SECRET="build-time-placeholder-secret-key-min-32-chars"
 RUN npx prisma generate
 
 # Next.js collects completely anonymous telemetry data about general usage.

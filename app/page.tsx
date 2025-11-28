@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { Share2, MessageCircle, Check, Search, Globe, DollarSign, TrendingUp } from 'lucide-react';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 interface Domain {
   id: number;
   name: string;
