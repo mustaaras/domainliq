@@ -42,7 +42,7 @@ export default async function UserProfilePage({ params }: PageProps) {
                 {/* List */}
                 <div className="flex flex-col gap-2">
                     {user.domains.length > 0 ? (
-                        user.domains.map(domain => (
+                        user.domains.map((domain: any) => (
                             <div
                                 key={domain.id}
                                 className={`
