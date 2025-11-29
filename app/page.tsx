@@ -34,13 +34,20 @@ export default function Home() {
       const res = await fetch(`/api/domains?page=${pageNum}&limit=20&search=${searchQuery}`);
       const data = await res.json();
 
+      if (data.error) {
+        console.error('API Error:', data.error);
+        return;
+      }
+
       if (isLoadMore) {
         setDomains(prev => [...prev, ...data.domains]);
       } else {
         setDomains(data.domains);
       }
 
-      setHasMore(data.pagination.page < data.pagination.pages);
+      if (data.pagination) {
+        setHasMore(data.pagination.page < data.pagination.pages);
+      }
     } catch (error) {
       console.error('Failed to fetch domains:', error);
     } finally {
@@ -68,9 +75,24 @@ export default function Home() {
   const toggleSelection = (id: string) => {
     if (selectedIds.includes(id)) {
       setSelectedIds(selectedIds.filter(i => i !== id));
-    } else {
-      setSelectedIds([...selectedIds, id]);
+      return;
     }
+
+    // Check if new domain belongs to the same seller as existing selections
+    const domainToAdd = domains.find(d => d.id === id);
+    if (!domainToAdd) return;
+
+    if (selectedIds.length > 0) {
+      const firstSelectedId = selectedIds[0];
+      const firstSelectedDomain = domains.find(d => d.id === firstSelectedId);
+
+      if (firstSelectedDomain && firstSelectedDomain.user.subdomain !== domainToAdd.user.subdomain) {
+        alert("You can only select domains from the same seller at once.");
+        return;
+      }
+    }
+
+    setSelectedIds([...selectedIds, id]);
   };
 
   const handleShare = () => {
