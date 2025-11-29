@@ -368,12 +368,32 @@ export default function Home() {
               })}
 
               {/* Show More/Less Button */}
-              {domains.length > 20 && (
+              {(domains.length > 20 || (!showAll && hasMore)) && (
                 <button
-                  onClick={() => setShowAll(!showAll)}
-                  className="mt-4 w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 hover:text-white transition-all flex items-center justify-center gap-2"
+                  onClick={() => {
+                    if (showAll) {
+                      setShowAll(false);
+                    } else if (domains.length > 20) {
+                      setShowAll(true);
+                    } else if (hasMore) {
+                      handleLoadMore();
+                    }
+                  }}
+                  disabled={isLoadingMore}
+                  className="mt-4 w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 hover:text-white transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  {showAll ? 'Show Less' : `Show More (${domains.length - 20} more)`}
+                  {isLoadingMore ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Loading...
+                    </>
+                  ) : showAll ? (
+                    'Show Less'
+                  ) : domains.length > 20 ? (
+                    `Show More (${domains.length - 20} more)`
+                  ) : (
+                    'Load More Domains'
+                  )}
                 </button>
               )}
             </>
