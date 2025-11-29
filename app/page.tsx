@@ -36,6 +36,7 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [showAll, setShowAll] = useState(false);
 
   const fetchDomains = async (pageNum: number, isLoadMore = false) => {
     try {
@@ -230,7 +231,7 @@ export default function Home() {
         {/* Section Title */}
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-white">Recently Added Domains</h2>
-          <p className="text-gray-400 text-sm mt-1">Fresh listings from our marketplace</p>
+          <p className="text-gray-400 text-sm mt-1">Fresh listing from the sellers</p>
         </div>
 
         {/* List */}
@@ -242,7 +243,7 @@ export default function Home() {
             ))
           ) : domains.length > 0 ? (
             <>
-              {domains.map(domain => {
+              {(showAll ? domains : domains.slice(0, 20)).map(domain => {
                 const isSelected = selectedIds.includes(domain.id);
                 const isSold = domain.status === 'sold';
 
@@ -260,71 +261,55 @@ export default function Home() {
                       }
                     `}
                   >
-                    <div className="flex items-center gap-4">
-                      <div className={`
-                        w-5 h-5 rounded-full border flex items-center justify-center transition-all duration-200 flex-shrink-0
-                        ${isSold
-                          ? 'border-gray-700 bg-gray-800'
-                          : isSelected
+                    <div className="flex items-center gap-4 min-w-0">
+                      {!isSold && (
+                        <div className={`
+                          shrink-0 w-5 h-5 rounded border-2 transition-all
+                          ${isSelected
                             ? 'bg-amber-500 border-amber-500'
-                            : 'border-gray-600 group-hover:border-gray-500'
-                        }
-                      `}>
-                        {isSelected && <Check className="h-3 w-3 text-white" />}
-                        {isSold && <div className="w-2 h-2 rounded-full bg-gray-600" />}
-                      </div>
-
-                      <div className="flex flex-col">
-                        <div className="flex items-center gap-2">
-                          <span className={`text-lg font-medium ${isSelected ? 'text-white' : 'text-gray-200'} ${isSold && 'line-through'}`}>
-                            {domain.name}
-                          </span>
-                          {domain.isVerified && (
-                            <div className="group relative">
-                              <ShieldCheck className="h-4 w-4 text-green-400" />
-                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
-                                Ownership Verified
-                              </div>
-                            </div>
+                            : 'border-gray-600 group-hover:border-amber-500/50'
+                          }
+                        `}>
+                          {isSelected && (
+                            <svg className="w-full h-full text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            </svg>
                           )}
                         </div>
-                        <Link
-                          href={`/u/${domain.user.subdomain}`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="text-xs text-gray-500 hover:text-amber-400 transition-colors"
-                        >
-                          by {domain.user.name || domain.user.subdomain}
-                        </Link>
+                      )}
+
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="font-medium text-white group-hover:text-amber-400 transition-colors truncate">
+                            {domain.name}
+                          </h3>
+                          {isSold && (
+                            <span className="px-2 py-0.5 text-xs font-medium bg-amber-500/20 text-amber-400 rounded-full whitespace-nowrap">
+                              SOLD
+                            </span>
+                          )}
+                          {domain.isVerified && (
+                            <ShieldCheck className="h-4 w-4 text-green-500 shrink-0" />
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-500 truncate">@{domain.user.subdomain}</p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                      {isSold ? (
-                        <span className="text-xs font-medium text-red-400 uppercase tracking-wider">Sold</span>
-                      ) : (
-                        <span className={`font-mono ${isSelected ? 'text-indigo-300' : 'text-gray-400'}`}>
-                          ${domain.price.toLocaleString()}
-                        </span>
-                      )}
+                    <div className={`shrink-0 font-bold transition-colors ${isSold ? 'text-gray-600' : 'text-amber-500'}`}>
+                      ${domain.price.toLocaleString()}
                     </div>
                   </div>
                 );
               })}
 
-              {hasMore && (
+              {/* Show More/Less Button */}
+              {domains.length > 20 && (
                 <button
-                  onClick={handleLoadMore}
-                  disabled={isLoadingMore}
-                  className="mt-4 py-3 px-4 w-full rounded-xl border border-white/10 bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white transition-all text-sm font-medium flex items-center justify-center gap-2"
+                  onClick={() => setShowAll(!showAll)}
+                  className="mt-4 w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 hover:text-white transition-all flex items-center justify-center gap-2"
                 >
-                  {isLoadingMore ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Loading...
-                    </>
-                  ) : (
-                    'Load More Domains'
-                  )}
+                  {showAll ? 'Show Less' : `Show More (${domains.length - 20} more)`}
                 </button>
               )}
             </>

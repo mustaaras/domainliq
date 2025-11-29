@@ -31,6 +31,7 @@ interface ProfileClientProps {
 export default function ProfileClient({ user, domains, username }: ProfileClientProps) {
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [showContactModal, setShowContactModal] = useState(false);
+    const [showAll, setShowAll] = useState(false);
 
     // Get available contact methods
     const availableMethods = [
@@ -149,65 +150,77 @@ export default function ProfileClient({ user, domains, username }: ProfileClient
                 {/* List */}
                 <div className="flex flex-col gap-2">
                     {domains.length > 0 ? (
-                        domains.map((domain) => (
-                            <div
-                                key={domain.id}
-                                onClick={() => domain.status === 'available' && toggleSelection(domain.id)}
-                                className={`
-                                    group flex items-center justify-between p-4 rounded-xl border transition-all duration-200
-                                    ${domain.status === 'sold'
-                                        ? 'bg-transparent border-transparent opacity-40 cursor-not-allowed'
-                                        : selectedIds.includes(domain.id)
-                                            ? 'bg-amber-500/10 border-amber-500/30'
-                                            : 'bg-white/5 border-transparent hover:bg-white/10 cursor-pointer'
-                                    }
-                                `}
-                            >
-                                <div className="flex items-center gap-4">
-                                    <div className={`
-                                        w-5 h-5 rounded-full border flex items-center justify-center transition-all duration-200 flex-shrink-0
+                        <>
+                            {(showAll ? domains : domains.slice(0, 20)).map((domain) => (
+                                <div
+                                    key={domain.id}
+                                    onClick={() => domain.status === 'available' && toggleSelection(domain.id)}
+                                    className={`
+                                        group flex items-center justify-between p-4 rounded-xl border transition-all duration-200
                                         ${domain.status === 'sold'
-                                            ? 'border-gray-700 bg-gray-800'
+                                            ? 'bg-transparent border-transparent opacity-40 cursor-not-allowed'
                                             : selectedIds.includes(domain.id)
-                                                ? 'border-amber-500 bg-amber-500'
-                                                : 'border-gray-600 group-hover:border-gray-500'
+                                                ? 'bg-amber-500/10 border-amber-500/30'
+                                                : 'bg-white/5 border-transparent hover:bg-white/10 cursor-pointer'
                                         }
-                                    `}>
-                                        {domain.status === 'sold' ? (
-                                            <div className="w-2 h-2 rounded-full bg-gray-600" />
-                                        ) : selectedIds.includes(domain.id) ? (
-                                            <Check className="h-3 w-3 text-white" />
-                                        ) : null}
-                                    </div>
+                                    `}
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className={`
+                                            w-5 h-5 rounded-full border flex items-center justify-center transition-all duration-200 flex-shrink-0
+                                            ${domain.status === 'sold'
+                                                ? 'border-gray-700 bg-gray-800'
+                                                : selectedIds.includes(domain.id)
+                                                    ? 'border-amber-500 bg-amber-500'
+                                                    : 'border-gray-600 group-hover:border-gray-500'
+                                            }
+                                        `}>
+                                            {domain.status === 'sold' ? (
+                                                <div className="w-2 h-2 rounded-full bg-gray-600" />
+                                            ) : selectedIds.includes(domain.id) ? (
+                                                <Check className="h-3 w-3 text-white" />
+                                            ) : null}
+                                        </div>
 
-                                    <div className="flex flex-col">
-                                        <div className="flex items-center gap-2">
-                                            <span className={`text-lg font-medium ${domain.status === 'sold' ? 'line-through text-gray-500' : 'text-gray-200'}`}>
-                                                {domain.name}
-                                            </span>
-                                            {domain.isVerified && (
-                                                <div className="group relative">
-                                                    <ShieldCheck className="h-4 w-4 text-green-400" />
-                                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                                                        Ownership Verified
+                                        <div className="flex flex-col">
+                                            <div className="flex items-center gap-2">
+                                                <span className={`text-lg font-medium ${domain.status === 'sold' ? 'line-through text-gray-500' : 'text-gray-200'}`}>
+                                                    {domain.name}
+                                                </span>
+                                                {domain.isVerified && (
+                                                    <div className="group relative">
+                                                        <ShieldCheck className="h-4 w-4 text-green-400" />
+                                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                                                            Ownership Verified
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            )}
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div className="flex items-center gap-4">
-                                    {domain.status === 'sold' ? (
-                                        <span className="text-xs font-medium text-red-400 uppercase tracking-wider">Sold</span>
-                                    ) : (
-                                        <span className="font-mono text-gray-400">
-                                            ${domain.price.toLocaleString()}
-                                        </span>
-                                    )}
+                                    <div className="flex items-center gap-4">
+                                        {domain.status === 'sold' ? (
+                                            <span className="text-xs font-medium text-red-400 uppercase tracking-wider">Sold</span>
+                                        ) : (
+                                            <span className="font-mono text-gray-400">
+                                                ${domain.price.toLocaleString()}
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        ))
+                            ))}
+
+                            {/* Show More/Less Button */}
+                            {domains.length > 20 && (
+                                <button
+                                    onClick={() => setShowAll(!showAll)}
+                                    className="mt-4 w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 hover:text-white transition-all flex items-center justify-center gap-2"
+                                >
+                                    {showAll ? 'Show Less' : `Show More (${domains.length - 20} more)`}
+                                </button>
+                            )}
+                        </>
                     ) : (
                         <div className="text-center py-12 text-gray-600">
                             No domains listed yet.
