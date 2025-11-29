@@ -12,6 +12,7 @@ interface PageProps {
 
 export default async function UserProfilePage({ params }: PageProps) {
     const { subdomain } = await params;
+    console.log('🔍 Page - Rendering subdomain page for:', subdomain);
 
     const user = await db.user.findUnique({
         where: { subdomain },
@@ -22,7 +23,10 @@ export default async function UserProfilePage({ params }: PageProps) {
         },
     });
 
+    console.log('🔍 Page - User found:', user ? 'Yes' : 'No', user?.email);
+
     if (!user) {
+        console.log('🔍 Page - User not found, returning 404');
         notFound();
     }
 
