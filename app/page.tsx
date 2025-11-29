@@ -179,7 +179,7 @@ export default function Home() {
               <div className="flex items-center gap-3">
                 <img src="/logo.svg" alt="DomainLiq" className="h-12 w-auto" />
               </div>
-              <p className="text-gray-500 mt-1">Domain Liquidation Marketplace</p>
+              <p className="text-gray-500 mt-1">Domain Liquidation Listing Platform</p>
             </div>
 
             <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">

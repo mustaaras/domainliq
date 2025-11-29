@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DomainLiq - Domain Liquidation Marketplace",
+  title: "DomainLiq - Domain Liquidation Listing Platform",
   description: "Sell and buy domains quickly. The easiest way to liquidate your domain portfolio.",
   icons: {
     icon: "/favicon.svg",

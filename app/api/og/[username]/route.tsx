@@ -48,7 +48,7 @@ export async function GET(
                             </div>
                         </div>
                         <div style={{ color: '#9CA3AF', fontSize: 28 }}>
-                            Domain Liquidation Marketplace
+                            Domain Liquidation Listing Platform
                         </div>
                     </div>
 

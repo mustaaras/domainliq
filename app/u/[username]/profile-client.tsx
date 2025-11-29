@@ -141,7 +141,7 @@ export default function ProfileClient({ user, domains, username }: ProfileClient
                             <h1 className="text-3xl font-bold tracking-tight text-white">
                                 {user.name || username}'s Domains
                             </h1>
-                            <p className="text-gray-500 mt-1">Domain Liquidation Marketplace</p>
+                            <p className="text-gray-500 mt-1">Domain Liquidation Listing Platform</p>
                         </div>
                     </div>
                 </header>
