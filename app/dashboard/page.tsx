@@ -31,6 +31,9 @@ export default function DashboardPage() {
     const [bulkText, setBulkText] = useState('');
     const [bulkError, setBulkError] = useState('');
 
+    // User subdomain for profile link
+    const [userSubdomain, setUserSubdomain] = useState('');
+
     useEffect(() => {
         if (status === 'unauthenticated') {
             router.push('/login');
@@ -39,8 +42,20 @@ export default function DashboardPage() {
 
         if (status === 'authenticated') {
             fetchUserDomains();
+            fetchUserSubdomain();
         }
     }, [status, router]);
+
+    const fetchUserSubdomain = async () => {
+        try {
+            const res = await fetch('/api/user/settings');
+            if (!res.ok) throw new Error('Failed to fetch user data');
+            const data = await res.json();
+            setUserSubdomain(data.subdomain || '');
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     const fetchUserDomains = async () => {
         try {
@@ -211,7 +226,7 @@ export default function DashboardPage() {
                             Home
                         </Link>
                         <Link
-                            href={`/${session?.user?.email?.split('@')[0] || ''}`}
+                            href={`/${userSubdomain || 'profile'}`}
                             className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-2"
                         >
                             <ExternalLink className="h-4 w-4" />
@@ -362,8 +377,8 @@ export default function DashboardPage() {
                                                 <button
                                                     onClick={() => handleToggleSold(domain.id, domain.status)}
                                                     className={`p-2 rounded-lg transition-all ${domain.status === 'sold'
-                                                            ? 'text-green-400 hover:text-green-300 hover:bg-green-500/10'
-                                                            : 'text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/10'
+                                                        ? 'text-green-400 hover:text-green-300 hover:bg-green-500/10'
+                                                        : 'text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/10'
                                                         }`}
                                                     title={domain.status === 'sold' ? 'Mark as Available' : 'Mark as Sold'}
                                                 >

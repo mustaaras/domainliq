@@ -14,6 +14,14 @@ export default function SettingsPage() {
     const [isSaving, setIsSaving] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
 
+    const [passwordData, setPasswordData] = useState({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+    });
+    const [passwordMessage, setPasswordMessage] = useState({ type: '', text: '' });
+    const [isChangingPassword, setIsChangingPassword] = useState(false);
+
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -81,6 +89,46 @@ export default function SettingsPage() {
             setMessage({ type: 'error', text: 'Failed to update profile' });
         } finally {
             setIsSaving(false);
+        }
+    };
+
+    const handlePasswordChange = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setPasswordMessage({ type: '', text: '' });
+
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            setPasswordMessage({ type: 'error', text: 'New passwords do not match' });
+            return;
+        }
+
+        if (passwordData.newPassword.length < 6) {
+            setPasswordMessage({ type: 'error', text: 'Password must be at least 6 characters' });
+            return;
+        }
+
+        setIsChangingPassword(true);
+
+        try {
+            const res = await fetch('/api/user/password', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    currentPassword: passwordData.currentPassword,
+                    newPassword: passwordData.newPassword
+                })
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.error || 'Failed to change password');
+            }
+
+            setPasswordMessage({ type: 'success', text: 'Password changed successfully' });
+            setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+        } catch (error: any) {
+            setPasswordMessage({ type: 'error', text: error.message });
+        } finally {
+            setIsChangingPassword(false);
         }
     };
 
@@ -266,6 +314,64 @@ export default function SettingsPage() {
                         </button>
                     </div>
                 </form>
+
+                {/* Password Change Section */}
+                <div className="mt-8 bg-white/5 border border-white/10 rounded-xl p-6">
+                    <h2 className="text-xl font-semibold mb-6">Change Password</h2>
+                    <form onSubmit={handlePasswordChange} className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-1">Current Password</label>
+                            <input
+                                type="password"
+                                value={passwordData.currentPassword}
+                                onChange={e => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                                className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-1">New Password</label>
+                            <input
+                                type="password"
+                                value={passwordData.newPassword}
+                                onChange={e => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                                className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                required
+                                minLength={6}
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-1">Confirm New Password</label>
+                            <input
+                                type="password"
+                                value={passwordData.confirmPassword}
+                                onChange={e => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                                className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                required
+                                minLength={6}
+                            />
+                        </div>
+
+                        {passwordMessage.text && (
+                            <div className={`p-4 rounded-lg text-sm ${passwordMessage.type === 'error' ? 'bg-red-500/10 text-red-400' : 'bg-green-500/10 text-green-400'}`}>
+                                {passwordMessage.text}
+                            </div>
+                        )}
+
+                        <div className="flex justify-end">
+                            <button
+                                type="submit"
+                                disabled={isChangingPassword}
+                                className="flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-medium transition-all disabled:opacity-50"
+                            >
+                                {isChangingPassword ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
+                                Change Password
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     );

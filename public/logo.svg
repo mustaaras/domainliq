@@ -1,0 +1,19 @@
+<svg width="300" height="80" viewBox="0 0 300 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fusionGradText" x1="0" y1="0" x2="0" y2="80" gradientUnits="userSpaceOnUse">
+      <stop offset="0.4" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#FFD700"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Icon Part -->
+  <g transform="translate(15, 10) scale(0.6)">
+     <!-- Circle -->
+    <circle cx="45" cy="50" r="35" stroke="url(#fusionGradText)" stroke-width="12"/>
+    <!-- Vertical Line -->
+    <path d="M80 0V100" stroke="url(#fusionGradText)" stroke-width="12" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Text Part -->
+  <text x="85" y="52" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="36" fill="white" letter-spacing="-0.5">domain<tspan fill="#FFD700">liq</tspan></text>
+</svg>

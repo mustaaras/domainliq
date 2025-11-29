@@ -55,6 +55,9 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen bg-[#050505] flex items-center justify-center p-4">
             <div className="w-full max-w-md bg-white/5 p-8 rounded-2xl border border-white/10">
+                <div className="flex justify-center mb-6">
+                    <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto" />
+                </div>
                 <h1 className="text-2xl font-bold text-white mb-6 text-center">Login to DomainLiq</h1>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>

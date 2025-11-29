@@ -175,9 +175,9 @@ export default function Home() {
         <header className="mb-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight text-white">
-                DomainLiq
-              </h1>
+              <div className="flex items-center gap-3">
+                <img src="/logo.svg" alt="DomainLiq" className="h-10 w-auto" />
+              </div>
               <p className="text-gray-500 mt-1">Domain Liquidation Marketplace</p>
             </div>
 
