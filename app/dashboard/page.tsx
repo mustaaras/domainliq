@@ -226,7 +226,8 @@ export default function DashboardPage() {
                             Home
                         </Link>
                         <Link
-                            href={`/${userSubdomain || 'profile'}`}
+                            href={`/u/${userSubdomain}`}
+                            target="_blank"
                             className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-2"
                         >
                             <ExternalLink className="h-4 w-4" />

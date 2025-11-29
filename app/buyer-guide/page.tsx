@@ -49,7 +49,7 @@ export default function UserGuidePage() {
                     <p className="font-bold text-green-400 mb-2">Recommended Escrow Services:</p>
                     <ul className="list-disc pl-6 text-gray-300">
                         <li><strong>Escrow.com</strong> - Most trusted for domain transactions</li>
-                        <li><strong>Dan.com</strong> - Popular domain marketplace with built-in escrow</li>
+                        <li><strong>Afternic.com</strong> - Popular domain marketplace with built-in escrow</li>
                         <li><strong>Sedo.com</strong> - Another trusted option</li>
                     </ul>
                 </div>

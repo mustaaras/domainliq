@@ -86,7 +86,7 @@ export async function GET(
                     {/* Footer */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
                         <div style={{ color: '#6B7280', fontSize: 24 }}>
-                            domainliq.com/{username}
+                            domainliq.com/u/{username}
                         </div>
                         <div style={{ color: '#FFD700', fontSize: 24, fontWeight: 600 }}>
                             {user.domains.length} {user.domains.length === 1 ? 'domain' : 'domains'}

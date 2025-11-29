@@ -16,7 +16,7 @@ export default function SellerGuidePage() {
                 <ul className="list-disc pl-6 text-gray-300 mb-4">
                     <li>Click "Sign Up" in the top navigation</li>
                     <li>Provide your name, email, and password</li>
-                    <li>Choose a username (this becomes your store URL: domainliq.com/yourname)</li>
+                    <li>Choose a username (this becomes your store URL: domainliq.com/u/yourname)</li>
                     <li>Accept Terms of Service and Privacy Policy</li>
                     <li>Verify your email address</li>
                 </ul>
@@ -62,7 +62,7 @@ export default function SellerGuidePage() {
 
                 <h2 className="text-2xl font-bold mt-8 mb-4">Step 5: Share Your Store</h2>
                 <ul className="list-disc pl-6 text-gray-300 mb-4">
-                    <li>Your unique URL: domainliq.com/yourname</li>
+                    <li>Your unique URL: domainliq.com/u/yourname</li>
                     <li>Share on social media (X, LinkedIn, Reddit, etc.)</li>
                     <li>When shared, a preview shows your domain list automatically!</li>
                     <li>Add to your email signature</li>
@@ -85,7 +85,7 @@ export default function SellerGuidePage() {
                     </p>
                     <ul className="list-disc pl-6 text-gray-300">
                         <li>Escrow.com (most trusted)</li>
-                        <li>Dan.com</li>
+                        <li>Afternic.com</li>
                         <li>Sedo.com</li>
                     </ul>
                 </div>

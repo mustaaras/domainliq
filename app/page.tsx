@@ -276,7 +276,7 @@ export default function Home() {
                           {domain.name}
                         </span>
                         <Link
-                          href={`/${domain.user.subdomain}`}
+                          href={`/u/${domain.user.subdomain}`}
                           onClick={(e) => e.stopPropagation()}
                           className="text-xs text-gray-500 hover:text-amber-400 transition-colors"
                         >
