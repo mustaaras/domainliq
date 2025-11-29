@@ -16,23 +16,38 @@ export default function LoginPage() {
         e.preventDefault();
         setIsLoading(true);
         setError('');
+        console.log('Attempting login for:', email);
 
         try {
-            const result = await signIn('credentials', {
-                email,
-                password,
-                redirect: false,
-            });
+            // Create a timeout promise
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Request timed out')), 15000)
+            );
+
+            // Race between signIn and timeout
+            const result = await Promise.race([
+                signIn('credentials', {
+                    email,
+                    password,
+                    redirect: false,
+                }),
+                timeoutPromise
+            ]) as any;
+
+            console.log('Login result:', result);
 
             if (result?.error) {
+                console.error('Login error:', result.error);
                 setError('Invalid email or password');
                 setIsLoading(false);
             } else {
+                console.log('Login successful, redirecting...');
                 router.push('/dashboard');
                 router.refresh();
             }
-        } catch (error) {
-            setError('An error occurred during login');
+        } catch (error: any) {
+            console.error('Login exception:', error);
+            setError(error.message || 'An error occurred during login. Please try again.');
             setIsLoading(false);
         }
     };
