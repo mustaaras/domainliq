@@ -7,7 +7,8 @@ import { useSession } from 'next-auth/react';
 
 export default function SettingsPage() {
     const router = useRouter();
-    const { data: session, status } = useSession();
+    const sessionData = useSession();
+    const { data: session, status } = sessionData || {};
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
