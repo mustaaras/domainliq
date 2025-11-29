@@ -37,6 +37,7 @@ export default function Home() {
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [showAll, setShowAll] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
 
   const fetchDomains = async (pageNum: number, isLoadMore = false) => {
     try {
@@ -111,21 +112,45 @@ export default function Home() {
     window.open(url, '_blank');
   };
 
-  const handleContact = async () => {
+  const handleContact = () => {
     const selected = domains.filter(d => selectedIds.includes(d.id));
     if (selected.length === 0) return;
 
     const seller = selected[0].user;
+
+    // Get available contact methods
+    const availableMethods = [
+      seller.contactEmail && { type: 'email', label: 'Email', icon: '📧' },
+      seller.twitterHandle && { type: 'twitter', label: 'Twitter/X', icon: '𝕏' },
+      seller.whatsappNumber && { type: 'whatsapp', label: 'WhatsApp', icon: '💬' },
+      seller.linkedinProfile && { type: 'linkedin', label: 'LinkedIn', icon: '💼' },
+      seller.telegramUsername && { type: 'telegram', label: 'Telegram', icon: '✈️' },
+    ].filter(Boolean);
+
+    // If multiple contact methods available, show modal to choose
+    if (availableMethods.length > 1) {
+      setShowContactModal(true);
+    } else if (availableMethods.length === 1) {
+      // Directly contact using the only available method
+      contactViaMethod(availableMethods[0].type);
+    } else {
+      alert("Seller hasn't provided any contact information yet.");
+    }
+  };
+
+  const contactViaMethod = async (method: string) => {
+    const selected = domains.filter(d => selectedIds.includes(d.id));
+    const seller = selected[0].user;
     const domainNames = selected.map(d => d.name).join(', ');
     const message = `Hi, I'm interested in these domains: ${domainNames}`;
 
-    switch (seller.preferredContact) {
+    setShowContactModal(false);
+
+    switch (method) {
       case 'twitter':
         if (seller.twitterHandle) {
           await navigator.clipboard.writeText(message);
-          window.open(`https://x.com/messages/compose?recipient=${seller.twitterHandle}`, '_blank');
-        } else {
-          alert("Seller hasn't provided their X handle yet.");
+          window.open(`https://twitter.com/messages/compose?recipient_id=${seller.twitterHandle}`, '_blank');
         }
         break;
 
@@ -133,8 +158,6 @@ export default function Home() {
         if (seller.whatsappNumber) {
           const encodedMessage = encodeURIComponent(message);
           window.open(`https://wa.me/${seller.whatsappNumber.replace(/[^0-9]/g, '')}?text=${encodedMessage}`, '_blank');
-        } else {
-          alert("Seller hasn't provided their WhatsApp number yet.");
         }
         break;
 
@@ -142,8 +165,6 @@ export default function Home() {
         if (seller.linkedinProfile) {
           await navigator.clipboard.writeText(message);
           window.open(seller.linkedinProfile, '_blank');
-        } else {
-          alert("Seller hasn't provided their LinkedIn profile yet.");
         }
         break;
 
@@ -151,20 +172,16 @@ export default function Home() {
         if (seller.telegramUsername) {
           const encodedMessage = encodeURIComponent(message);
           window.open(`https://t.me/${seller.telegramUsername}?text=${encodedMessage}`, '_blank');
-        } else {
-          alert("Seller hasn't provided their Telegram username yet.");
         }
         break;
 
       case 'email':
       default:
-        const email = seller.contactEmail || seller.email; // Fallback to login email
+        const email = seller.contactEmail || seller.email;
         if (email) {
           const subject = `Inquiry about ${domainNames}`;
           const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
           window.open(mailtoLink, '_blank');
-        } else {
-          alert("Seller contact email not found.");
         }
         break;
     }
@@ -226,6 +243,47 @@ export default function Home() {
               </div>
             </div>
           </div>
+
+          {/* Contact Method Selection Modal */}
+          {showContactModal && selectedIds.length > 0 && (() => {
+            const selected = domains.filter(d => selectedIds.includes(d.id));
+            const seller = selected[0]?.user;
+            if (!seller) return null;
+
+            const availableMethods = [
+              seller.contactEmail && { type: 'email', label: 'Email', icon: '📧' },
+              seller.twitterHandle && { type: 'twitter', label: 'Twitter/X', icon: '𝕏' },
+              seller.whatsappNumber && { type: 'whatsapp', label: 'WhatsApp', icon: '💬' },
+              seller.linkedinProfile && { type: 'linkedin', label: 'LinkedIn', icon: '💼' },
+              seller.telegramUsername && { type: 'telegram', label: 'Telegram', icon: '✈️' },
+            ].filter(Boolean) as Array<{ type: string; label: string; icon: string }>;
+
+            return (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowContactModal(false)}>
+                <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
+                  <h3 className="text-xl font-bold text-white mb-4">Choose Contact Method</h3>
+                  <div className="space-y-2">
+                    {availableMethods.map((method) => (
+                      <button
+                        key={method.type}
+                        onClick={() => contactViaMethod(method.type)}
+                        className="w-full flex items-center gap-3 p-4 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-500/50 transition-all text-left"
+                      >
+                        <span className="text-2xl">{method.icon}</span>
+                        <span className="text-white font-medium">{method.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => setShowContactModal(false)}
+                    className="mt-4 w-full py-2 text-gray-400 hover:text-white transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            );
+          })()}
         </header>
 
         {/* Section Title */}
