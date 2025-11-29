@@ -63,7 +63,7 @@ export default function Footer() {
 
                 <div className="mt-8 pt-8 border-t border-white/10 text-center text-gray-500 text-sm">
                     <p>© {new Date().getFullYear()} DomainLiq. All rights reserved.</p>
-                    <p className="mt-2">A free, open marketplace for domain liquidation.</p>
+                    <p className="mt-2">A free, open platform for domain liquidation listing.</p>
                 </div>
             </div>
         </footer>

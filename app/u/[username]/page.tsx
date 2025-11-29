@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         title: `${user.name || username}'s Domains - DomainLiq`,
         description,
         openGraph: {
-            title: `${user.name || username}'s Domain Marketplace`,
+            title: `${user.name || username}'s Domain Listing`,
             description,
             images: [
                 {
@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         },
         twitter: {
             card: 'summary_large_image',
-            title: `${user.name || username}'s Domain Marketplace`,
+            title: `${user.name || username}'s Domain Listing`,
             description,
             images: [`/api/og/${username}`],
         },
