@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Share2, MessageCircle, Check, Search, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -26,6 +27,7 @@ interface Domain {
 }
 
 export default function Home() {
+  const { data: session } = useSession();
   const [domains, setDomains] = useState<Domain[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -194,22 +196,29 @@ export default function Home() {
               </div>
 
               <div className="flex gap-3 shrink-0">
-                <Link
-                  href="/dashboard"
-                  className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors"
-                >
-                  Dashboard
-                </Link>
-                {/* We can rely on middleware or client-side checks, but for now let's keep it simple. 
-                    Ideally we'd check session here, but this is a server component (mostly). 
-                    Let's just add Dashboard link which redirects to login if not auth. 
-                    Actually, let's make it smarter. */}
-                <Link
-                  href="/login"
-                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors"
-                >
-                  Sign In / Dashboard
-                </Link>
+                {session ? (
+                  <Link
+                    href="/dashboard"
+                    className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors"
+                  >
+                    Dashboard
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors"
+                    >
+                      Sign In
+                    </Link>
+                    <Link
+                      href="/signup"
+                      className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors"
+                    >
+                      Sign Up
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>

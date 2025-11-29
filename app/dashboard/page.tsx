@@ -27,6 +27,10 @@ export default function DashboardPage() {
     const [newDomain, setNewDomain] = useState({ name: '', price: '' });
     const [addError, setAddError] = useState('');
 
+    // Bulk upload state
+    const [bulkText, setBulkText] = useState('');
+    const [bulkError, setBulkError] = useState('');
+
     useEffect(() => {
         if (status === 'unauthenticated') {
             router.push('/login');
@@ -76,6 +80,62 @@ export default function DashboardPage() {
             setNewDomain({ name: '', price: '' }); // Reset form
         } catch (error: any) {
             setAddError(error.message);
+        } finally {
+            setIsAdding(false);
+        }
+    };
+
+    const handleBulkUpload = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setBulkError('');
+        setIsAdding(true);
+
+        try {
+            const lines = bulkText.trim().split('\n').filter(line => line.trim());
+            if (lines.length === 0) {
+                throw new Error('Please enter at least one domain');
+            }
+            if (lines.length > 50) {
+                throw new Error('Maximum 50 domains per bulk upload');
+            }
+
+            const domainsToAdd = [];
+            for (let i = 0; i < lines.length; i++) {
+                const parts = lines[i].trim().split(/\s+/);
+                if (parts.length !== 2) {
+                    throw new Error(`Line ${i + 1}: Invalid format. Use "domain.com price"`);
+                }
+                const [name, priceStr] = parts;
+                const price = parseFloat(priceStr);
+                if (isNaN(price) || price <= 0) {
+                    throw new Error(`Line ${i + 1}: Invalid price "${priceStr}"`);
+                }
+                domainsToAdd.push({ name, price });
+            }
+
+            // Add all domains
+            const results = [];
+            for (const domain of domainsToAdd) {
+                const res = await fetch('/api/user/domains', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(domain)
+                });
+
+                if (!res.ok) {
+                    const data = await res.json();
+                    throw new Error(data.error || `Failed to add ${domain.name}`);
+                }
+
+                const addedDomain = await res.json();
+                results.push(addedDomain);
+            }
+
+            setDomains([...results, ...domains]);
+            setBulkText('');
+            setAddError('');
+        } catch (error: any) {
+            setBulkError(error.message);
         } finally {
             setIsAdding(false);
         }
@@ -191,6 +251,48 @@ export default function DashboardPage() {
                                 >
                                     {isAdding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
                                     Add Domain
+                                </button>
+                            </form>
+
+                            {/* Divider */}
+                            <div className="relative my-6">
+                                <div className="absolute inset-0 flex items-center">
+                                    <div className="w-full border-t border-white/10"></div>
+                                </div>
+                                <div className="relative flex justify-center text-xs uppercase">
+                                    <span className="bg-white/5 px-2 text-gray-500">Or Bulk Upload</span>
+                                </div>
+                            </div>
+
+                            {/* Bulk Upload Form */}
+                            <form onSubmit={handleBulkUpload} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                                        Bulk Upload (max 50 domains)
+                                    </label>
+                                    <textarea
+                                        value={bulkText}
+                                        onChange={e => setBulkText(e.target.value)}
+                                        placeholder={"example.com 1000\ntest.com 500\ndomain.com 2500"}
+                                        className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono text-sm min-h-[120px]"
+                                        disabled={isAdding}
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">Format: domain.com price (one per line)</p>
+                                </div>
+
+                                {bulkError && (
+                                    <div className="text-red-400 text-sm bg-red-500/10 p-3 rounded-lg border border-red-500/20">
+                                        {bulkError}
+                                    </div>
+                                )}
+
+                                <button
+                                    type="submit"
+                                    disabled={isAdding || !bulkText.trim()}
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition-all disabled:opacity-50"
+                                >
+                                    {isAdding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                                    Upload Domains
                                 </button>
                             </form>
                         </div>
