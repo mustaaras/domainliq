@@ -247,11 +247,33 @@ export default function DashboardPage() {
         setTimeout(() => setCopiedToken(false), 2000);
     };
 
-    const openVerifyModal = (domain: Domain) => {
+    const openVerifyModal = async (domain: Domain) => {
         setSelectedDomain(domain);
         setVerificationStatus('idle');
         setVerificationMessage('');
         setShowVerifyModal(true);
+
+        // If token is missing, generate it
+        if (!domain.verificationToken) {
+            try {
+                const res = await fetch(`/api/user/domains/${domain.id}/verify-token`, {
+                    method: 'POST'
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.token) {
+                        // Update local state
+                        setDomains(prev => prev.map(d =>
+                            d.id === domain.id ? { ...d, verificationToken: data.token } : d
+                        ));
+                        // Update selected domain in modal
+                        setSelectedDomain(prev => prev ? { ...prev, verificationToken: data.token } : null);
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to generate token:', error);
+            }
+        }
     };
 
     if (status === 'loading' || isLoading) {
