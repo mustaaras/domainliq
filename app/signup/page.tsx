@@ -52,7 +52,9 @@ export default function SignupPage() {
             <div className="w-full max-w-md space-y-8">
                 <div className="text-center">
                     <div className="flex justify-center mb-6">
-                        <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto" />
+                        <Link href="/">
+                            <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto cursor-pointer" />
+                        </Link>
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight text-white">Create an account</h1>
                     <p className="mt-2 text-gray-400">Start selling your domains today</p>

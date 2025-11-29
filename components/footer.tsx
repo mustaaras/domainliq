@@ -10,8 +10,8 @@ export default function Footer() {
                     {/* About */}
                     <div>
                         <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto mb-4" />
-                        <p className="text-gray-400 text-sm">
-                            Free and open domain marketplace. Connect sellers with buyers directly.
+                        <p className="text-sm text-gray-400">
+                            Free and open domain liquidation listing platform. Connect sellers with buyers directly.
                         </p>
                     </div>
 

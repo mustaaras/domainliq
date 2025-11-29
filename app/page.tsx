@@ -177,7 +177,9 @@ export default function Home() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8">
             <div>
               <div className="flex items-center gap-3">
-                <img src="/logo.svg" alt="DomainLiq" className="h-12 w-auto" />
+                <Link href="/">
+                  <img src="/logo.svg" alt="DomainLiq" className="h-12 w-auto cursor-pointer" />
+                </Link>
               </div>
               <p className="text-gray-500 mt-1">Domain Liquidation Listing Platform</p>
             </div>
