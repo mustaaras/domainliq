@@ -29,9 +29,35 @@ export async function verifyDomain(domainId: string) {
         }
 
         try {
-            // 2. Query DNS
-            const records = await resolveTxt(domain.name);
-            const flatRecords = records.flat();
+            // 2. Query DNS using Cloudflare DNS-over-HTTPS for faster propagation check
+            // Fallback to system DNS if DoH fails
+            let txtRecords: string[][] = [];
+
+            try {
+                const dohResponse = await fetch(`https://cloudflare-dns.com/dns-query?name=${domain.name}&type=TXT`, {
+                    headers: { 'Accept': 'application/dns-json' },
+                    cache: 'no-store'
+                });
+
+                if (dohResponse.ok) {
+                    const data = await dohResponse.json();
+                    if (data.Answer) {
+                        txtRecords = data.Answer
+                            .filter((record: any) => record.type === 16) // 16 is TXT
+                            .map((record: any) => [record.data.replace(/^"|"$/g, '')]); // Remove quotes
+                    }
+                }
+            } catch (dohError) {
+                console.error('DoH lookup failed, falling back to system DNS:', dohError);
+            }
+
+            // If DoH didn't find it, try system DNS
+            if (txtRecords.length === 0) {
+                const records = await resolveTxt(domain.name);
+                txtRecords = records;
+            }
+
+            const flatRecords = txtRecords.flat();
 
             // 3. Check for token match
             const isMatch = flatRecords.some((r) => r.includes(domain.verificationToken!));
