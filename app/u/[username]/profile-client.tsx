@@ -137,7 +137,7 @@ export default function ProfileClient({ user, domains, username }: ProfileClient
                 {/* Header */}
                 <header className="mb-8">
                     <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-8">
-                        <div>
+                        <div className="text-center md:text-left w-full md:w-auto">
                             <h1 className="text-3xl font-bold tracking-tight text-white">
                                 {user.name || username}'s Domains
                             </h1>

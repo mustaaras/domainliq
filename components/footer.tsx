@@ -9,7 +9,9 @@ export default function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                     {/* About */}
                     <div>
-                        <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto mb-4" />
+                        <Link href="/">
+                            <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto mb-4 cursor-pointer" />
+                        </Link>
                         <p className="text-sm text-gray-400">
                             Free and open domain liquidation listing platform. Connect sellers with buyers directly.
                         </p>
