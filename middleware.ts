@@ -5,14 +5,19 @@ export function middleware(req: NextRequest) {
     const url = req.nextUrl;
     const hostname = req.headers.get('host') || '';
 
-    // Get the subdomain
-    const subdomain = hostname.split('.')[0];
+    // Check if this is a subdomain of domainliq.com
+    const parts = hostname.split('.');
 
-    // If it's a subdomain (not www or the main domain)
-    if (subdomain && subdomain !== 'www' && subdomain !== 'domainliq' && !hostname.includes('localhost')) {
-        // Rewrite to the subdomain page
-        url.pathname = `/p/${subdomain}`;
-        return NextResponse.rewrite(url);
+    // If hostname has more than 2 parts and ends with domainliq.com, it's a subdomain
+    if (parts.length >= 3 && hostname.includes('domainliq.com')) {
+        const subdomain = parts[0];
+
+        // Exclude www
+        if (subdomain !== 'www') {
+            // Rewrite to the subdomain page
+            url.pathname = `/p/${subdomain}`;
+            return NextResponse.rewrite(url);
+        }
     }
 
     return NextResponse.next();
