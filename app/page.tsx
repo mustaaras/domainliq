@@ -15,6 +15,12 @@ interface Domain {
   user: {
     name: string | null;
     subdomain: string;
+    email: string | null; // Added for fallback
+    contactEmail: string | null;
+    twitterHandle: string | null;
+    whatsappNumber: string | null;
+    linkedinProfile: string | null;
+    preferredContact: string;
   };
 }
 
@@ -100,11 +106,54 @@ export default function Home() {
     window.open(url, '_blank');
   };
 
-  const handleDM = async () => {
+  const handleContact = async () => {
     const selected = domains.filter(d => selectedIds.includes(d.id));
-    const text = `Hi, I'm interested in these domains: ${selected.map(d => d.name).join(', ')}`;
-    await navigator.clipboard.writeText(text);
-    window.open('https://x.com/messages/compose?recipient=mustaaras', '_blank');
+    if (selected.length === 0) return;
+
+    const seller = selected[0].user;
+    const domainNames = selected.map(d => d.name).join(', ');
+    const message = `Hi, I'm interested in these domains: ${domainNames}`;
+
+    switch (seller.preferredContact) {
+      case 'twitter':
+        if (seller.twitterHandle) {
+          await navigator.clipboard.writeText(message);
+          window.open(`https://x.com/messages/compose?recipient=${seller.twitterHandle}`, '_blank');
+        } else {
+          alert("Seller hasn't provided their X handle yet.");
+        }
+        break;
+
+      case 'whatsapp':
+        if (seller.whatsappNumber) {
+          const encodedMessage = encodeURIComponent(message);
+          window.open(`https://wa.me/${seller.whatsappNumber.replace(/[^0-9]/g, '')}?text=${encodedMessage}`, '_blank');
+        } else {
+          alert("Seller hasn't provided their WhatsApp number yet.");
+        }
+        break;
+
+      case 'linkedin':
+        if (seller.linkedinProfile) {
+          await navigator.clipboard.writeText(message);
+          window.open(seller.linkedinProfile, '_blank');
+        } else {
+          alert("Seller hasn't provided their LinkedIn profile yet.");
+        }
+        break;
+
+      case 'email':
+      default:
+        const email = seller.contactEmail || seller.email; // Fallback to login email
+        if (email) {
+          const subject = `Inquiry about ${domainNames}`;
+          const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+          window.open(mailtoLink, '_blank');
+        } else {
+          alert("Seller contact email not found.");
+        }
+        break;
+    }
   };
 
   return (
@@ -265,7 +314,7 @@ export default function Home() {
             </button>
 
             <button
-              onClick={handleDM}
+              onClick={handleContact}
               className="flex items-center gap-2 px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium transition-colors"
             >
               <MessageCircle className="h-5 w-5" />

@@ -19,6 +19,13 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   domains       Domain[]
+
+  // Contact Info
+  contactEmail    String?
+  twitterHandle   String?
+  whatsappNumber  String?
+  linkedinProfile String?
+  preferredContact String @default("email") // email, twitter, whatsapp, linkedin
 }
 
 model Domain {

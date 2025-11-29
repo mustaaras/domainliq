@@ -30,6 +30,11 @@ export async function GET(request: NextRequest) {
             select: {
               name: true,
               subdomain: true,
+              contactEmail: true,
+              twitterHandle: true,
+              whatsappNumber: true,
+              linkedinProfile: true,
+              preferredContact: true,
             },
           },
         },
