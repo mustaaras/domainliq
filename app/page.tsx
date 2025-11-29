@@ -185,16 +185,20 @@ export default function Home() {
 
               <div className="flex gap-3 shrink-0">
                 <Link
-                  href="/login"
+                  href="/dashboard"
                   className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors"
                 >
-                  Sign In
+                  Dashboard
                 </Link>
+                {/* We can rely on middleware or client-side checks, but for now let's keep it simple. 
+                    Ideally we'd check session here, but this is a server component (mostly). 
+                    Let's just add Dashboard link which redirects to login if not auth. 
+                    Actually, let's make it smarter. */}
                 <Link
-                  href="/signup"
+                  href="/login"
                   className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors"
                 >
-                  Sign Up
+                  Sign In / Dashboard
                 </Link>
               </div>
             </div>
