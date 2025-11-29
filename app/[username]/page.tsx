@@ -38,7 +38,7 @@ export default async function UserProfilePage({ params }: PageProps) {
                             <h1 className="text-3xl font-bold tracking-tight text-white">
                                 {user.name || username}'s Domains
                             </h1>
-                            <p className="text-gray-500 mt-1">Premium Domains for Sale</p>
+                            <p className="text-gray-500 mt-1">Domain Liquidation Marketplace</p>
                         </div>
                     </div>
                 </header>

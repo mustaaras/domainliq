@@ -26,7 +26,8 @@ model User {
   twitterHandle   String?
   whatsappNumber  String?
   linkedinProfile String?
-  preferredContact String @default("email") // email, twitter, whatsapp, linkedin
+  telegramUsername String?
+  preferredContact String @default("email") // email, twitter, whatsapp, linkedin, telegram
 }
 
 model Domain {

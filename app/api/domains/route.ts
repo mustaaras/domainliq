@@ -34,6 +34,7 @@ export async function GET(request: NextRequest) {
               twitterHandle: true,
               whatsappNumber: true,
               linkedinProfile: true,
+              telegramUsername: true,
               preferredContact: true,
             },
           },

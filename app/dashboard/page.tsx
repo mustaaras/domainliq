@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Loader2, Plus, Trash2, Settings, ExternalLink, DollarSign } from 'lucide-react';
-import { useSession } from 'next-auth/react';
+import { Loader2, Plus, Trash2, Settings, ExternalLink, DollarSign, LogOut } from 'lucide-react';
+import { useSession, signOut } from 'next-auth/react';
 
 interface Domain {
     id: string;
@@ -130,6 +130,13 @@ export default function DashboardPage() {
                             <Settings className="h-4 w-4" />
                             Settings
                         </Link>
+                        <button
+                            onClick={() => signOut({ callbackUrl: '/' })}
+                            className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white bg-red-600/10 hover:bg-red-600/20 border border-red-600/20 rounded-lg transition-colors flex items-center gap-2"
+                        >
+                            <LogOut className="h-4 w-4" />
+                            Logout
+                        </button>
                     </div>
                 </header>
 

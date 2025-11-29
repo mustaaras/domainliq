@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2, Save, User, Mail, Twitter, Phone, Linkedin } from 'lucide-react';
+import Link from 'next/link';
+import { Loader2, Save, User, Mail, Twitter, Phone, Linkedin, ArrowLeft, Send } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
 export default function SettingsPage() {
@@ -21,6 +22,7 @@ export default function SettingsPage() {
         twitterHandle: '',
         whatsappNumber: '',
         linkedinProfile: '',
+        telegramUsername: '',
         preferredContact: 'email'
     });
 
@@ -48,6 +50,7 @@ export default function SettingsPage() {
                 twitterHandle: data.twitterHandle || '',
                 whatsappNumber: data.whatsappNumber || '',
                 linkedinProfile: data.linkedinProfile || '',
+                telegramUsername: data.telegramUsername || '',
                 preferredContact: data.preferredContact || 'email'
             });
         } catch (error) {
@@ -93,8 +96,18 @@ export default function SettingsPage() {
         <div className="min-h-screen bg-[#050505] text-white p-4 md:p-8">
             <div className="max-w-2xl mx-auto">
                 <header className="mb-8">
-                    <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-                    <p className="text-gray-400 mt-2">Manage your profile and contact preferences</p>
+                    <div className="flex items-center gap-4 mb-4">
+                        <Link
+                            href="/dashboard"
+                            className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                        >
+                            <ArrowLeft className="h-5 w-5" />
+                        </Link>
+                        <div>
+                            <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+                        </div>
+                    </div>
+                    <p className="text-gray-400 ml-14">Manage your profile and contact preferences</p>
                 </header>
 
                 <form onSubmit={handleSubmit} className="space-y-8">
@@ -193,12 +206,30 @@ export default function SettingsPage() {
                                     className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                                 />
                             </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">
+                                    <span className="flex items-center gap-2">
+                                        <Send className="h-4 w-4" /> Telegram Username
+                                    </span>
+                                </label>
+                                <div className="relative">
+                                    <span className="absolute left-3 top-2.5 text-gray-500">@</span>
+                                    <input
+                                        type="text"
+                                        value={formData.telegramUsername}
+                                        onChange={e => setFormData({ ...formData, telegramUsername: e.target.value.replace('@', '') })}
+                                        placeholder="username"
+                                        className="w-full bg-black/20 border border-white/10 rounded-lg pl-8 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                    />
+                                </div>
+                            </div>
                         </div>
 
                         <div className="pt-4 border-t border-white/10">
                             <label className="block text-sm font-medium text-gray-300 mb-2">Preferred Contact Method</label>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                {['email', 'twitter', 'whatsapp', 'linkedin'].map((method) => (
+                            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                                {['email', 'twitter', 'whatsapp', 'linkedin', 'telegram'].map((method) => (
                                     <button
                                         key={method}
                                         type="button"

@@ -19,6 +19,7 @@ export async function GET() {
                 twitterHandle: true,
                 whatsappNumber: true,
                 linkedinProfile: true,
+                telegramUsername: true,
                 preferredContact: true,
             },
         });
@@ -50,6 +51,7 @@ export async function PUT(req: NextRequest) {
             twitterHandle,
             whatsappNumber,
             linkedinProfile,
+            telegramUsername,
             preferredContact
         } = data;
 
@@ -61,6 +63,7 @@ export async function PUT(req: NextRequest) {
                 twitterHandle,
                 whatsappNumber,
                 linkedinProfile,
+                telegramUsername,
                 preferredContact,
             },
         });

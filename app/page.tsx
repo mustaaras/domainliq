@@ -20,6 +20,7 @@ interface Domain {
     twitterHandle: string | null;
     whatsappNumber: string | null;
     linkedinProfile: string | null;
+    telegramUsername: string | null;
     preferredContact: string;
   };
 }
@@ -102,7 +103,7 @@ export default function Home() {
   };
 
   const handleShare = () => {
-    const url = `https://twitter.com/intent/tweet?text=Check out these premium domains!&url=${encodeURIComponent(window.location.href)}`;
+    const url = `https://twitter.com/intent/tweet?text=Check out these domains for sale!&url=${encodeURIComponent(window.location.href)}`;
     window.open(url, '_blank');
   };
 
@@ -142,6 +143,15 @@ export default function Home() {
         }
         break;
 
+      case 'telegram':
+        if (seller.telegramUsername) {
+          const encodedMessage = encodeURIComponent(message);
+          window.open(`https://t.me/${seller.telegramUsername}?text=${encodedMessage}`, '_blank');
+        } else {
+          alert("Seller hasn't provided their Telegram username yet.");
+        }
+        break;
+
       case 'email':
       default:
         const email = seller.contactEmail || seller.email; // Fallback to login email
@@ -166,7 +176,7 @@ export default function Home() {
               <h1 className="text-3xl font-bold tracking-tight text-white">
                 DomainLiq
               </h1>
-              <p className="text-gray-500 mt-1">Premium Domains for Sale</p>
+              <p className="text-gray-500 mt-1">Domain Liquidation Marketplace</p>
             </div>
 
             <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
