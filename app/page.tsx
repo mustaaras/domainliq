@@ -24,6 +24,7 @@ interface Domain {
     telegramUsername: string | null;
     preferredContact: string;
   };
+  isVerified?: boolean;
 }
 
 export default function Home() {
