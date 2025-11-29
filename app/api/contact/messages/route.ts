@@ -7,7 +7,7 @@ export async function GET() {
         const session = await auth();
 
         // Check if user is authenticated and is admin
-        if (!session?.user?.email || session.user.email !== 'mustafa.aras@hotmail.com.tr') {
+        if (!session?.user?.email || session.user.email !== 'huldil@icloud.com') {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 

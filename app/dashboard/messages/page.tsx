@@ -31,7 +31,7 @@ export default function MessagesPage() {
         }
 
         // Check if user is admin (replace with your email)
-        if (session.user?.email !== 'mustafa.aras@hotmail.com.tr') {
+        if (session.user?.email !== 'huldil@icloud.com') {
             router.push('/dashboard');
             return;
         }
@@ -123,8 +123,8 @@ export default function MessagesPage() {
                             <div
                                 key={msg.id}
                                 className={`p-6 rounded-xl border transition-all ${msg.read
-                                        ? 'bg-white/5 border-white/10'
-                                        : 'bg-amber-500/10 border-amber-500/30'
+                                    ? 'bg-white/5 border-white/10'
+                                    : 'bg-amber-500/10 border-amber-500/30'
                                     }`}
                             >
                                 <div className="flex items-start justify-between gap-4">

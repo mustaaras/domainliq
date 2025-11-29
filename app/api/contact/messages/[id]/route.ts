@@ -11,7 +11,7 @@ export async function PATCH(
         const { id } = await params;
 
         // Check if user is authenticated and is admin
-        if (!session?.user?.email || session.user.email !== 'mustafa.aras@hotmail.com.tr') {
+        if (!session?.user?.email || session.user.email !== 'huldil@icloud.com') {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -38,7 +38,7 @@ export async function DELETE(
         const { id } = await params;
 
         // Check if user is authenticated and is admin
-        if (!session?.user?.email || session.user.email !== 'mustafa.aras@hotmail.com.tr') {
+        if (!session?.user?.email || session.user.email !== 'huldil@icloud.com') {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
