@@ -1,56 +1,53 @@
-import { promises as fs } from 'fs';
+import { db } from '@/lib/db';
 import { NextRequest } from 'next/server';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const data = await fs.readFile('data/domains.json', 'utf-8');
-    const domains = JSON.parse(data);
-    return Response.json(domains);
-  } catch (error) {
-    return Response.json({ error: 'Failed to read domains' }, { status: 500 });
-  }
-}
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '20');
+    const search = searchParams.get('search') || '';
 
-export async function POST(request: NextRequest) {
-  try {
-    const newDomain = await request.json();
-    const data = await fs.readFile('data/domains.json', 'utf-8');
-    const domains = JSON.parse(data);
-    newDomain.id = Math.max(...domains.map((d: any) => d.id), 0) + 1;
-    domains.push(newDomain);
-    await fs.writeFile('data/domains.json', JSON.stringify(domains, null, 2));
-    return Response.json(newDomain);
-  } catch (error) {
-    return Response.json({ error: 'Failed to add domain' }, { status: 500 });
-  }
-}
+    const skip = (page - 1) * limit;
 
-export async function PUT(request: NextRequest) {
-  try {
-    const { id, status } = await request.json();
-    const data = await fs.readFile('data/domains.json', 'utf-8');
-    const domains = JSON.parse(data);
-    const index = domains.findIndex((d: any) => d.id === id);
-    if (index !== -1) {
-      domains[index].status = status;
-      await fs.writeFile('data/domains.json', JSON.stringify(domains, null, 2));
-      return Response.json(domains[index]);
-    }
-    return Response.json({ error: 'Domain not found' }, { status: 404 });
-  } catch (error) {
-    return Response.json({ error: 'Failed to update domain' }, { status: 500 });
-  }
-}
+    const where = search ? {
+      name: {
+        contains: search,
+        mode: 'insensitive' as const,
+      },
+    } : {};
 
-export async function DELETE(request: NextRequest) {
-  try {
-    const { id } = await request.json();
-    const data = await fs.readFile('data/domains.json', 'utf-8');
-    const domains = JSON.parse(data);
-    const filtered = domains.filter((d: any) => d.id !== id);
-    await fs.writeFile('data/domains.json', JSON.stringify(filtered, null, 2));
-    return Response.json({ success: true });
+    const [domains, total] = await Promise.all([
+      db.domain.findMany({
+        where,
+        take: limit,
+        skip,
+        orderBy: {
+          createdAt: 'desc',
+        },
+        include: {
+          user: {
+            select: {
+              name: true,
+              subdomain: true,
+            },
+          },
+        },
+      }),
+      db.domain.count({ where }),
+    ]);
+
+    return Response.json({
+      domains,
+      pagination: {
+        total,
+        pages: Math.ceil(total / limit),
+        page,
+        limit,
+      },
+    });
   } catch (error) {
-    return Response.json({ error: 'Failed to delete domain' }, { status: 500 });
+    console.error('Failed to fetch domains:', error);
+    return Response.json({ error: 'Failed to fetch domains' }, { status: 500 });
   }
 }
