@@ -195,11 +195,11 @@ export default function Home() {
                 />
               </div>
 
-              <div className="flex gap-3 shrink-0">
+              <div className="flex gap-2 shrink-0">
                 {session ? (
                   <Link
                     href="/dashboard"
-                    className="px-4 py-2 text-sm font-medium text-white bg-amber-500 hover:bg-amber-400 rounded-lg transition-colors"
+                    className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium text-white bg-amber-500 hover:bg-amber-400 rounded-lg transition-colors"
                   >
                     Dashboard
                   </Link>
@@ -207,13 +207,13 @@ export default function Home() {
                   <>
                     <Link
                       href="/login"
-                      className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors"
+                      className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium text-gray-300 hover:text-white transition-colors"
                     >
                       Sign In
                     </Link>
                     <Link
                       href="/signup"
-                      className="px-4 py-2 text-sm font-medium text-white bg-amber-500 hover:bg-amber-400 rounded-lg transition-colors"
+                      className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium text-white bg-amber-500 hover:bg-amber-400 rounded-lg transition-colors"
                     >
                       Sign Up
                     </Link>
@@ -223,6 +223,12 @@ export default function Home() {
             </div>
           </div>
         </header>
+
+        {/* Section Title */}
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-white">Recently Added Domains</h2>
+          <p className="text-gray-400 text-sm mt-1">Fresh listings from our marketplace</p>
+        </div>
 
         {/* List */}
         <div className="flex flex-col gap-2">
@@ -338,9 +344,9 @@ export default function Home() {
 
             <button
               onClick={handleContact}
-              className="flex items-center gap-2 px-6 py-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-white font-medium transition-colors"
+              className="flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-white font-medium transition-colors text-sm md:text-base"
             >
-              <MessageCircle className="h-5 w-5" />
+              <MessageCircle className="h-4 w-4 md:h-5 md:w-5" />
               <span>Contact Seller</span>
             </button>
           </div>
