@@ -292,11 +292,17 @@ export default function Home() {
                             <ShieldCheck className="h-4 w-4 text-green-500 shrink-0" />
                           )}
                         </div>
-                        <p className="text-sm text-gray-500 truncate">@{domain.user.subdomain}</p>
+                        <Link
+                          href={`/u/${domain.user.subdomain}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-xs text-gray-500 hover:text-amber-400 transition-colors"
+                        >
+                          by {domain.user.name || domain.user.subdomain}
+                        </Link>
                       </div>
                     </div>
 
-                    <div className={`shrink-0 font-bold transition-colors ${isSold ? 'text-gray-600' : 'text-amber-500'}`}>
+                    <div className={`shrink-0 font-mono transition-colors ${isSold ? 'text-gray-600' : 'text-gray-400'}`}>
                       ${domain.price.toLocaleString()}
                     </div>
                   </div>
