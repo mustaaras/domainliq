@@ -141,6 +141,11 @@ export default function DashboardPage() {
         }
     };
 
+    const handleLogout = async () => {
+        await signOut({ redirect: false });
+        router.push('/');
+    };
+
     const handleDeleteDomain = async (id: string) => {
         if (!confirm('Are you sure you want to delete this domain?')) return;
 
@@ -191,7 +196,7 @@ export default function DashboardPage() {
                             Settings
                         </Link>
                         <button
-                            onClick={() => signOut({ callbackUrl: '/' })}
+                            onClick={handleLogout}
                             className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white bg-red-600/10 hover:bg-red-600/20 border border-red-600/20 rounded-lg transition-colors flex items-center gap-2"
                         >
                             <LogOut className="h-4 w-4" />
