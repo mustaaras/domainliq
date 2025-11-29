@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Share2, MessageCircle, Check, Search, Loader2 } from 'lucide-react';
+import { Share2, MessageCircle, Check, Search, Loader2, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 
@@ -14,8 +14,8 @@ interface Domain {
   price: number;
   status: string;
   user: {
-    name: string | null;
     subdomain: string;
+    name: string | null;
     email: string | null; // Added for fallback
     contactEmail: string | null;
     twitterHandle: string | null;
@@ -272,9 +272,19 @@ export default function Home() {
                       </div>
 
                       <div className="flex flex-col">
-                        <span className={`text-lg font-medium ${isSelected ? 'text-white' : 'text-gray-200'} ${isSold && 'line-through'}`}>
-                          {domain.name}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className={`text-lg font-medium ${isSelected ? 'text-white' : 'text-gray-200'} ${isSold && 'line-through'}`}>
+                            {domain.name}
+                          </span>
+                          {domain.isVerified && (
+                            <div className="group relative">
+                              <ShieldCheck className="h-4 w-4 text-green-400" />
+                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+                                Ownership Verified
+                              </div>
+                            </div>
+                          )}
+                        </div>
                         <Link
                           href={`/u/${domain.user.subdomain}`}
                           onClick={(e) => e.stopPropagation()}

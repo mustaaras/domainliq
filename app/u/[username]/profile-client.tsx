@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { MessageCircle, Check } from 'lucide-react';
+import { MessageCircle, Check, ShieldCheck } from 'lucide-react';
 
 interface Domain {
     id: string;
     name: string;
     price: number;
     status: string;
+    isVerified?: boolean;
 }
 
 interface User {
@@ -180,9 +181,19 @@ export default function ProfileClient({ user, domains, username }: ProfileClient
                                     </div>
 
                                     <div className="flex flex-col">
-                                        <span className={`text-lg font-medium ${domain.status === 'sold' ? 'line-through text-gray-500' : 'text-gray-200'}`}>
-                                            {domain.name}
-                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            <span className={`text-lg font-medium ${domain.status === 'sold' ? 'line-through text-gray-500' : 'text-gray-200'}`}>
+                                                {domain.name}
+                                            </span>
+                                            {domain.isVerified && (
+                                                <div className="group relative">
+                                                    <ShieldCheck className="h-4 w-4 text-green-400" />
+                                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                                                        Ownership Verified
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
 
