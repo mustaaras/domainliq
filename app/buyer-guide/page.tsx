@@ -16,6 +16,7 @@ export default function UserGuidePage() {
                 <ul className="list-disc pl-6 text-gray-300 mb-4">
                     <li>Visit the homepage to see all recently added domains</li>
                     <li>Use the search bar to find specific domains</li>
+                    <li><strong>Look for the Green Shield:</strong> Domains with a green shield badge have verified ownership!</li>
                     <li>Check domain prices and seller information</li>
                     <li>Look at seller profiles (click on username) to see all their listings</li>
                 </ul>

@@ -52,7 +52,17 @@ export default function SellerGuidePage() {
                     <li>Click "Upload Domains"</li>
                 </ul>
 
-                <h2 className="text-2xl font-bold mt-8 mb-4">Step 4: Manage Your Listings</h2>
+                <h2 className="text-2xl font-bold mt-8 mb-4">Step 4: Verify Ownership (Recommended)</h2>
+                <ul className="list-disc pl-6 text-gray-300 mb-4">
+                    <li>Go to your Dashboard</li>
+                    <li>Click the "Verify" button next to your domain</li>
+                    <li>Copy the unique verification token (e.g., domainliq-xyz123)</li>
+                    <li>Add a <strong>TXT record</strong> to your domain's DNS settings with this token</li>
+                    <li>Click "Check Now" to verify</li>
+                    <li><strong>Benefit:</strong> Verified domains get a green shield badge, increasing buyer trust!</li>
+                </ul>
+
+                <h2 className="text-2xl font-bold mt-8 mb-4">Step 5: Manage Your Listings</h2>
                 <ul className="list-disc pl-6 text-gray-300 mb-4">
                     <li><strong>Mark as Sold:</strong> Click the gold ✓ button when a domain sells</li>
                     <li><strong>Mark as Available:</strong> Click the green ↺ button to relist</li>

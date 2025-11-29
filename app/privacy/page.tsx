@@ -37,12 +37,13 @@ export default function PrivacyPage() {
                     <li>Contact handles only (we never access your messages)</li>
                 </ul>
 
-                <h3 className="text-xl font-semibold mt-6 mb-3">Domain Listings:</h3>
+                <h3 className="text-xl font-semibold mt-6 mb-3">Domain Listings & Verification:</h3>
                 <ul className="list-disc pl-6 text-gray-300 mb-4">
                     <li>Domain names you list</li>
                     <li>Prices you set</li>
                     <li>Domain descriptions (optional)</li>
                     <li>Domain status (available/sold)</li>
+                    <li>DNS verification records (accessed publicly to verify ownership)</li>
                 </ul>
 
                 <h2 className="text-2xl font-bold mt-8 mb-4">2. How We Use Your Information</h2>

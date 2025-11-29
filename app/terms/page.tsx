@@ -8,7 +8,7 @@ export default function TermsPage() {
                 <h2 className="text-2xl font-bold mt-8 mb-4">Welcome to DomainLiq</h2>
                 <p className="text-gray-300 mb-4">
                     These Terms of Service ("Terms") govern your use of DomainLiq ("Service", "Platform", "we", "us", or "our"),
-                    a domain marketplace platform. By accessing or using our Service, you agree to be bound by these Terms.
+                    a domain liquidation listing platform. By accessing or using our Service, you agree to be bound by these Terms.
                 </p>
 
                 <h2 className="text-2xl font-bold mt-8 mb-4">1. Service Description</h2>
@@ -26,7 +26,7 @@ export default function TermsPage() {
                     <ul className="list-disc pl-6 text-gray-300">
                         <li>Process payments</li>
                         <li>Act as an escrow service</li>
-                        <li>Verify domain ownership</li>
+                        <li>Guarantee legal ownership title (Verification proves DNS control only)</li>
                         <li>Guarantee transactions</li>
                         <li>Mediate disputes</li>
                     </ul>
