@@ -234,7 +234,7 @@ export default function DashboardPage() {
                         </Link>
                         <Link
                             href="/settings"
-                            className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors flex items-center gap-2"
+                            className="px-4 py-2 text-sm font-medium text-white bg-amber-500 hover:bg-amber-400 rounded-lg transition-colors flex items-center gap-2"
                         >
                             <Settings className="h-4 w-4" />
                             Settings
@@ -254,7 +254,7 @@ export default function DashboardPage() {
                     <div className="lg:col-span-1">
                         <div className="bg-white/5 border border-white/10 rounded-xl p-6 sticky top-8">
                             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                                <Plus className="h-5 w-5 text-indigo-400" />
+                                <Plus className="h-5 w-5 text-amber-400" />
                                 Add New Domain
                             </h2>
 
@@ -266,7 +266,7 @@ export default function DashboardPage() {
                                         value={newDomain.name}
                                         onChange={e => setNewDomain({ ...newDomain, name: e.target.value })}
                                         placeholder="example.com"
-                                        className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                        className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                                         required
                                     />
                                 </div>
@@ -280,7 +280,7 @@ export default function DashboardPage() {
                                             value={newDomain.price}
                                             onChange={e => setNewDomain({ ...newDomain, price: e.target.value })}
                                             placeholder="1000"
-                                            className="w-full bg-black/20 border border-white/10 rounded-lg pl-9 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                            className="w-full bg-black/20 border border-white/10 rounded-lg pl-9 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                                             required
                                             min="0"
                                         />
@@ -296,7 +296,7 @@ export default function DashboardPage() {
                                 <button
                                     type="submit"
                                     disabled={isAdding}
-                                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-medium transition-all disabled:opacity-50"
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-white rounded-lg font-medium transition-all disabled:opacity-50"
                                 >
                                     {isAdding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
                                     Add Domain
@@ -323,7 +323,7 @@ export default function DashboardPage() {
                                         value={bulkText}
                                         onChange={e => setBulkText(e.target.value)}
                                         placeholder={"example.com 1000\ntest.com 500\ndomain.com 2500"}
-                                        className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono text-sm min-h-[120px]"
+                                        className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50 font-mono text-sm min-h-[120px]"
                                         disabled={isAdding}
                                     />
                                     <p className="text-xs text-gray-500 mt-1">Format: domain.com price (one per line)</p>
@@ -365,7 +365,7 @@ export default function DashboardPage() {
                                             <div>
                                                 <div className="font-medium text-lg text-white">{domain.name}</div>
                                                 <div className="text-sm text-gray-400">
-                                                    Listed for <span className="text-indigo-400">${domain.price.toLocaleString()}</span>
+                                                    Listed for <span className="text-amber-400">${domain.price.toLocaleString()}</span>
                                                     <span className="mx-2">•</span>
                                                     <span className={`capitalize ${domain.status === 'sold' ? 'text-red-400' : 'text-green-400'}`}>
                                                         {domain.status}

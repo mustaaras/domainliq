@@ -162,7 +162,7 @@ export default function SettingsPage() {
                     {/* Basic Info */}
                     <div className="bg-white/5 border border-white/10 rounded-xl p-6 space-y-6">
                         <h2 className="text-xl font-semibold flex items-center gap-2">
-                            <User className="h-5 w-5 text-indigo-400" />
+                            <User className="h-5 w-5 text-amber-400" />
                             Basic Information
                         </h2>
 
@@ -173,7 +173,7 @@ export default function SettingsPage() {
                                     type="text"
                                     value={formData.name}
                                     onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                    className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                                 />
                             </div>
                             <div>
@@ -191,7 +191,7 @@ export default function SettingsPage() {
                     {/* Contact Methods */}
                     <div className="bg-white/5 border border-white/10 rounded-xl p-6 space-y-6">
                         <h2 className="text-xl font-semibold flex items-center gap-2">
-                            <Mail className="h-5 w-5 text-indigo-400" />
+                            <Mail className="h-5 w-5 text-amber-400" />
                             Contact Methods
                         </h2>
 
@@ -203,7 +203,7 @@ export default function SettingsPage() {
                                     value={formData.contactEmail}
                                     onChange={e => setFormData({ ...formData, contactEmail: e.target.value })}
                                     placeholder="Where buyers should email you"
-                                    className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                    className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                                 />
                             </div>
 
@@ -220,7 +220,7 @@ export default function SettingsPage() {
                                         value={formData.twitterHandle}
                                         onChange={e => setFormData({ ...formData, twitterHandle: e.target.value.replace('@', '') })}
                                         placeholder="username"
-                                        className="w-full bg-black/20 border border-white/10 rounded-lg pl-8 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                        className="w-full bg-black/20 border border-white/10 rounded-lg pl-8 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                                     />
                                 </div>
                             </div>
@@ -236,7 +236,7 @@ export default function SettingsPage() {
                                     value={formData.whatsappNumber}
                                     onChange={e => setFormData({ ...formData, whatsappNumber: e.target.value })}
                                     placeholder="+1234567890"
-                                    className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                    className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                                 />
                             </div>
 
@@ -251,7 +251,7 @@ export default function SettingsPage() {
                                     value={formData.linkedinProfile}
                                     onChange={e => setFormData({ ...formData, linkedinProfile: e.target.value })}
                                     placeholder="https://linkedin.com/in/username"
-                                    className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                    className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                                 />
                             </div>
 
@@ -268,7 +268,7 @@ export default function SettingsPage() {
                                         value={formData.telegramUsername}
                                         onChange={e => setFormData({ ...formData, telegramUsername: e.target.value.replace('@', '') })}
                                         placeholder="username"
-                                        className="w-full bg-black/20 border border-white/10 rounded-lg pl-8 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                        className="w-full bg-black/20 border border-white/10 rounded-lg pl-8 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                                     />
                                 </div>
                             </div>
@@ -285,7 +285,7 @@ export default function SettingsPage() {
                                         className={`
                       px-4 py-2 rounded-lg text-sm font-medium capitalize transition-all
                       ${formData.preferredContact === method
-                                                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+                                                ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20'
                                                 : 'bg-white/5 text-gray-400 hover:bg-white/10'
                                             }
                     `}
@@ -307,7 +307,7 @@ export default function SettingsPage() {
                         <button
                             type="submit"
                             disabled={isSaving}
-                            className="flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-medium transition-all disabled:opacity-50"
+                            className="flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-400 text-white rounded-lg font-medium transition-all disabled:opacity-50"
                         >
                             {isSaving ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
                             Save Changes
@@ -325,7 +325,7 @@ export default function SettingsPage() {
                                 type="password"
                                 value={passwordData.currentPassword}
                                 onChange={e => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                                className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                                 required
                             />
                         </div>
@@ -336,7 +336,7 @@ export default function SettingsPage() {
                                 type="password"
                                 value={passwordData.newPassword}
                                 onChange={e => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                                className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                                 required
                                 minLength={6}
                             />
@@ -348,7 +348,7 @@ export default function SettingsPage() {
                                 type="password"
                                 value={passwordData.confirmPassword}
                                 onChange={e => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                                className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                                 required
                                 minLength={6}
                             />
@@ -364,7 +364,7 @@ export default function SettingsPage() {
                             <button
                                 type="submit"
                                 disabled={isChangingPassword}
-                                className="flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-medium transition-all disabled:opacity-50"
+                                className="flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-400 text-white rounded-lg font-medium transition-all disabled:opacity-50"
                             >
                                 {isChangingPassword ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
                                 Change Password

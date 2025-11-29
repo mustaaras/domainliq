@@ -101,7 +101,7 @@ export default function ProfileClient({ user, domains, username }: ProfileClient
     const availableDomains = domains.filter(d => d.status === 'available');
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-indigo-500/30">
+        <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-amber-500/30">
             <div className="max-w-3xl mx-auto px-4 py-8 pb-32 md:pb-12">
                 {/* Header */}
                 <header className="mb-8">
@@ -127,7 +127,7 @@ export default function ProfileClient({ user, domains, username }: ProfileClient
                                     ${domain.status === 'sold'
                                         ? 'bg-transparent border-transparent opacity-40 cursor-not-allowed'
                                         : selectedIds.includes(domain.id)
-                                            ? 'bg-indigo-500/10 border-indigo-500/30'
+                                            ? 'bg-amber-500/10 border-amber-500/30'
                                             : 'bg-white/5 border-transparent hover:bg-white/10 cursor-pointer'
                                     }
                                 `}
@@ -138,7 +138,7 @@ export default function ProfileClient({ user, domains, username }: ProfileClient
                                         ${domain.status === 'sold'
                                             ? 'border-gray-700 bg-gray-800'
                                             : selectedIds.includes(domain.id)
-                                                ? 'border-indigo-500 bg-indigo-500'
+                                                ? 'border-amber-500 bg-amber-500'
                                                 : 'border-gray-600 group-hover:border-gray-500'
                                         }
                                     `}>
@@ -188,7 +188,7 @@ export default function ProfileClient({ user, domains, username }: ProfileClient
                     <div className="max-w-3xl mx-auto pointer-events-auto">
                         <button
                             onClick={handleContact}
-                            className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-medium shadow-lg transition-all hover:shadow-indigo-500/50"
+                            className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-amber-500 hover:bg-amber-400 text-white rounded-xl font-medium shadow-lg transition-all hover:shadow-amber-500/50"
                         >
                             <MessageCircle className="h-5 w-5" />
                             Contact Seller ({selectedIds.length} {selectedIds.length === 1 ? 'domain' : 'domains'})

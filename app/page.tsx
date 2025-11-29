@@ -169,14 +169,14 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-indigo-500/30">
+    <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-amber-500/30">
       <div className="max-w-3xl mx-auto px-4 py-8 pb-32 md:pb-12">
         {/* Header */}
         <header className="mb-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8">
             <div>
               <div className="flex items-center gap-3">
-                <img src="/logo.svg" alt="DomainLiq" className="h-10 w-auto" />
+                <img src="/logo.svg" alt="DomainLiq" className="h-12 w-auto" />
               </div>
               <p className="text-gray-500 mt-1">Domain Liquidation Marketplace</p>
             </div>
@@ -189,7 +189,7 @@ export default function Home() {
                 <input
                   type="text"
                   placeholder="Search domains..."
-                  className="block w-full pl-9 pr-4 py-2 border border-white/10 rounded-lg bg-white/5 text-gray-300 placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500/50 focus:bg-white/10 transition-all text-sm"
+                  className="block w-full pl-9 pr-4 py-2 border border-white/10 rounded-lg bg-white/5 text-gray-300 placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-amber-500/50 focus:border-amber-500/50 focus:bg-white/10 transition-all text-sm"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -199,7 +199,7 @@ export default function Home() {
                 {session ? (
                   <Link
                     href="/dashboard"
-                    className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors"
+                    className="px-4 py-2 text-sm font-medium text-white bg-amber-500 hover:bg-amber-400 rounded-lg transition-colors"
                   >
                     Dashboard
                   </Link>
@@ -213,7 +213,7 @@ export default function Home() {
                     </Link>
                     <Link
                       href="/signup"
-                      className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors"
+                      className="px-4 py-2 text-sm font-medium text-white bg-amber-500 hover:bg-amber-400 rounded-lg transition-colors"
                     >
                       Sign Up
                     </Link>
@@ -246,7 +246,7 @@ export default function Home() {
                       ${isSold
                         ? 'bg-transparent border-transparent opacity-40 cursor-not-allowed'
                         : isSelected
-                          ? 'bg-indigo-900/10 border-indigo-500/50'
+                          ? 'bg-indigo-900/10 border-amber-500/50'
                           : 'bg-white/5 border-transparent hover:bg-white/10'
                       }
                     `}
@@ -257,7 +257,7 @@ export default function Home() {
                         ${isSold
                           ? 'border-gray-700 bg-gray-800'
                           : isSelected
-                            ? 'bg-indigo-500 border-indigo-500'
+                            ? 'bg-amber-500 border-amber-500'
                             : 'border-gray-600 group-hover:border-gray-500'
                         }
                       `}>
@@ -272,7 +272,7 @@ export default function Home() {
                         <Link
                           href={`/${domain.user.subdomain}`}
                           onClick={(e) => e.stopPropagation()}
-                          className="text-xs text-gray-500 hover:text-indigo-400 transition-colors"
+                          className="text-xs text-gray-500 hover:text-amber-400 transition-colors"
                         >
                           by {domain.user.name || domain.user.subdomain}
                         </Link>
@@ -338,7 +338,7 @@ export default function Home() {
 
             <button
               onClick={handleContact}
-              className="flex items-center gap-2 px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium transition-colors"
+              className="flex items-center gap-2 px-6 py-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-white font-medium transition-colors"
             >
               <MessageCircle className="h-5 w-5" />
               <span>Contact Seller</span>

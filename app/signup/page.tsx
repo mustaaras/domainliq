@@ -68,7 +68,7 @@ export default function SignupPage() {
                                 name="name"
                                 type="text"
                                 required
-                                className="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                className="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
                                 placeholder="John Doe"
                             />
                         </div>
@@ -83,7 +83,7 @@ export default function SignupPage() {
                                 type="email"
                                 autoComplete="email"
                                 required
-                                className="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                className="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
                                 placeholder="john@example.com"
                             />
                         </div>
@@ -101,7 +101,7 @@ export default function SignupPage() {
                                     name="subdomain"
                                     id="subdomain"
                                     required
-                                    className="flex-1 min-w-0 block w-full px-3 py-2 bg-white/5 border border-white/10 rounded-r-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                    className="flex-1 min-w-0 block w-full px-3 py-2 bg-white/5 border border-white/10 rounded-r-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
                                     placeholder="john"
                                 />
                             </div>
@@ -117,7 +117,7 @@ export default function SignupPage() {
                                 type="password"
                                 autoComplete="new-password"
                                 required
-                                className="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                className="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
                                 placeholder="••••••••"
                             />
                         </div>
@@ -126,7 +126,7 @@ export default function SignupPage() {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-amber-500 hover:bg-amber-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                     >
                         {isLoading ? (
                             <Loader2 className="h-5 w-5 animate-spin" />
@@ -137,7 +137,7 @@ export default function SignupPage() {
 
                     <p className="text-center text-sm text-gray-400">
                         Already have an account?{' '}
-                        <Link href="/login" className="font-medium text-indigo-400 hover:text-indigo-300 transition-colors">
+                        <Link href="/login" className="font-medium text-amber-400 hover:text-indigo-300 transition-colors">
                             Sign in
                         </Link>
                     </p>
