@@ -220,28 +220,28 @@ export default function DashboardPage() {
                     <div className="flex gap-3">
                         <Link
                             href="/"
-                            className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-2"
+                            className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-2"
                         >
                             <ExternalLink className="h-4 w-4" />
                             Home
                         </Link>
                         <Link
                             href={`/${userSubdomain || 'profile'}`}
-                            className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-2"
+                            className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-2"
                         >
                             <ExternalLink className="h-4 w-4" />
                             View Your Store
                         </Link>
                         <Link
                             href="/settings"
-                            className="px-4 py-2 text-sm font-medium text-white bg-amber-500 hover:bg-amber-400 rounded-lg transition-colors flex items-center gap-2"
+                            className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium text-white bg-amber-500 hover:bg-amber-400 rounded-lg transition-colors flex items-center gap-2"
                         >
                             <Settings className="h-4 w-4" />
                             Settings
                         </Link>
                         <button
                             onClick={handleLogout}
-                            className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white bg-red-600/10 hover:bg-red-600/20 border border-red-600/20 rounded-lg transition-colors flex items-center gap-2"
+                            className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium text-gray-300 hover:text-white bg-red-600/10 hover:bg-red-600/20 border border-red-600/20 rounded-lg transition-colors flex items-center gap-2"
                         >
                             <LogOut className="h-4 w-4" />
                             Logout

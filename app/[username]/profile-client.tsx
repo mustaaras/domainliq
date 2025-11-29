@@ -29,6 +29,16 @@ interface ProfileClientProps {
 
 export default function ProfileClient({ user, domains, username }: ProfileClientProps) {
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [showContactModal, setShowContactModal] = useState(false);
+
+    // Get available contact methods
+    const availableMethods = [
+        user.contactEmail && { type: 'email', label: 'Email', value: user.contactEmail },
+        user.twitterHandle && { type: 'twitter', label: 'X / Twitter', value: user.twitterHandle },
+        user.whatsappNumber && { type: 'whatsapp', label: 'WhatsApp', value: user.whatsappNumber },
+        user.linkedinProfile && { type: 'linkedin', label: 'LinkedIn', value: user.linkedinProfile },
+        user.telegramUsername && { type: 'telegram', label: 'Telegram', value: user.telegramUsername },
+    ].filter(Boolean) as Array<{ type: string; label: string; value: string }>;
 
     const toggleSelection = (id: string) => {
         if (selectedIds.includes(id)) {
@@ -52,10 +62,23 @@ export default function ProfileClient({ user, domains, username }: ProfileClient
             return;
         }
 
+        // If multiple contact methods available, show modal
+        if (availableMethods.length > 1) {
+            setShowContactModal(true);
+        } else if (availableMethods.length === 1) {
+            // Directly contact using the only available method
+            contactViaMethod(availableMethods[0].type);
+        } else {
+            alert("Seller hasn't provided any contact information yet.");
+        }
+    };
+
+    const contactViaMethod = async (method: string) => {
+        const selected = domains.filter(d => selectedIds.includes(d.id));
         const domainNames = selected.map(d => d.name).join(', ');
         const message = `Hi, I'm interested in these domains: ${domainNames}`;
 
-        switch (user.preferredContact) {
+        switch (method) {
             case 'twitter':
                 if (user.twitterHandle) {
                     await navigator.clipboard.writeText(message);
@@ -199,6 +222,39 @@ export default function ProfileClient({ user, domains, username }: ProfileClient
                         >
                             <MessageCircle className="h-5 w-5" />
                             Contact Seller ({selectedIds.length} {selectedIds.length === 1 ? 'domain' : 'domains'})
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Contact Method Selection Modal */}
+            {showContactModal && (
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50" onClick={() => setShowContactModal(false)}>
+                    <div className="bg-[#0A0A0A] border border-white/20 rounded-xl p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+                        <h3 className="text-xl font-bold mb-4 text-white">Choose Contact Method</h3>
+                        <p className="text-gray-400 text-sm mb-6">How would you like to contact the seller?</p>
+
+                        <div className="space-y-3">
+                            {availableMethods.map((method) => (
+                                <button
+                                    key={method.type}
+                                    onClick={() => {
+                                        contactViaMethod(method.type);
+                                        setShowContactModal(false);
+                                    }}
+                                    className="w-full flex items-center justify-between p-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-500/50 rounded-lg transition-all group"
+                                >
+                                    <span className="text-white font-medium">{method.label}</span>
+                                    <span className="text-gray-400 text-sm group-hover:text-amber-400 transition-colors">→</span>
+                                </button>
+                            ))}
+                        </div>
+
+                        <button
+                            onClick={() => setShowContactModal(false)}
+                            className="w-full mt-6 px-4 py-2 text-gray-400 hover:text-white transition-colors"
+                        >
+                            Cancel
                         </button>
                     </div>
                 </div>

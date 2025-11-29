@@ -6,13 +6,30 @@ export default function Footer() {
     return (
         <footer className="border-t border-white/10 bg-[#050505] text-white">
             <div className="max-w-7xl mx-auto px-4 py-8">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                     {/* About */}
                     <div>
                         <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto mb-4" />
                         <p className="text-gray-400 text-sm">
                             Free and open domain marketplace. Connect sellers with buyers directly.
                         </p>
+                    </div>
+
+                    {/* Guides */}
+                    <div>
+                        <h3 className="font-semibold mb-4">Resources</h3>
+                        <ul className="space-y-2">
+                            <li>
+                                <Link href="/buyer-guide" className="text-gray-400 hover:text-white text-sm transition-colors">
+                                    Buyer's Guide
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/seller-guide" className="text-gray-400 hover:text-white text-sm transition-colors">
+                                    Seller's Guide
+                                </Link>
+                            </li>
+                        </ul>
                     </div>
 
                     {/* Links */}
