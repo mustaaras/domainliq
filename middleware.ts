@@ -1,8 +1,7 @@
-import { auth } from '@/auth';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export default auth(async (req) => {
+export function middleware(req: NextRequest) {
     const url = req.nextUrl;
     const hostname = req.headers.get('host') || '';
 
@@ -17,7 +16,7 @@ export default auth(async (req) => {
     }
 
     return NextResponse.next();
-});
+}
 
 export const config = {
     matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
