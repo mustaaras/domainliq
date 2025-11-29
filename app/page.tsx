@@ -125,7 +125,7 @@ export default function Home() {
       seller.whatsappNumber && { type: 'whatsapp', label: 'WhatsApp', icon: '💬' },
       seller.linkedinProfile && { type: 'linkedin', label: 'LinkedIn', icon: '💼' },
       seller.telegramUsername && { type: 'telegram', label: 'Telegram', icon: '✈️' },
-    ].filter(Boolean);
+    ].filter(Boolean) as { type: string; label: string; icon: string }[];
 
     // If multiple contact methods available, show modal to choose
     if (availableMethods.length > 1) {
