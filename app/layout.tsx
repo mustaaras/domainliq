@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
+import Footer from "@/components/footer";
+import CookieConsent from "@/components/cookie-consent";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,6 +38,8 @@ export default async function RootLayout({
       >
         <SessionProvider session={session}>
           {children}
+          <Footer />
+          <CookieConsent />
         </SessionProvider>
       </body>
     </html>

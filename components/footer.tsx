@@ -1,0 +1,54 @@
+'use client';
+
+import Link from 'next/link';
+
+export default function Footer() {
+    return (
+        <footer className="border-t border-white/10 bg-[#050505] text-white">
+            <div className="max-w-7xl mx-auto px-4 py-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    {/* About */}
+                    <div>
+                        <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto mb-4" />
+                        <p className="text-gray-400 text-sm">
+                            Free and open domain marketplace. Connect sellers with buyers directly.
+                        </p>
+                    </div>
+
+                    {/* Links */}
+                    <div>
+                        <h3 className="font-semibold mb-4">Legal</h3>
+                        <ul className="space-y-2">
+                            <li>
+                                <Link href="/terms" className="text-gray-400 hover:text-white text-sm transition-colors">
+                                    Terms of Service
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/privacy" className="text-gray-400 hover:text-white text-sm transition-colors">
+                                    Privacy Policy
+                                </Link>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {/* Info */}
+                    <div>
+                        <h3 className="font-semibold mb-4">Important</h3>
+                        <ul className="space-y-2 text-sm text-gray-400">
+                            <li>✓ No payment processing</li>
+                            <li>✓ No data selling</li>
+                            <li>✓ Free platform</li>
+                            <li className="text-amber-400">⚠ Use escrow for safety</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div className="mt-8 pt-8 border-t border-white/10 text-center text-gray-500 text-sm">
+                    <p>© {new Date().getFullYear()} DomainLiq. All rights reserved.</p>
+                    <p className="mt-2">A free, open marketplace for domain liquidation.</p>
+                </div>
+            </div>
+        </footer>
+    );
+}

@@ -9,9 +9,16 @@ export default function SignupPage() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+    const [acceptedTerms, setAcceptedTerms] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        if (!acceptedTerms) {
+            setError('You must accept the Terms of Service and Privacy Policy to continue');
+            return;
+        }
+
         setIsLoading(true);
         setError('');
 
@@ -121,6 +128,26 @@ export default function SignupPage() {
                                 placeholder="••••••••"
                             />
                         </div>
+                    </div>
+
+                    <div className="flex items-start">
+                        <input
+                            id="terms"
+                            type="checkbox"
+                            checked={acceptedTerms}
+                            onChange={(e) => setAcceptedTerms(e.target.checked)}
+                            className="mt-1 mr-3 h-4 w-4"
+                        />
+                        <label htmlFor="terms" className="text-sm text-gray-300">
+                            I agree to the{' '}
+                            <a href="/terms" target="_blank" className="text-amber-400 hover:text-amber-300 underline">
+                                Terms of Service
+                            </a>
+                            {' '}and{' '}
+                            <a href="/privacy" target="_blank" className="text-amber-400 hover:text-amber-300 underline">
+                                Privacy Policy
+                            </a>. I understand that DomainLiq does not process payments and I should only transact with trusted sellers using escrow services.
+                        </label>
                     </div>
 
                     <button

@@ -39,6 +39,13 @@ export default function ProfileClient({ user, domains, username }: ProfileClient
     };
 
     const handleContact = async () => {
+        // Check if user has accepted terms
+        const consent = localStorage.getItem('domainliq_consent');
+        if (!consent) {
+            alert('Please accept our Terms of Service and Privacy Policy using the banner at the bottom of the page before contacting sellers.');
+            return;
+        }
+
         const selected = domains.filter(d => selectedIds.includes(d.id));
         if (selected.length === 0) {
             alert('Please select at least one domain');
