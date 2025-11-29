@@ -56,11 +56,12 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 
-# Copy Prisma CLI binary
+# Copy Prisma CLI binary and make it executable
 RUN mkdir -p node_modules/.bin
 COPY --from=builder /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
-COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
+RUN chmod +x ./node_modules/.bin/prisma
 
 # Set the correct permission for prerender cache
 RUN mkdir .next
