@@ -31,7 +31,8 @@ interface ProfileClientProps {
 export default function ProfileClient({ user, domains, username }: ProfileClientProps) {
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [showContactModal, setShowContactModal] = useState(false);
-    const [showAll, setShowAll] = useState(false);
+    const [itemsPerPage, setItemsPerPage] = useState(20);
+    const [currentPage, setCurrentPage] = useState(1);
 
     // Get available contact methods
     const availableMethods = [
@@ -130,7 +131,22 @@ export default function ProfileClient({ user, domains, username }: ProfileClient
         }
     };
 
-    const availableDomains = domains.filter(d => d.status === 'available');
+    const handlePageChange = (newPage: number) => {
+        setCurrentPage(newPage);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const handleLimitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setItemsPerPage(parseInt(e.target.value));
+        setCurrentPage(1);
+    };
+
+    // Calculate pagination
+    const totalDomains = domains.length;
+    const totalPages = Math.ceil(totalDomains / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, totalDomains);
+    const currentDomains = domains.slice(startIndex, endIndex);
 
     return (
         <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-amber-500/30">
@@ -147,11 +163,28 @@ export default function ProfileClient({ user, domains, username }: ProfileClient
                     </div>
                 </header>
 
+                {/* Controls */}
+                <div className="mb-6 flex justify-end">
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-400">Show:</span>
+                        <select
+                            value={itemsPerPage}
+                            onChange={handleLimitChange}
+                            className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+                        >
+                            <option value={20}>20</option>
+                            <option value={50}>50</option>
+                            <option value={100}>100</option>
+                            <option value={200}>200</option>
+                        </select>
+                    </div>
+                </div>
+
                 {/* List */}
                 <div className="flex flex-col gap-2">
                     {domains.length > 0 ? (
                         <>
-                            {(showAll ? domains : domains.slice(0, 20)).map((domain) => (
+                            {currentDomains.map((domain) => (
                                 <div
                                     key={domain.id}
                                     onClick={() => domain.status === 'available' && toggleSelection(domain.id)}
@@ -211,14 +244,29 @@ export default function ProfileClient({ user, domains, username }: ProfileClient
                                 </div>
                             ))}
 
-                            {/* Show More/Less Button */}
-                            {domains.length > 20 && (
-                                <button
-                                    onClick={() => setShowAll(!showAll)}
-                                    className="mt-4 w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 hover:text-white transition-all flex items-center justify-center gap-2"
-                                >
-                                    {showAll ? 'Show Less' : `Show More (${domains.length - 20} more)`}
-                                </button>
+                            {/* Pagination Controls */}
+                            {totalDomains > 0 && (
+                                <div className="mt-8 flex items-center justify-between border-t border-white/10 pt-4">
+                                    <div className="text-sm text-gray-400">
+                                        Showing <span className="font-medium text-white">{startIndex + 1}</span> to <span className="font-medium text-white">{endIndex}</span> of <span className="font-medium text-white">{totalDomains}</span> results
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => handlePageChange(currentPage - 1)}
+                                            disabled={currentPage === 1}
+                                            className="px-3 py-1 text-sm bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                        >
+                                            Previous
+                                        </button>
+                                        <button
+                                            onClick={() => handlePageChange(currentPage + 1)}
+                                            disabled={currentPage >= totalPages}
+                                            className="px-3 py-1 text-sm bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                        >
+                                            Next
+                                        </button>
+                                    </div>
+                                </div>
                             )}
                         </>
                     ) : (
@@ -254,7 +302,7 @@ export default function ProfileClient({ user, domains, username }: ProfileClient
             {/* Contact Method Selection Modal */}
             {showContactModal && (
                 <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50" onClick={() => setShowContactModal(false)}>
-                    <div className="bg-[#0A0A0A] border border-white/20 rounded-xl p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+                    <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
                         <h3 className="text-xl font-bold mb-4 text-white">Choose Contact Method</h3>
                         <p className="text-gray-400 text-sm mb-6">How would you like to contact the seller?</p>
 

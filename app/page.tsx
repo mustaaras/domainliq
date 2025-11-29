@@ -36,14 +36,14 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [showAll, setShowAll] = useState(false);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [totalDomains, setTotalDomains] = useState(0);
   const [showContactModal, setShowContactModal] = useState(false);
 
-  const fetchDomains = async (pageNum: number, isLoadMore = false) => {
+  const fetchDomains = async (pageNum: number, limit: number) => {
     try {
-      if (isLoadMore) setIsLoadingMore(true);
-
-      const res = await fetch(`/api/domains?page=${pageNum}&limit=20&search=${searchQuery}`);
+      setIsLoading(true);
+      const res = await fetch(`/api/domains?page=${pageNum}&limit=${limit}&search=${searchQuery}`);
       const data = await res.json();
 
       if (data.error) {
@@ -51,14 +51,10 @@ export default function Home() {
         return;
       }
 
-      if (isLoadMore) {
-        setDomains(prev => [...prev, ...data.domains]);
-      } else {
-        setDomains(data.domains);
-      }
-
+      setDomains(data.domains);
       if (data.pagination) {
         setHasMore(data.pagination.page < data.pagination.pages);
+        setTotalDomains(data.pagination.total);
       }
     } catch (error) {
       console.error('Failed to fetch domains:', error);
@@ -72,16 +68,23 @@ export default function Home() {
     // Debounce search
     const timer = setTimeout(() => {
       setPage(1);
-      fetchDomains(1);
+      fetchDomains(1, itemsPerPage);
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [searchQuery]);
+  }, [searchQuery, itemsPerPage]);
 
-  const handleLoadMore = () => {
-    const nextPage = page + 1;
-    setPage(nextPage);
-    fetchDomains(nextPage, true);
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    fetchDomains(newPage, itemsPerPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleLimitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newLimit = parseInt(e.target.value);
+    setItemsPerPage(newLimit);
+    setPage(1);
+    // Effect will trigger fetch
   };
 
   const toggleSelection = (id: string) => {
@@ -286,10 +289,26 @@ export default function Home() {
           })()}
         </header>
 
-        {/* Section Title */}
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-white">Recently Added Domains</h2>
-          <p className="text-gray-400 text-sm mt-1">Fresh listing from the sellers</p>
+        {/* Section Title & Controls */}
+        <div className="mb-6 flex flex-col sm:flex-row justify-between items-end sm:items-center gap-4">
+          <div>
+            <h2 className="text-2xl font-bold text-white">Recently Added Domains</h2>
+            <p className="text-gray-400 text-sm mt-1">Fresh listing from the sellers</p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-400">Show:</span>
+            <select
+              value={itemsPerPage}
+              onChange={handleLimitChange}
+              className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+            >
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+              <option value={200}>200</option>
+            </select>
+          </div>
         </div>
 
         {/* List */}
@@ -301,7 +320,7 @@ export default function Home() {
             ))
           ) : domains.length > 0 ? (
             <>
-              {(showAll ? domains : domains.slice(0, 20)).map(domain => {
+              {domains.map(domain => {
                 const isSelected = selectedIds.includes(domain.id);
                 const isSold = domain.status === 'sold';
 
@@ -367,35 +386,28 @@ export default function Home() {
                 );
               })}
 
-              {/* Show More/Less Button */}
-              {(domains.length > 20 || (!showAll && hasMore)) && (
-                <button
-                  onClick={() => {
-                    if (showAll) {
-                      setShowAll(false);
-                    } else if (domains.length > 20) {
-                      setShowAll(true);
-                    } else if (hasMore) {
-                      handleLoadMore();
-                    }
-                  }}
-                  disabled={isLoadingMore}
-                  className="mt-4 w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 hover:text-white transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  {isLoadingMore ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Loading...
-                    </>
-                  ) : showAll ? (
-                    'Show Less'
-                  ) : domains.length > 20 ? (
-                    `Show More (${domains.length - 20} more)`
-                  ) : (
-                    'Load More Domains'
-                  )}
-                </button>
-              )}
+              {/* Pagination Controls */}
+              <div className="mt-8 flex items-center justify-between border-t border-white/10 pt-4">
+                <div className="text-sm text-gray-400">
+                  Showing <span className="font-medium text-white">{(page - 1) * itemsPerPage + 1}</span> to <span className="font-medium text-white">{Math.min(page * itemsPerPage, totalDomains)}</span> of <span className="font-medium text-white">{totalDomains}</span> results
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handlePageChange(page - 1)}
+                    disabled={page === 1 || isLoading}
+                    className="px-3 py-1 text-sm bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={() => handlePageChange(page + 1)}
+                    disabled={!hasMore || isLoading}
+                    className="px-3 py-1 text-sm bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
             </>
           ) : (
             <div className="text-center py-12 text-gray-600">
