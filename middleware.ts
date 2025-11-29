@@ -1,11 +1,7 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import NextAuth from 'next-auth';
+import { authConfig } from './auth.config';
 
-export function middleware(req: NextRequest) {
-    // No custom middleware logic needed for path-based routing
-    // Next.js handles /username routing automatically via file system
-    return NextResponse.next();
-}
+export default NextAuth(authConfig).auth;
 
 export const config = {
     matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
