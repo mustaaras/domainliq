@@ -9,11 +9,32 @@ export default function LoginPage() {
     const [password, setPassword] = useState('');
     const router = useRouter();
 
+    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // In a real app, use server actions or the signIn function properly
-        // For now, this is a placeholder
-        console.log('Login attempt', email, password);
+        setIsLoading(true);
+        setError('');
+
+        try {
+            const result = await signIn('credentials', {
+                email,
+                password,
+                redirect: false,
+            });
+
+            if (result?.error) {
+                setError('Invalid email or password');
+                setIsLoading(false);
+            } else {
+                router.push('/');
+                router.refresh();
+            }
+        } catch (error) {
+            setError('An error occurred during login');
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -41,11 +62,17 @@ export default function LoginPage() {
                             required
                         />
                     </div>
+                    {error && (
+                        <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-sm">
+                            {error}
+                        </div>
+                    )}
                     <button
                         type="submit"
-                        className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg transition-colors"
+                        disabled={isLoading}
+                        className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        Sign In
+                        {isLoading ? 'Signing in...' : 'Sign In'}
                     </button>
                 </form>
             </div>
