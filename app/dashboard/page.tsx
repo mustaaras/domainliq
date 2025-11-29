@@ -146,6 +146,28 @@ export default function DashboardPage() {
         router.push('/');
     };
 
+    const handleToggleSold = async (id: string, currentStatus: string) => {
+        const newStatus = currentStatus === 'sold' ? 'available' : 'sold';
+
+        try {
+            const res = await fetch(`/api/user/domains/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+            });
+
+            if (!res.ok) throw new Error('Failed to update domain');
+
+            // Update local state
+            setDomains(domains.map(d =>
+                d.id === id ? { ...d, status: newStatus } : d
+            ));
+        } catch (error) {
+            console.error(error);
+            alert('Failed to update domain status');
+        }
+    };
+
     const handleDeleteDomain = async (id: string) => {
         if (!confirm('Are you sure you want to delete this domain?')) return;
 
@@ -186,7 +208,14 @@ export default function DashboardPage() {
                             className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-2"
                         >
                             <ExternalLink className="h-4 w-4" />
-                            View Site
+                            Home
+                        </Link>
+                        <Link
+                            href={`/${session?.user?.email?.split('@')[0] || ''}`}
+                            className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-2"
+                        >
+                            <ExternalLink className="h-4 w-4" />
+                            View Your Store
                         </Link>
                         <Link
                             href="/settings"
@@ -329,13 +358,25 @@ export default function DashboardPage() {
                                                 </div>
                                             </div>
 
-                                            <button
-                                                onClick={() => handleDeleteDomain(domain.id)}
-                                                className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
-                                                title="Delete Domain"
-                                            >
-                                                <Trash2 className="h-5 w-5" />
-                                            </button>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => handleToggleSold(domain.id, domain.status)}
+                                                    className={`p-2 rounded-lg transition-all ${domain.status === 'sold'
+                                                            ? 'text-green-400 hover:text-green-300 hover:bg-green-500/10'
+                                                            : 'text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/10'
+                                                        }`}
+                                                    title={domain.status === 'sold' ? 'Mark as Available' : 'Mark as Sold'}
+                                                >
+                                                    {domain.status === 'sold' ? '↺' : '✓'}
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteDomain(domain.id)}
+                                                    className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+                                                    title="Delete Domain"
+                                                >
+                                                    <Trash2 className="h-5 w-5" />
+                                                </button>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
