@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Loader2, Plus, Trash2, Settings, ExternalLink, DollarSign, LogOut, Shield, ShieldCheck, Copy, Check } from 'lucide-react';
+import { Loader2, Plus, Trash2, Settings, ExternalLink, DollarSign, LogOut, Shield, ShieldCheck, Copy, Check, CheckSquare } from 'lucide-react';
 import { useSession, signOut } from 'next-auth/react';
 import { verifyDomain } from '../actions/verify-domain';
 
@@ -53,6 +53,8 @@ export default function DashboardPage() {
     // Bulk delete state
     const [selectedDomainIds, setSelectedDomainIds] = useState<Set<string>>(new Set());
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isInSelectionMode, setIsInSelectionMode] = useState(false);
+    const [isBulkVerifying, setIsBulkVerifying] = useState(false);
 
     useEffect(() => {
         if (status === 'unauthenticated') {
@@ -270,6 +272,26 @@ export default function DashboardPage() {
             // Select all on current page
             setSelectedDomainIds(new Set(currentPageDomains.map(d => d.id)));
         }
+    };
+
+    const handleBulkVerify = async () => {
+        if (selectedDomainIds.size === 0) return;
+
+        setIsBulkVerifying(true);
+        const selectedDomains = domains.filter(d => selectedDomainIds.has(d.id));
+
+        for (const domain of selectedDomains) {
+            try {
+                await verifyDomain(domain.id);
+                // Small delay between verifications to avoid overwhelming the server
+                await new Promise(resolve => setTimeout(resolve, 500));
+            } catch (error) {
+                console.error(`Failed to verify ${domain.name}:`, error);
+            }
+        }
+
+        setIsBulkVerifying(false);
+        fetchUserDomains(); // Refresh the list
     };
 
     const handleVerifyDomain = async () => {
@@ -511,16 +533,49 @@ export default function DashboardPage() {
                         <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
                             <div className="p-6 border-b border-white/10 flex items-center justify-between">
                                 <h2 className="text-xl font-semibold">Your Domains</h2>
-                                {selectedDomainIds.size > 0 && (
-                                    <button
-                                        onClick={handleBulkDelete}
-                                        disabled={isDeleting}
-                                        className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-medium transition-all disabled:opacity-50"
-                                    >
-                                        {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-                                        Delete Selected ({selectedDomainIds.size})
-                                    </button>
-                                )}
+                                <div className="flex items-center gap-2">
+                                    {!isInSelectionMode ? (
+                                        <button
+                                            onClick={() => setIsInSelectionMode(true)}
+                                            className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg font-medium transition-all"
+                                        >
+                                            <CheckSquare className="h-4 w-4" />
+                                            Select
+                                        </button>
+                                    ) : (
+                                        <>
+                                            {selectedDomainIds.size > 0 && (
+                                                <>
+                                                    <button
+                                                        onClick={handleBulkVerify}
+                                                        disabled={isBulkVerifying}
+                                                        className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition-all disabled:opacity-50"
+                                                    >
+                                                        {isBulkVerifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
+                                                        Verify Selected ({selectedDomainIds.size})
+                                                    </button>
+                                                    <button
+                                                        onClick={handleBulkDelete}
+                                                        disabled={isDeleting}
+                                                        className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-medium transition-all disabled:opacity-50"
+                                                    >
+                                                        {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                                                        Delete Selected ({selectedDomainIds.size})
+                                                    </button>
+                                                </>
+                                            )}
+                                            <button
+                                                onClick={() => {
+                                                    setIsInSelectionMode(false);
+                                                    setSelectedDomainIds(new Set());
+                                                }}
+                                                className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg font-medium transition-all"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
                             </div>
 
                             {domains.length === 0 ? (
@@ -529,8 +584,8 @@ export default function DashboardPage() {
                                 </div>
                             ) : (
                                 <div className="divide-y divide-white/5">
-                                    {/* Select All Row */}
-                                    {domains.length > 0 && (
+                                    {/* Select All Row - Only show in selection mode */}
+                                    {isInSelectionMode && domains.length > 0 && (
                                         <div className="p-4 bg-white/5 flex items-center gap-3">
                                             <input
                                                 type="checkbox"
@@ -546,12 +601,14 @@ export default function DashboardPage() {
 
                                     {domains.slice((currentPage - 1) * domainsPerPage, currentPage * domainsPerPage).map(domain => (
                                         <div key={domain.id} className="p-4 flex items-center gap-3 hover:bg-white/5 transition-colors">
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedDomainIds.has(domain.id)}
-                                                onChange={() => toggleSelectDomain(domain.id)}
-                                                className="h-4 w-4 rounded border-white/20 bg-black/20 text-amber-500 focus:ring-amber-500/50"
-                                            />
+                                            {isInSelectionMode && (
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedDomainIds.has(domain.id)}
+                                                    onChange={() => toggleSelectDomain(domain.id)}
+                                                    className="h-4 w-4 rounded border-white/20 bg-black/20 text-amber-500 focus:ring-amber-500/50"
+                                                />
+                                            )}
                                             <div className="flex-1 flex items-center justify-between">
                                                 <div>
                                                     <div className="flex items-center gap-2">
