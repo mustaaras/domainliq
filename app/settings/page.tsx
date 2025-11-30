@@ -145,7 +145,7 @@ export default function SettingsPage() {
             <div className="max-w-2xl mx-auto">
                 <header className="mb-8">
                     {/* Logo */}
-                    <div className="flex justify-center md:justify-start mb-6">
+                    <div className="flex justify-center mb-6">
                         <Link href="/">
                             <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto cursor-pointer" />
                         </Link>

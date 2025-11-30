@@ -432,8 +432,8 @@ export default function DashboardPage() {
                 {/* Header */}
                 <header className="relative mb-8">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div className="text-center md:text-left w-full md:w-auto">
-                            <div className="flex items-center gap-3 justify-center md:justify-start mb-4">
+                        <div className="text-center w-full md:w-auto">
+                            <div className="flex items-center gap-3 justify-center mb-4">
                                 <Link href="/">
                                     <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto cursor-pointer" />
                                 </Link>
