@@ -35,6 +35,10 @@ export default function DashboardPage() {
     const [activeMethod, setActiveMethod] = useState<'txt' | 'ns' | null>(null);
     const [copiedToken, setCopiedToken] = useState(false);
 
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(9);
+
     // New domain form state
     const [newDomain, setNewDomain] = useState({ name: '', price: '' });
     const [addError, setAddError] = useState('');
@@ -438,7 +442,7 @@ export default function DashboardPage() {
                                 </div>
                             ) : (
                                 <div className="divide-y divide-white/5">
-                                    {domains.map(domain => (
+                                    {domains.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map(domain => (
                                         <div key={domain.id} className="p-4 flex items-center justify-between hover:bg-white/5 transition-colors">
                                             <div>
                                                 <div className="flex items-center gap-2">
@@ -497,6 +501,48 @@ export default function DashboardPage() {
                                     ))}
                                 </div>
                             )}
+
+                            {/* Pagination */}
+                            {domains.length > 0 && (
+                                <div className="p-4 border-t border-white/10 flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-sm text-gray-500">Show:</span>
+                                        <select
+                                            value={itemsPerPage}
+                                            onChange={(e) => {
+                                                setItemsPerPage(Number(e.target.value));
+                                                setCurrentPage(1);
+                                            }}
+                                            className="bg-black/20 border border-white/10 rounded px-2 py-1 text-sm text-gray-300 focus:outline-none focus:border-amber-500/50"
+                                        >
+                                            <option value={9}>9</option>
+                                            <option value={12}>12</option>
+                                            <option value={24}>24</option>
+                                            <option value={48}>48</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                            disabled={currentPage === 1}
+                                            className="px-3 py-1 text-sm text-gray-400 hover:text-white disabled:opacity-50 disabled:hover:text-gray-400 transition-colors"
+                                        >
+                                            Previous
+                                        </button>
+                                        <span className="text-sm text-gray-500">
+                                            Page {currentPage} of {Math.ceil(domains.length / itemsPerPage)}
+                                        </span>
+                                        <button
+                                            onClick={() => setCurrentPage(p => Math.min(Math.ceil(domains.length / itemsPerPage), p + 1))}
+                                            disabled={currentPage >= Math.ceil(domains.length / itemsPerPage)}
+                                            className="px-3 py-1 text-sm text-gray-400 hover:text-white disabled:opacity-50 disabled:hover:text-gray-400 transition-colors"
+                                        >
+                                            Next
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -517,7 +563,7 @@ export default function DashboardPage() {
 
                         <div
                             className={`bg-white/5 border rounded-lg p-4 mb-6 cursor-pointer transition-colors ${activeMethod === 'txt' ? 'border-amber-500/50 bg-amber-500/5' : 'border-white/10 hover:border-white/20'}`}
-                            onClick={() => setActiveMethod('txt')}
+                            onClick={() => setActiveMethod(activeMethod === 'txt' ? null : 'txt')}
                         >
                             <div className="flex justify-between text-xs text-gray-500 mb-1">
                                 <span>Record Type</span>
@@ -560,7 +606,7 @@ export default function DashboardPage() {
 
                         <div
                             className={`bg-white/5 border rounded-lg p-4 mb-6 cursor-pointer transition-colors ${activeMethod === 'ns' ? 'border-amber-500/50 bg-amber-500/5' : 'border-white/10 hover:border-white/20'}`}
-                            onClick={() => setActiveMethod('ns')}
+                            onClick={() => setActiveMethod(activeMethod === 'ns' ? null : 'ns')}
                         >
                             <div className="flex justify-between text-xs text-gray-500 mb-1">
                                 <span>Record Type</span>
