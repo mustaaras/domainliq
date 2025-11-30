@@ -25,6 +25,7 @@ interface Domain {
     preferredContact: string;
   };
   isVerified?: boolean;
+  expiresAt?: string | null;
 }
 
 export default function Home() {
@@ -502,13 +503,23 @@ export default function Home() {
                             <ShieldCheck className="h-4 w-4 text-green-500 shrink-0" />
                           )}
                         </div>
-                        <Link
-                          href={`/u/${domain.user.subdomain}`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="text-xs text-gray-500 hover:text-amber-400 transition-colors"
-                        >
-                          by {domain.user.name || domain.user.subdomain}
-                        </Link>
+                        <div className="flex items-center gap-2 flex-wrap text-xs text-gray-500">
+                          <Link
+                            href={`/u/${domain.user.subdomain}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="hover:text-amber-400 transition-colors"
+                          >
+                            by {domain.user.name || domain.user.subdomain}
+                          </Link>
+                          {domain.expiresAt && (
+                            <>
+                              <span>•</span>
+                              <span>
+                                Expires {new Date(domain.expiresAt).toLocaleDateString()}
+                              </span>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
 
