@@ -167,96 +167,83 @@ async function checkAuthoritative(domain: string, expectedNs: string, resolveNs:
         const tldNs = await resolveNs(tld);
         if (!tldNs || tldNs.length === 0) return false;
 
-        // 3. Pick one random TLD NS
-        const targetNsHostname = tldNs[Math.floor(Math.random() * tldNs.length)];
-        console.log(`📡 Querying authoritative NS: ${targetNsHostname}`);
+        // 3. Query ALL TLD nameservers in parallel for speed
+        const dns = await import('dns');
+        const { resolve4 } = dns.promises;
 
-        // 4. Query using low-level DNS packet to access AUTHORITY section
-        try {
-            const dns = await import('dns');
-            const { resolve4 } = dns.promises;
-            const packet = await import('dns-packet');
-            const dgram = await import('dgram');
+        const queries = tldNs.map(async (targetNsHostname: string) => {
+            try {
+                const packet = await import('dns-packet');
+                const dgram = await import('dgram');
 
-            // Resolve the TLD NS hostname to an IP
-            const nsIps = await resolve4(targetNsHostname);
-            if (!nsIps || nsIps.length === 0) {
-                console.log('Could not resolve TLD NS hostname to IP');
+                // Resolve the TLD NS hostname to an IP
+                const nsIps = await resolve4(targetNsHostname);
+                if (!nsIps || nsIps.length === 0) return false;
+
+                const nsIp = nsIps[0];
+
+                // Create DNS query packet
+                const query = packet.encode({
+                    type: 'query',
+                    id: Math.floor(Math.random() * 65535),
+                    flags: packet.RECURSION_DESIRED,
+                    questions: [{
+                        type: 'NS',
+                        name: domain
+                    }]
+                });
+
+                // Send query via UDP
+                return new Promise<boolean>((resolve) => {
+                    const socket = dgram.createSocket('udp4');
+                    const timeout = setTimeout(() => {
+                        socket.close();
+                        resolve(false);
+                    }, 3000); // Reduced timeout for faster parallel queries
+
+                    socket.on('message', (message: Buffer) => {
+                        clearTimeout(timeout);
+                        socket.close();
+
+                        try {
+                            const response = packet.decode(message);
+
+                            // Check both ANSWER and AUTHORITY sections
+                            const allRecords = [
+                                ...(response.answers || []),
+                                ...(response.authorities || [])
+                            ];
+
+                            const nsRecords = allRecords.filter((r: any) => r.type === 'NS');
+                            const normalizedExpected = expectedNs.toLowerCase().replace(/\.$/, '');
+
+                            const match = nsRecords.some((record: any) => {
+                                const cleanRecord = (record.data || '').toLowerCase().replace(/\.$/, '');
+                                return cleanRecord === normalizedExpected;
+                            });
+
+                            resolve(match);
+                        } catch (e) {
+                            resolve(false);
+                        }
+                    });
+
+                    socket.on('error', () => {
+                        clearTimeout(timeout);
+                        socket.close();
+                        resolve(false);
+                    });
+
+                    socket.send(query, 53, nsIp);
+                });
+            } catch (e) {
                 return false;
             }
+        });
 
-            const nsIp = nsIps[0];
-
-            // Create DNS query packet
-            const query = packet.encode({
-                type: 'query',
-                id: Math.floor(Math.random() * 65535),
-                flags: packet.RECURSION_DESIRED,
-                questions: [{
-                    type: 'NS',
-                    name: domain
-                }]
-            });
-
-            // Send query via UDP
-            return new Promise((resolve) => {
-                const socket = dgram.createSocket('udp4');
-                const timeout = setTimeout(() => {
-                    socket.close();
-                    console.log('DNS query timeout');
-                    resolve(false);
-                }, 5000);
-
-                socket.on('message', (message: Buffer) => {
-                    clearTimeout(timeout);
-                    socket.close();
-
-                    try {
-                        const response = packet.decode(message);
-
-                        // Check both ANSWER and AUTHORITY sections
-                        const allRecords = [
-                            ...(response.answers || []),
-                            ...(response.authorities || [])
-                        ];
-
-                        const nsRecords = allRecords.filter((r: any) => r.type === 'NS');
-                        console.log(`✓ Found ${nsRecords.length} NS records from authoritative server`);
-
-                        // Log actual records for debugging
-                        nsRecords.forEach((r: any, i: number) => {
-                            console.log(`  NS Record ${i + 1}:`, JSON.stringify(r));
-                        });
-
-                        const normalizedExpected = expectedNs.toLowerCase().replace(/\.$/, '');
-                        console.log(`Looking for: "${normalizedExpected}"`);
-
-                        const match = nsRecords.some((record: any) => {
-                            const cleanRecord = (record.data || '').toLowerCase().replace(/\.$/, '');
-                            console.log(`  Comparing "${cleanRecord}" === "${normalizedExpected}"`);
-                            return cleanRecord === normalizedExpected;
-                        });
-
-                        resolve(match);
-                    } catch (e) {
-                        console.error('Failed to parse DNS response:', e);
-                        resolve(false);
-                    }
-                });
-
-                socket.on('error', (err: Error) => {
-                    clearTimeout(timeout);
-                    socket.close();
-                    console.error('DNS socket error:', err.message);
-                    resolve(false);
-                });
-
-                socket.send(query, 53, nsIp);
-            });
-        } catch (e: any) {
-            console.error('Authoritative NS query failed:', e.message);
-            return false;
-        }
+        // Return true as soon as ANY server confirms the record
+        const results = await Promise.all(queries);
+        return results.some(result => result === true);
     } catch (e) {
         console.error('Authoritative check error:', e);
         return false;
