@@ -37,7 +37,7 @@ export default function DashboardPage() {
 
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(9);
+    const [domainsPerPage, setDomainsPerPage] = useState(10);
 
     // New domain form state
     const [newDomain, setNewDomain] = useState({ name: '', price: '' });
@@ -49,6 +49,10 @@ export default function DashboardPage() {
 
     // User subdomain for profile link
     const [userSubdomain, setUserSubdomain] = useState('');
+
+    // Bulk delete state
+    const [selectedDomainIds, setSelectedDomainIds] = useState<Set<string>>(new Set());
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         if (status === 'unauthenticated') {
@@ -196,20 +200,75 @@ export default function DashboardPage() {
         }
     };
 
-    const handleDeleteDomain = async (id: string) => {
+    const handleDeleteDomain = async (domainId: string) => {
         if (!confirm('Are you sure you want to delete this domain?')) return;
 
         try {
-            const res = await fetch(`/api/user/domains/${id}`, {
-                method: 'DELETE'
+            const res = await fetch(`/api/user/domains/${domainId}`, {
+                method: 'DELETE',
             });
 
-            if (!res.ok) throw new Error('Failed to delete domain');
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.error || 'Failed to delete domain');
+            }
 
-            setDomains(domains.filter(d => d.id !== id));
-        } catch (error) {
-            console.error(error);
-            alert('Failed to delete domain');
+            setDomains(domains.filter(d => d.id !== domainId));
+            // Remove from selection if it was selected
+            setSelectedDomainIds(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(domainId);
+                return newSet;
+            });
+        } catch (error: any) {
+            alert(error.message);
+        }
+    };
+
+    const handleBulkDelete = async () => {
+        if (selectedDomainIds.size === 0) return;
+        if (!confirm(`Are you sure you want to delete ${selectedDomainIds.size} domain(s)?`)) return;
+
+        setIsDeleting(true);
+        try {
+            const deletePromises = Array.from(selectedDomainIds).map(id =>
+                fetch(`/api/user/domains/${id}`, { method: 'DELETE' })
+            );
+
+            await Promise.all(deletePromises);
+            setDomains(domains.filter(d => !selectedDomainIds.has(d.id)));
+            setSelectedDomainIds(new Set());
+        } catch (error: any) {
+            alert('Failed to delete some domains');
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
+    const toggleSelectDomain = (domainId: string) => {
+        setSelectedDomainIds(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(domainId)) {
+                newSet.delete(domainId);
+            } else {
+                newSet.add(domainId);
+            }
+            return newSet;
+        });
+    };
+
+    const toggleSelectAll = () => {
+        const currentPageDomains = domains.slice(
+            (currentPage - 1) * domainsPerPage,
+            currentPage * domainsPerPage
+        );
+
+        if (selectedDomainIds.size === currentPageDomains.length) {
+            // Deselect all
+            setSelectedDomainIds(new Set());
+        } else {
+            // Select all on current page
+            setSelectedDomainIds(new Set(currentPageDomains.map(d => d.id)));
         }
     };
 
@@ -450,8 +509,18 @@ export default function DashboardPage() {
                     {/* Domain List */}
                     <div className="lg:col-span-2">
                         <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
-                            <div className="p-6 border-b border-white/10">
+                            <div className="p-6 border-b border-white/10 flex items-center justify-between">
                                 <h2 className="text-xl font-semibold">Your Domains</h2>
+                                {selectedDomainIds.size > 0 && (
+                                    <button
+                                        onClick={handleBulkDelete}
+                                        disabled={isDeleting}
+                                        className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-medium transition-all disabled:opacity-50"
+                                    >
+                                        {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                                        Delete Selected ({selectedDomainIds.size})
+                                    </button>
+                                )}
                             </div>
 
                             {domains.length === 0 ? (
@@ -460,60 +529,83 @@ export default function DashboardPage() {
                                 </div>
                             ) : (
                                 <div className="divide-y divide-white/5">
-                                    {domains.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map(domain => (
-                                        <div key={domain.id} className="p-4 flex items-center justify-between hover:bg-white/5 transition-colors">
-                                            <div>
-                                                <div className="flex items-center gap-2">
-                                                    <h3 className={`font-medium ${domain.status === 'sold' ? 'line-through text-gray-500' : 'text-white'}`}>
-                                                        {domain.name}
-                                                    </h3>
-                                                    {domain.isVerified ? (
-                                                        <div className="group relative">
-                                                            <ShieldCheck className="h-4 w-4 text-green-400" />
-                                                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                                                                Ownership Verified
-                                                            </div>
-                                                        </div>
-                                                    ) : (
-                                                        domain.status !== 'sold' && (
-                                                            <button
-                                                                onClick={() => openVerifyModal(domain)}
-                                                                className="text-xs text-amber-500 hover:text-amber-400 flex items-center gap-1 bg-amber-500/10 hover:bg-amber-500/20 px-2 py-0.5 rounded transition-colors"
-                                                            >
-                                                                <Shield className="h-3 w-3" />
-                                                                Verify
-                                                            </button>
-                                                        )
-                                                    )}
-                                                </div>
-                                                <p className="text-sm text-gray-500">
-                                                    Listed on {new Date(domain.createdAt).toLocaleDateString()}
-                                                </p>
-                                            </div>
+                                    {/* Select All Row */}
+                                    {domains.length > 0 && (
+                                        <div className="p-4 bg-white/5 flex items-center gap-3">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedDomainIds.size > 0 && selectedDomainIds.size === domains.slice((currentPage - 1) * domainsPerPage, currentPage * domainsPerPage).length}
+                                                onChange={toggleSelectAll}
+                                                className="h-4 w-4 rounded border-white/20 bg-black/20 text-amber-500 focus:ring-amber-500/50"
+                                            />
+                                            <span className="text-sm text-gray-400">
+                                                Select all on this page
+                                            </span>
+                                        </div>
+                                    )}
 
-                                            <div className="flex items-center gap-4">
-                                                <div className="text-right">
-                                                    <div className="font-mono text-white">
-                                                        ${domain.price.toLocaleString()}
+                                    {domains.slice((currentPage - 1) * domainsPerPage, currentPage * domainsPerPage).map(domain => (
+                                        <div key={domain.id} className="p-4 flex items-center gap-3 hover:bg-white/5 transition-colors">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedDomainIds.has(domain.id)}
+                                                onChange={() => toggleSelectDomain(domain.id)}
+                                                className="h-4 w-4 rounded border-white/20 bg-black/20 text-amber-500 focus:ring-amber-500/50"
+                                            />
+                                            <div className="flex-1 flex items-center justify-between">
+                                                <div>
+                                                    <div className="flex items-center gap-2">
+                                                        <h3 className={`font-medium ${domain.status === 'sold' ? 'line-through text-gray-500' : 'text-white'}`}>
+                                                            {domain.name}
+                                                        </h3>
+                                                        {domain.isVerified ? (
+                                                            <div className="group relative">
+                                                                <ShieldCheck className="h-4 w-4 text-green-400" />
+                                                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                                                                    Ownership Verified
+                                                                </div>
+                                                            </div>
+                                                        ) : (
+                                                            domain.status !== 'sold' && (
+                                                                <button
+                                                                    onClick={() => openVerifyModal(domain)}
+                                                                    className="text-xs text-amber-500 hover:text-amber-400 flex items-center gap-1 bg-amber-500/10 hover:bg-amber-500/20 px-2 py-0.5 rounded transition-colors"
+                                                                >
+                                                                    <Shield className="h-3 w-3" />
+                                                                    Verify
+                                                                </button>
+                                                            )
+                                                        )}
                                                     </div>
+                                                    <p className="text-sm text-gray-500">
+                                                        Listed on {new Date(domain.createdAt).toLocaleDateString()}
+                                                    </p>
+                                                </div>
+
+                                                <div className="flex items-center gap-4">
+                                                    <div className="text-right">
+                                                        <div className="font-mono text-white">
+                                                            ${domain.price.toLocaleString()}
+                                                        </div>
+                                                        <button
+                                                            onClick={() => handleToggleSold(domain.id, domain.status)}
+                                                            className={`text-xs font-medium mt-1 ${domain.status === 'sold'
+                                                                ? 'text-green-400 hover:text-green-300'
+                                                                : 'text-amber-500 hover:text-amber-400'
+                                                                }`}
+                                                        >
+                                                            {domain.status === 'sold' ? 'Mark Available' : 'Mark Sold'}
+                                                        </button>
+                                                    </div>
+
                                                     <button
-                                                        onClick={() => handleToggleSold(domain.id, domain.status)}
-                                                        className={`text-xs font-medium mt-1 ${domain.status === 'sold'
-                                                            ? 'text-green-400 hover:text-green-300'
-                                                            : 'text-amber-500 hover:text-amber-400'
-                                                            }`}
+                                                        onClick={() => handleDeleteDomain(domain.id)}
+                                                        className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                                                        title="Delete Domain"
                                                     >
-                                                        {domain.status === 'sold' ? 'Mark Available' : 'Mark Sold'}
+                                                        <Trash2 className="h-4 w-4" />
                                                     </button>
                                                 </div>
-
-                                                <button
-                                                    onClick={() => handleDeleteDomain(domain.id)}
-                                                    className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-                                                    title="Delete Domain"
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </button>
                                             </div>
                                         </div>
                                     ))}
@@ -526,17 +618,17 @@ export default function DashboardPage() {
                                     <div className="flex items-center gap-2">
                                         <span className="text-sm text-gray-500">Show:</span>
                                         <select
-                                            value={itemsPerPage}
+                                            value={domainsPerPage}
                                             onChange={(e) => {
-                                                setItemsPerPage(Number(e.target.value));
+                                                setDomainsPerPage(Number(e.target.value));
                                                 setCurrentPage(1);
                                             }}
                                             className="bg-black/20 border border-white/10 rounded px-2 py-1 text-sm text-gray-300 focus:outline-none focus:border-amber-500/50"
                                         >
-                                            <option value={9}>9</option>
-                                            <option value={12}>12</option>
-                                            <option value={24}>24</option>
-                                            <option value={48}>48</option>
+                                            <option value="10">10 per page</option>
+                                            <option value="50">50 per page</option>
+                                            <option value="100">100 per page</option>
+                                            <option value="200">200 per page</option>
                                         </select>
                                     </div>
 
@@ -549,11 +641,11 @@ export default function DashboardPage() {
                                             Previous
                                         </button>
                                         <span className="text-sm text-gray-500">
-                                            Page {currentPage} of {Math.ceil(domains.length / itemsPerPage)}
+                                            Page {currentPage} of {Math.ceil(domains.length / domainsPerPage)}
                                         </span>
                                         <button
-                                            onClick={() => setCurrentPage(p => Math.min(Math.ceil(domains.length / itemsPerPage), p + 1))}
-                                            disabled={currentPage >= Math.ceil(domains.length / itemsPerPage)}
+                                            onClick={() => setCurrentPage(p => Math.min(Math.ceil(domains.length / domainsPerPage), p + 1))}
+                                            disabled={currentPage >= Math.ceil(domains.length / domainsPerPage)}
                                             className="px-3 py-1 text-sm text-gray-400 hover:text-white disabled:opacity-50 disabled:hover:text-gray-400 transition-colors"
                                         >
                                             Next
@@ -654,9 +746,9 @@ export default function DashboardPage() {
 
                             {activeMethod === 'ns' && (
                                 <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded text-xs text-amber-200 animate-in fade-in slide-in-from-top-2">
-                                    <p className="font-medium mb-1">✨ Recommended: Instant Verification!</p>
+                                    <p className="font-medium mb-1">✨ Recommended: Fastest Verification!</p>
                                     <p className="mb-2">Add this as an <strong>additional nameserver (e.g., NS3)</strong> to your existing list. <br />Do <strong>NOT</strong> remove your current nameservers (NS1, NS2) to keep your landing page working.</p>
-                                    <p className="text-green-400 font-medium">⚡️ Verifies instantly after you save changes at your registrar!</p>
+                                    <p className="text-green-400 font-medium">⚡️ Verifies within minutes once your registrar updates the registry!</p>
                                 </div>
                             )}
                         </div>
