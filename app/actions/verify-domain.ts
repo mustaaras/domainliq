@@ -5,15 +5,16 @@ import { resolveTxt, resolveNs } from 'dns/promises';
 
 export async function verifyDomain(domainId: string) {
     try {
-        // 1. Get the domain and token from DB
+        // 1. Get the domain and user token from DB
         const domain = await db.domain.findUnique({
             where: { id: domainId },
-            select: {
-                id: true,
-                name: true,
-                verificationToken: true,
-                isVerified: true,
-            },
+            include: {
+                user: {
+                    select: {
+                        verificationToken: true
+                    }
+                }
+            }
         });
 
         if (!domain) {
@@ -24,9 +25,11 @@ export async function verifyDomain(domainId: string) {
             return { success: true, message: 'Domain is already verified' };
         }
 
-        if (!domain.verificationToken) {
-            return { error: 'Verification token missing. Please contact support.' };
+        if (!domain.user.verificationToken) {
+            return { error: 'Verification token missing. Please refresh the page to generate one.' };
         }
+
+        const userToken = domain.user.verificationToken;
 
         try {
             // 2. Query DNS using Cloudflare DNS-over-HTTPS for faster propagation check
@@ -35,6 +38,9 @@ export async function verifyDomain(domainId: string) {
             let nsRecords: string[] = [];
 
             // --- TXT Record Check ---
+            // Expected format: domainliq-verification=[userToken]
+            const expectedTxtRecord = `domainliq-verification=${userToken}`;
+
             try {
                 const dohResponse = await fetch(`https://cloudflare-dns.com/dns-query?name=${domain.name}&type=TXT`, {
                     headers: { 'Accept': 'application/dns-json' },
@@ -64,7 +70,7 @@ export async function verifyDomain(domainId: string) {
             }
 
             const flatTxtRecords = txtRecords.flat();
-            const isTxtMatch = flatTxtRecords.some((r) => r.includes(domain.verificationToken!));
+            const isTxtMatch = flatTxtRecords.some((r) => r.includes(expectedTxtRecord));
 
             if (isTxtMatch) {
                 await markAsVerified(domainId);
@@ -72,8 +78,8 @@ export async function verifyDomain(domainId: string) {
             }
 
             // --- NS Record Check ---
-            // Expected format: verify-[token].ns.domainliq.com
-            const expectedNsRecord = `verify-${domain.verificationToken}.ns.domainliq.com`;
+            // Expected format: ns1.domainliq.com or ns2.domainliq.com
+            const expectedNsRecords = ['ns1.domainliq.com', 'ns2.domainliq.com'];
 
             try {
                 const dohResponse = await fetch(`https://cloudflare-dns.com/dns-query?name=${domain.name}&type=NS`, {
@@ -102,7 +108,12 @@ export async function verifyDomain(domainId: string) {
                 }
             }
 
-            const isNsMatch = nsRecords.some(r => r === expectedNsRecord || r === expectedNsRecord + '.');
+            // Check if any of the domain's NS records match our expected NS records
+            // We check for partial match because NS records might have trailing dot
+            const isNsMatch = nsRecords.some(record => {
+                const cleanRecord = record.replace(/\.$/, '').toLowerCase();
+                return expectedNsRecords.includes(cleanRecord);
+            });
 
             if (isNsMatch) {
                 await markAsVerified(domainId);

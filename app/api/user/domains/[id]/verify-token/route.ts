@@ -27,18 +27,20 @@ export async function POST(
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
         }
 
-        if (domain.verificationToken) {
-            return NextResponse.json({ token: domain.verificationToken });
+        // Check if user already has a token
+        if (domain.user.verificationToken) {
+            return NextResponse.json({ token: domain.user.verificationToken });
         }
 
-        const verificationToken = `domainliq-${Math.random().toString(36).substring(2, 10)}`;
+        // Generate new token for the user
+        const verificationToken = `user-${Math.random().toString(36).substring(2, 10)}`;
 
-        const updatedDomain = await db.domain.update({
-            where: { id },
+        await db.user.update({
+            where: { id: domain.userId },
             data: { verificationToken }
         });
 
-        return NextResponse.json({ token: updatedDomain.verificationToken });
+        return NextResponse.json({ token: verificationToken });
 
     } catch (error) {
         console.error('Token generation error:', error);

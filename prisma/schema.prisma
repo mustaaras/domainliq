@@ -28,6 +28,9 @@ model User {
   linkedinProfile String?
   telegramUsername String?
   preferredContact String @default("email") // email, twitter, whatsapp, linkedin, telegram
+  
+  // Verification
+  verificationToken String? @unique
 }
 
 model Domain {
