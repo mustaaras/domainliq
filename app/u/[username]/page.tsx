@@ -88,5 +88,12 @@ export default async function UserProfilePage({ params }: PageProps) {
         preferredContact: user.preferredContact,
     };
 
-    return <ProfileClient user={userData} domains={user.domains} username={username} />;
+    const serializedDomains = user.domains.map(domain => ({
+        ...domain,
+        createdAt: domain.createdAt.toISOString(),
+        expiresAt: domain.expiresAt ? domain.expiresAt.toISOString() : null,
+        verificationToken: domain.verificationToken || null, // Ensure null instead of undefined
+    }));
+
+    return <ProfileClient user={userData} initialDomains={serializedDomains} username={username} />;
 }

@@ -48,6 +48,7 @@ model Domain {
   isVerified        Boolean   @default(false)
   verificationToken String?   @unique
   verifiedAt        DateTime?
+  expiresAt         DateTime?
 
   @@index([userId])
 }

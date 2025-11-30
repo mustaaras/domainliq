@@ -1,6 +1,7 @@
 'use server';
 
 import { db } from '@/lib/db';
+import whois from 'whois';
 
 export async function verifyDomain(domainId: string) {
     try {
@@ -63,7 +64,7 @@ export async function verifyDomain(domainId: string) {
             // Check TXT
             const isTxtMatch = Array.from(txtRecords).some(r => r.includes(expectedTxtRecord));
             if (isTxtMatch) {
-                await markAsVerified(domainId);
+                await markAsVerified(domainId, domain.name);
                 return { success: true };
             }
 
@@ -96,7 +97,7 @@ export async function verifyDomain(domainId: string) {
             });
 
             if (isNsMatch) {
-                await markAsVerified(domainId);
+                await markAsVerified(domainId, domain.name);
                 return { success: true };
             }
 
@@ -107,7 +108,7 @@ export async function verifyDomain(domainId: string) {
                 const authMatch = await checkAuthoritative(domain.name, expectedNsRecord, resolveNs);
                 console.log('📡 Authoritative check result:', authMatch);
                 if (authMatch) {
-                    await markAsVerified(domainId);
+                    await markAsVerified(domainId, domain.name);
                     return { success: true };
                 }
             } catch (authError) {
@@ -289,12 +290,47 @@ async function checkAuthoritative(domain: string, expectedNs: string, resolveNs:
     }
 }
 
-async function markAsVerified(domainId: string) {
+async function markAsVerified(domainId: string, domainName: string) {
+    let expiresAt: Date | null = null;
+
+    try {
+        // Try to fetch expiration date
+        const whoisData = await new Promise<string>((resolve, reject) => {
+            whois.lookup(domainName, (err, data) => {
+                if (err) reject(err);
+                else resolve(data);
+            });
+        });
+
+        // Common patterns for expiration date
+        const patterns = [
+            /Registry Expiry Date: (.+)/i,
+            /Expiration Date: (.+)/i,
+            /Expiry Date: (.+)/i,
+            /paid-till: (.+)/i,
+            /expires: (.+)/i
+        ];
+
+        for (const pattern of patterns) {
+            const match = whoisData.match(pattern);
+            if (match && match[1]) {
+                const date = new Date(match[1].trim());
+                if (!isNaN(date.getTime())) {
+                    expiresAt = date;
+                    break;
+                }
+            }
+        }
+    } catch (e) {
+        console.error('Failed to fetch WHOIS data:', e);
+    }
+
     await db.domain.update({
         where: { id: domainId },
         data: {
             isVerified: true,
             verifiedAt: new Date(),
+            expiresAt: expiresAt
         },
     });
 }

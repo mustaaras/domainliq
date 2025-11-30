@@ -15,6 +15,7 @@ interface Domain {
     createdAt: string;
     isVerified: boolean;
     verificationToken: string | null;
+    expiresAt: string | null;
 }
 
 export default function DashboardPage() {
@@ -63,6 +64,7 @@ export default function DashboardPage() {
     const [verificationFilter, setVerificationFilter] = useState<'all' | 'verified' | 'unverified'>('all');
     const [priceMin, setPriceMin] = useState<string>('');
     const [priceMax, setPriceMax] = useState<string>('');
+    const [sortBy, setSortBy] = useState('newest');
 
     // Mobile menu state
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -328,6 +330,24 @@ export default function DashboardPage() {
         if (priceMax && domain.price > parseFloat(priceMax)) return false;
 
         return true;
+    }).sort((a, b) => {
+        switch (sortBy) {
+            case 'price_asc':
+                return a.price - b.price;
+            case 'price_desc':
+                return b.price - a.price;
+            case 'expires_asc':
+                if (!a.expiresAt) return 1;
+                if (!b.expiresAt) return -1;
+                return new Date(a.expiresAt).getTime() - new Date(b.expiresAt).getTime();
+            case 'expires_desc':
+                if (!a.expiresAt) return 1;
+                if (!b.expiresAt) return -1;
+                return new Date(b.expiresAt).getTime() - new Date(a.expiresAt).getTime();
+            case 'newest':
+            default:
+                return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        }
     });
 
     const toggleTLD = (tld: string) => {
@@ -346,12 +366,15 @@ export default function DashboardPage() {
         setSelectedTLDs(new Set());
         setVerificationFilter('all');
         setPriceMin('');
+        setPriceMin('');
         setPriceMax('');
+        setSortBy('newest');
     };
 
     const activeFiltersCount = selectedTLDs.size +
         (verificationFilter !== 'all' ? 1 : 0) +
-        (priceMin || priceMax ? 1 : 0);
+        (priceMin || priceMax ? 1 : 0) +
+        (sortBy !== 'newest' ? 1 : 0);
 
     const handleVerifyDomain = async () => {
         if (!selectedDomain) return;
@@ -797,6 +820,22 @@ export default function DashboardPage() {
                                                                     />
                                                                 </div>
                                                             </div>
+
+                                                            {/* Sort Filter */}
+                                                            <div className="mt-4">
+                                                                <label className="text-sm font-medium text-gray-300 mb-2 block">Sort By</label>
+                                                                <select
+                                                                    value={sortBy}
+                                                                    onChange={(e) => setSortBy(e.target.value)}
+                                                                    className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500/50"
+                                                                >
+                                                                    <option value="newest">Newest Listed</option>
+                                                                    <option value="price_asc">Price: Low to High</option>
+                                                                    <option value="price_desc">Price: High to Low</option>
+                                                                    <option value="expires_asc">Expiring Soon</option>
+                                                                    <option value="expires_desc">Expiring Later</option>
+                                                                </select>
+                                                            </div>
                                                         </div>
                                                     )}
 
@@ -942,8 +981,16 @@ export default function DashboardPage() {
                                                             )
                                                         )}
                                                     </div>
-                                                    <p className="text-sm text-gray-500">
-                                                        Listed on {new Date(domain.createdAt).toLocaleDateString()}
+                                                    <p className="text-sm text-gray-500 flex items-center gap-2">
+                                                        <span>Listed on {new Date(domain.createdAt).toLocaleDateString()}</span>
+                                                        {domain.expiresAt && (
+                                                            <>
+                                                                <span className="text-gray-700">•</span>
+                                                                <span className="text-amber-500/80" title="Expiration Date">
+                                                                    Exp: {new Date(domain.expiresAt).toLocaleDateString()}
+                                                                </span>
+                                                            </>
+                                                        )}
                                                     </p>
                                                 </div>
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Share2, MessageCircle, Check, Search, Loader2, ShieldCheck } from 'lucide-react';
+import { Share2, MessageCircle, Check, Search, Loader2, ShieldCheck, Filter, X, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 
@@ -40,10 +40,29 @@ export default function Home() {
   const [totalDomains, setTotalDomains] = useState(0);
   const [showContactModal, setShowContactModal] = useState(false);
 
+  // Filter State
+  const [showFilterPanel, setShowFilterPanel] = useState(false);
+  const [filterTLD, setFilterTLD] = useState<string[]>([]);
+  const [filterPrice, setFilterPrice] = useState({ min: '', max: '' });
+  const [filterVerified, setFilterVerified] = useState(false);
+  const [sortBy, setSortBy] = useState('newest');
+
+  const commonTLDs = ['com', 'net', 'org', 'io', 'ai', 'xyz', 'co', 'app'];
+
   const fetchDomains = async (pageNum: number, limit: number) => {
     try {
       setIsLoading(true);
-      const res = await fetch(`/api/domains?page=${pageNum}&limit=${limit}&search=${searchQuery}`);
+      const params = new URLSearchParams({
+        page: pageNum.toString(),
+        limit: limit.toString(),
+        search: searchQuery,
+        sort: sortBy,
+        ...(filterTLD.length && { tld: filterTLD.join(',') }),
+        ...(filterPrice.min && { minPrice: filterPrice.min }),
+        ...(filterPrice.max && { maxPrice: filterPrice.max }),
+        ...(filterVerified && { verified: 'true' }),
+      });
+      const res = await fetch(`/api/domains?${params}`);
       const data = await res.json();
 
       if (data.error) {
@@ -72,7 +91,7 @@ export default function Home() {
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [searchQuery, itemsPerPage]);
+  }, [searchQuery, itemsPerPage, sortBy, filterVerified, filterTLD, filterPrice]); // Re-fetch when filters change (debounced)
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -290,25 +309,139 @@ export default function Home() {
         </header>
 
         {/* Section Title & Controls */}
-        <div className="mb-6 flex flex-col items-center gap-4">
-          <div className="text-center">
+        <div className="mb-6 flex flex-col md:flex-row justify-between items-center gap-4 relative">
+          <div className="text-center md:text-left w-full md:w-auto">
             <h2 className="text-xl font-bold text-white">Recently Added Domains</h2>
             <p className="text-gray-400 text-xs mt-1">Fresh listing from the sellers</p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-400">Show:</span>
-            <select
-              value={itemsPerPage}
-              onChange={handleLimitChange}
-              className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+          <div className="flex items-center gap-2 w-full md:w-auto justify-center md:justify-end">
+            <button
+              onClick={() => setShowFilterPanel(!showFilterPanel)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${showFilterPanel || filterTLD.length > 0 || filterPrice.min || filterPrice.max || filterVerified
+                ? 'bg-amber-500 text-white'
+                : 'bg-white/10 hover:bg-white/20 text-white'
+                }`}
             >
-              <option value={20}>20</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-              <option value={200}>200</option>
-            </select>
+              <Filter className="h-4 w-4" />
+              Filter
+              {(filterTLD.length > 0 || filterPrice.min || filterPrice.max || filterVerified) && (
+                <span className="ml-1 px-1.5 py-0.5 bg-white/20 rounded-full text-xs">
+                  •
+                </span>
+              )}
+            </button>
           </div>
+
+          {/* Filter Panel */}
+          {showFilterPanel && (
+            <div className="absolute top-full right-0 mt-2 w-full md:w-80 bg-[#0A0A0A] border border-white/20 rounded-xl shadow-2xl z-40 p-4">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-semibold text-white">Filters</h3>
+                <button onClick={() => setShowFilterPanel(false)} className="text-gray-400 hover:text-white">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              {/* TLDs */}
+              <div className="mb-4">
+                <label className="text-xs font-medium text-gray-400 mb-2 block">Extensions</label>
+                <div className="flex flex-wrap gap-2">
+                  {commonTLDs.map(tld => (
+                    <button
+                      key={tld}
+                      onClick={() => {
+                        setFilterTLD(prev =>
+                          prev.includes(tld) ? prev.filter(t => t !== tld) : [...prev, tld]
+                        );
+                        setPage(1);
+                      }}
+                      className={`px-2 py-1 text-xs rounded-md border transition-colors ${filterTLD.includes(tld)
+                        ? 'bg-amber-500 border-amber-500 text-white'
+                        : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'
+                        }`}
+                    >
+                      .{tld}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Price Range */}
+              <div className="mb-4">
+                <label className="text-xs font-medium text-gray-400 mb-2 block">Price Range ($)</label>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    placeholder="Min"
+                    value={filterPrice.min}
+                    onChange={e => {
+                      setFilterPrice(prev => ({ ...prev, min: e.target.value }));
+                      setPage(1);
+                    }}
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Max"
+                    value={filterPrice.max}
+                    onChange={e => {
+                      setFilterPrice(prev => ({ ...prev, max: e.target.value }));
+                      setPage(1);
+                    }}
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+                  />
+                </div>
+              </div>
+
+              {/* Status & Sort */}
+              <div className="mb-4 space-y-3">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={filterVerified}
+                    onChange={e => {
+                      setFilterVerified(e.target.checked);
+                      setPage(1);
+                    }}
+                    className="rounded border-white/10 bg-white/5 text-amber-500 focus:ring-amber-500/50"
+                  />
+                  <span className="text-sm text-gray-300">Verified Only</span>
+                </label>
+
+                <div>
+                  <label className="text-xs font-medium text-gray-400 mb-2 block">Sort By</label>
+                  <select
+                    value={sortBy}
+                    onChange={e => {
+                      setSortBy(e.target.value);
+                      setPage(1);
+                    }}
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+                  >
+                    <option value="newest">Newest Listed</option>
+                    <option value="price_asc">Price: Low to High</option>
+                    <option value="price_desc">Price: High to Low</option>
+                    <option value="expires_asc">Expiring Soon</option>
+                    <option value="expires_desc">Expiring Later</option>
+                  </select>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  setFilterTLD([]);
+                  setFilterPrice({ min: '', max: '' });
+                  setFilterVerified(false);
+                  setSortBy('newest');
+                  setPage(1);
+                }}
+                className="w-full py-2 text-xs text-gray-400 hover:text-white transition-colors border-t border-white/10"
+              >
+                Clear Filters
+              </button>
+            </div>
+          )}
         </div>
 
         {/* List */}
@@ -387,9 +520,24 @@ export default function Home() {
               })}
 
               {/* Pagination Controls */}
-              <div className="mt-8 flex items-center justify-between border-t border-white/10 pt-4">
-                <div className="text-sm text-gray-400">
-                  Showing <span className="font-medium text-white">{(page - 1) * itemsPerPage + 1}</span> to <span className="font-medium text-white">{Math.min(page * itemsPerPage, totalDomains)}</span> of <span className="font-medium text-white">{totalDomains}</span> results
+              <div className="mt-8 flex flex-col md:flex-row items-center justify-between border-t border-white/10 pt-4 gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="text-sm text-gray-400">
+                    Showing <span className="font-medium text-white">{(page - 1) * itemsPerPage + 1}</span> to <span className="font-medium text-white">{Math.min(page * itemsPerPage, totalDomains)}</span> of <span className="font-medium text-white">{totalDomains}</span> results
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-400">Show:</span>
+                    <select
+                      value={itemsPerPage}
+                      onChange={handleLimitChange}
+                      className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+                    >
+                      <option value={20}>20</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                      <option value={200}>200</option>
+                    </select>
+                  </div>
                 </div>
                 <div className="flex gap-2">
                   <button
