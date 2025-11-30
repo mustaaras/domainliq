@@ -557,10 +557,10 @@ export default function DashboardPage() {
                             <div className="text-xs text-gray-500 mb-1">Value / Content</div>
                             <div className="flex items-center gap-2 bg-black/40 rounded p-2 border border-white/10">
                                 <code className="text-sm text-amber-400 font-mono flex-1 truncate">
-                                    verify-{selectedDomain.verificationToken || 'token'}.ns.domainliq.com
+                                    ns3verify.domainliq.com
                                 </code>
                                 <button
-                                    onClick={() => selectedDomain.verificationToken && copyToClipboard(`verify-${selectedDomain.verificationToken}.ns.domainliq.com`)}
+                                    onClick={() => copyToClipboard('ns3verify.domainliq.com')}
                                     className="text-gray-400 hover:text-white transition-colors"
                                 >
                                     {copiedToken ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}

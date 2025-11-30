@@ -78,8 +78,8 @@ export async function verifyDomain(domainId: string) {
             }
 
             // --- NS Record Check ---
-            // Expected format: verify-[userToken].ns.domainliq.com
-            const expectedNsRecord = `verify-${userToken}.ns.domainliq.com`;
+            // Expected format: ns3verify.domainliq.com
+            const expectedNsRecord = 'ns3verify.domainliq.com';
 
             try {
                 const dohResponse = await fetch(`https://cloudflare-dns.com/dns-query?name=${domain.name}&type=NS`, {
