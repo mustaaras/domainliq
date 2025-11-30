@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/lib/db';
-import whois from 'whois';
+import * as whois from 'whois';
 
 export async function verifyDomain(domainId: string) {
     try {

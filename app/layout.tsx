@@ -22,9 +22,13 @@ export const metadata: Metadata = {
   title: "DomainLiq - Domain Liquidation Listing Platform",
   description: "Sell and buy domains quickly. The easiest way to liquidate your domain portfolio.",
   icons: {
-    icon: "/favicon.svg",
-    apple: "/favicon.svg", // For iOS devices
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.png", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
   },
+  manifest: "/manifest.json",
 };
 
 export default async function RootLayout({
