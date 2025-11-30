@@ -176,7 +176,7 @@ async function checkAuthoritative(domain: string, expectedNs: string, resolveNs:
         // 4. Query it using dig (requires dig to be installed)
         // We use dig because Node's dns module doesn't support specifying the server
         try {
-            const { stdout } = await execAsync(`dig @${targetNs} ns ${domain} +short`);
+            const { stdout } = await execAsync(`dig @${targetNs} ns ${domain}`);
             if (!stdout) return false;
 
             const records = stdout.split('\n').filter(Boolean);
