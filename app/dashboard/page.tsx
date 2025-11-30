@@ -316,8 +316,8 @@ export default function DashboardPage() {
         }
 
         // Verification filter
-        if (verificationFilter === 'verified' && domain.status !== 'verified') return false;
-        if (verificationFilter === 'unverified' && domain.status === 'verified') return false;
+        if (verificationFilter === 'verified' && !domain.isVerified) return false;
+        if (verificationFilter === 'unverified' && domain.isVerified) return false;
 
         // Price filter
         if (priceMin && domain.price < parseFloat(priceMin)) return false;
@@ -594,8 +594,8 @@ export default function DashboardPage() {
                                         <button
                                             onClick={() => setShowFilters(!showFilters)}
                                             className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${activeFiltersCount > 0
-                                                    ? 'bg-amber-600 hover:bg-amber-500 text-white'
-                                                    : 'bg-white/10 hover:bg-white/20 text-white'
+                                                ? 'bg-amber-600 hover:bg-amber-500 text-white'
+                                                : 'bg-white/10 hover:bg-white/20 text-white'
                                                 }`}
                                         >
                                             <Filter className="h-4 w-4" />
@@ -631,8 +631,8 @@ export default function DashboardPage() {
                                                                 key={tld}
                                                                 onClick={() => toggleTLD(tld)}
                                                                 className={`px-3 py-1 rounded-lg text-sm transition-all ${selectedTLDs.has(tld)
-                                                                        ? 'bg-amber-600 text-white'
-                                                                        : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                                                                    ? 'bg-amber-600 text-white'
+                                                                    : 'bg-white/10 text-gray-300 hover:bg-white/20'
                                                                     }`}
                                                             >
                                                                 .{tld}
@@ -648,8 +648,8 @@ export default function DashboardPage() {
                                                         <button
                                                             onClick={() => setVerificationFilter('all')}
                                                             className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${verificationFilter === 'all'
-                                                                    ? 'bg-amber-600 text-white'
-                                                                    : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                                                                ? 'bg-amber-600 text-white'
+                                                                : 'bg-white/10 text-gray-300 hover:bg-white/20'
                                                                 }`}
                                                         >
                                                             All
@@ -657,8 +657,8 @@ export default function DashboardPage() {
                                                         <button
                                                             onClick={() => setVerificationFilter('verified')}
                                                             className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${verificationFilter === 'verified'
-                                                                    ? 'bg-green-600 text-white'
-                                                                    : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                                                                ? 'bg-green-600 text-white'
+                                                                : 'bg-white/10 text-gray-300 hover:bg-white/20'
                                                                 }`}
                                                         >
                                                             Verified
@@ -666,8 +666,8 @@ export default function DashboardPage() {
                                                         <button
                                                             onClick={() => setVerificationFilter('unverified')}
                                                             className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${verificationFilter === 'unverified'
-                                                                    ? 'bg-gray-600 text-white'
-                                                                    : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                                                                ? 'bg-gray-600 text-white'
+                                                                : 'bg-white/10 text-gray-300 hover:bg-white/20'
                                                                 }`}
                                                         >
                                                             Unverified
