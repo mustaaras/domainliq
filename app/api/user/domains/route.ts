@@ -43,16 +43,12 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
 
-        // Generate verification token
-        const verificationToken = `domainliq-${Math.random().toString(36).substring(2, 10)}`;
-
         const domain = await db.domain.create({
             data: {
                 name,
                 price,
                 userId: user.id,
                 status: 'available',
-                verificationToken,
             },
         });
 
