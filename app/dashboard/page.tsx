@@ -424,6 +424,27 @@ export default function DashboardPage() {
                                 </button>
                             </form>
                         </div>
+
+                        {/* Contact Info Reminder */}
+                        <div className="mt-6 bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-6">
+                            <div className="flex items-start gap-4">
+                                <div className="p-2 bg-indigo-500/20 rounded-lg">
+                                    <Settings className="h-5 w-5 text-indigo-400" />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-medium text-indigo-200 mb-1">Update Contact Info</h3>
+                                    <p className="text-sm text-indigo-200/70 mb-3">
+                                        Don't forget to update your contact information in settings so buyers can reach you.
+                                    </p>
+                                    <Link
+                                        href="/settings"
+                                        className="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1"
+                                    >
+                                        Go to Settings <ExternalLink className="h-3 w-3" />
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Domain List */}
