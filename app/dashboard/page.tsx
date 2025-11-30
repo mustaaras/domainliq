@@ -427,12 +427,17 @@ export default function DashboardPage() {
         <div className="min-h-screen bg-[#050505] text-white p-4 md:p-8">
             <div className="max-w-5xl mx-auto">
                 {/* Header */}
-                <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-                    <div>
+                <header className="flex flex-col md:flex-row justify-between items-center md:items-center gap-4 mb-8">
+                    <div className="text-center md:text-left w-full md:w-auto">
+                        <div className="flex items-center gap-3 justify-center md:justify-start mb-2 md:mb-0">
+                            <Link href="/">
+                                <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto cursor-pointer" />
+                            </Link>
+                        </div>
                         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
                         <p className="text-gray-400 mt-1">Manage your domains and account</p>
                     </div>
-                    <div className="flex gap-3">
+                    <div className="flex gap-3 w-full md:w-auto justify-center md:justify-end">
                         <Link
                             href="/"
                             className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-2"
@@ -595,8 +600,8 @@ export default function DashboardPage() {
                                         <button
                                             onClick={() => setShowManagePanel(!showManagePanel)}
                                             className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${activeFiltersCount > 0 || isInSelectionMode
-                                                    ? 'bg-amber-600 hover:bg-amber-500 text-white'
-                                                    : 'bg-white/10 hover:bg-white/20 text-white'
+                                                ? 'bg-amber-600 hover:bg-amber-500 text-white'
+                                                : 'bg-white/10 hover:bg-white/20 text-white'
                                                 }`}
                                         >
                                             {isInSelectionMode ? <CheckSquare className="h-4 w-4" /> : <Filter className="h-4 w-4" />}
@@ -616,8 +621,8 @@ export default function DashboardPage() {
                                                     <button
                                                         onClick={() => setActiveTab('filter')}
                                                         className={`flex-1 px-4 py-3 font-medium transition-colors ${activeTab === 'filter'
-                                                                ? 'text-amber-400 border-b-2 border-amber-400'
-                                                                : 'text-gray-400 hover:text-white'
+                                                            ? 'text-amber-400 border-b-2 border-amber-400'
+                                                            : 'text-gray-400 hover:text-white'
                                                             }`}
                                                     >
                                                         <Filter className="h-4 w-4 inline mr-2" />
@@ -631,8 +636,8 @@ export default function DashboardPage() {
                                                     <button
                                                         onClick={() => setActiveTab('select')}
                                                         className={`flex-1 px-4 py-3 font-medium transition-colors ${activeTab === 'select'
-                                                                ? 'text-amber-400 border-b-2 border-amber-400'
-                                                                : 'text-gray-400 hover:text-white'
+                                                            ? 'text-amber-400 border-b-2 border-amber-400'
+                                                            : 'text-gray-400 hover:text-white'
                                                             }`}
                                                     >
                                                         <CheckSquare className="h-4 w-4 inline mr-2" />
@@ -670,8 +675,8 @@ export default function DashboardPage() {
                                                                             key={tld}
                                                                             onClick={() => toggleTLD(tld)}
                                                                             className={`px-3 py-1 rounded-lg text-sm transition-all ${selectedTLDs.has(tld)
-                                                                                    ? 'bg-amber-600 text-white'
-                                                                                    : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                                                                                ? 'bg-amber-600 text-white'
+                                                                                : 'bg-white/10 text-gray-300 hover:bg-white/20'
                                                                                 }`}
                                                                         >
                                                                             .{tld}
@@ -687,8 +692,8 @@ export default function DashboardPage() {
                                                                     <button
                                                                         onClick={() => setVerificationFilter('all')}
                                                                         className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${verificationFilter === 'all'
-                                                                                ? 'bg-amber-600 text-white'
-                                                                                : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                                                                            ? 'bg-amber-600 text-white'
+                                                                            : 'bg-white/10 text-gray-300 hover:bg-white/20'
                                                                             }`}
                                                                     >
                                                                         All
@@ -696,8 +701,8 @@ export default function DashboardPage() {
                                                                     <button
                                                                         onClick={() => setVerificationFilter('verified')}
                                                                         className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${verificationFilter === 'verified'
-                                                                                ? 'bg-green-600 text-white'
-                                                                                : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                                                                            ? 'bg-green-600 text-white'
+                                                                            : 'bg-white/10 text-gray-300 hover:bg-white/20'
                                                                             }`}
                                                                     >
                                                                         Verified
@@ -705,8 +710,8 @@ export default function DashboardPage() {
                                                                     <button
                                                                         onClick={() => setVerificationFilter('unverified')}
                                                                         className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${verificationFilter === 'unverified'
-                                                                                ? 'bg-gray-600 text-white'
-                                                                                : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                                                                            ? 'bg-gray-600 text-white'
+                                                                            : 'bg-white/10 text-gray-300 hover:bg-white/20'
                                                                             }`}
                                                                     >
                                                                         Unverified

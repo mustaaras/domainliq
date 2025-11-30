@@ -144,6 +144,13 @@ export default function SettingsPage() {
         <div className="min-h-screen bg-[#050505] text-white p-4 md:p-8">
             <div className="max-w-2xl mx-auto">
                 <header className="mb-8">
+                    {/* Logo */}
+                    <div className="flex justify-center md:justify-start mb-6">
+                        <Link href="/">
+                            <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto cursor-pointer" />
+                        </Link>
+                    </div>
+
                     <div className="flex items-center gap-4 mb-4">
                         <Link
                             href="/dashboard"

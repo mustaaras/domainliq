@@ -193,7 +193,8 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-amber-500/30">
       <div className="max-w-3xl mx-auto px-4 py-8 pb-32 md:pb-12">
-        {/* Header */}\n        <header className="mb-8">
+        {/* Header */}
+        <header className="mb-8">
           <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-6 mb-8">
             <div className="text-center md:text-left w-full md:w-auto">
               <div className="flex items-center gap-3 justify-center md:justify-start">
