@@ -154,13 +154,13 @@ export default function ProfileClient({ user, domains, username }: ProfileClient
             <div className="max-w-3xl mx-auto px-4 py-8 pb-32 md:pb-12">
                 {/* Header */}
                 <header className="mb-8">
+                    <div className="flex justify-center mb-6">
+                        <Link href="/">
+                            <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto cursor-pointer" />
+                        </Link>
+                    </div>
                     <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-8">
-                        <div className="text-center w-full md:w-auto">
-                            <div className="flex items-center gap-3 justify-center mb-4">
-                                <Link href="/">
-                                    <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto cursor-pointer" />
-                                </Link>
-                            </div>
+                        <div className="text-center md:text-left w-full md:w-auto">
                             <h1 className="text-3xl font-bold tracking-tight text-white">
                                 {user.name || username}'s Domains
                             </h1>

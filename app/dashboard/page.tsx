@@ -431,13 +431,13 @@ export default function DashboardPage() {
             <div className="max-w-5xl mx-auto">
                 {/* Header */}
                 <header className="relative mb-8">
+                    <div className="flex justify-center mb-6">
+                        <Link href="/">
+                            <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto cursor-pointer" />
+                        </Link>
+                    </div>
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div className="text-center w-full md:w-auto">
-                            <div className="flex items-center gap-3 justify-center mb-4">
-                                <Link href="/">
-                                    <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto cursor-pointer" />
-                                </Link>
-                            </div>
+                        <div className="text-center md:text-left w-full md:w-auto">
                             <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
                             <p className="text-gray-400 mt-1">Manage your domains and account</p>
                         </div>

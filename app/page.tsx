@@ -290,10 +290,10 @@ export default function Home() {
         </header>
 
         {/* Section Title & Controls */}
-        <div className="mb-6 flex flex-col sm:flex-row justify-between items-end sm:items-center gap-4">
-          <div>
-            <h2 className="text-2xl font-bold text-white">Recently Added Domains</h2>
-            <p className="text-gray-400 text-sm mt-1">Fresh listing from the sellers</p>
+        <div className="mb-6 flex flex-col items-center gap-4">
+          <div className="text-center">
+            <h2 className="text-xl font-bold text-white">Recently Added Domains</h2>
+            <p className="text-gray-400 text-xs mt-1">Fresh listing from the sellers</p>
           </div>
 
           <div className="flex items-center gap-2">
