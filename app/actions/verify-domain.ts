@@ -309,8 +309,15 @@ async function markAsVerified(domainId: string, domainName: string) {
             /Registry Expiry Date: (.+)/i,
             /Expiration Date: (.+)/i,
             /Expiry Date: (.+)/i,
+            /Expiry: (.+)/i,
+            /Expire Date: (.+)/i,
+            /Expires On: (.+)/i,
+            /Expires: (.+)/i,
+            /Expiration Time: (.+)/i,
             /paid-till: (.+)/i,
-            /expires: (.+)/i
+            /expires: (.+)/i,
+            /renewal date: (.+)/i,
+            /Registrar Registration Expiration Date: (.+)/i,
         ];
 
         for (const pattern of patterns) {
