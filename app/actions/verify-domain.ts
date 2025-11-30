@@ -17,10 +17,6 @@ export async function verifyDomain(domainId: string) {
             return { error: 'Domain not found' };
         }
 
-        if (domain.isVerified) {
-            return { success: true, message: 'Domain is already verified' };
-        }
-
         // Get the user to access their verification token
         const user = await db.user.findUnique({
             where: { id: domain.userId },
