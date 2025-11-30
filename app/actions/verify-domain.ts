@@ -1,10 +1,6 @@
 'use server';
 
 import { db } from '@/lib/db';
-import { exec } from 'child_process';
-import { promisify } from 'util';
-
-const execAsync = promisify(exec);
 
 export async function verifyDomain(domainId: string) {
     try {
@@ -172,22 +168,43 @@ async function checkAuthoritative(domain: string, expectedNs: string, resolveNs:
         if (!tldNs || tldNs.length === 0) return false;
 
         // 3. Pick one random TLD NS
-        const targetNs = tldNs[Math.floor(Math.random() * tldNs.length)];
+        const targetNsHostname = tldNs[Math.floor(Math.random() * tldNs.length)];
+        console.log(`📡 Querying authoritative NS: ${targetNsHostname}`);
 
-        // 4. Query it using dig (requires dig to be installed)
-        // We use dig because Node's dns module doesn't support specifying the server
+        // 4. Query it using Node.js dns.Resolver (doesn't require dig to be installed)
         try {
-            const { stdout } = await execAsync(`dig @${targetNs} ns ${domain}`);
-            if (!stdout) return false;
+            const dns = await import('dns');
+            const { Resolver } = dns.promises;
+            const { resolve4 } = dns.promises;
 
-            const records = stdout.split('\n').filter(Boolean);
-            const normalizedExpected = expectedNs.toLowerCase();
+            // Resolve the TLD NS hostname to an IP (setServers requires IPs)
+            const nsIps = await resolve4(targetNsHostname);
+            if (!nsIps || nsIps.length === 0) {
+                console.log('Could not resolve TLD NS hostname to IP');
+                return false;
+            }
 
-            return records.some(record => {
-                return record.toLowerCase().includes(normalizedExpected);
+            const resolver = new Resolver();
+            resolver.setServers([nsIps[0]]);
+
+            const records = await resolver.resolveNs(domain);
+            const normalizedExpected = expectedNs.toLowerCase().replace(/\.$/, '');
+
+            const match = records.some(record => {
+                const cleanRecord = record.toLowerCase().replace(/\.$/, '');
+                return cleanRecord === normalizedExpected;
             });
-        } catch (e) {
-            console.error('dig command failed (might not be installed):', e);
+
+            console.log(`✓ Found ${records.length} NS records from authoritative server`);
+            return match;
+        } catch (e: any) {
+            // If the authoritative server returns NXDOMAIN or similar, it might throw
+            // Check if error contains NS records in the authority section
+            if (e.code === 'ENOTFOUND' || e.code === 'ENODATA') {
+                console.log('Domain not found at authoritative server or no NS records');
+                return false;
+            }
+            console.error('Authoritative NS query failed:', e.message);
             return false;
         }
     } catch (e) {
