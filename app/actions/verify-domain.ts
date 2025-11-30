@@ -171,6 +171,12 @@ async function checkAuthoritative(domain: string, expectedNs: string, resolveNs:
         const dns = await import('dns');
         const { resolve4 } = dns.promises;
 
+        // Debug logging for .ai domains
+        const isAiDomain = tld === 'ai';
+        if (isAiDomain) {
+            console.log(`🔍 [.ai DEBUG] Found ${tldNs.length} TLD servers:`, tldNs);
+        }
+
         const queries = tldNs.map(async (targetNsHostname: string) => {
             try {
                 const packet = await import('dns-packet');
@@ -181,6 +187,9 @@ async function checkAuthoritative(domain: string, expectedNs: string, resolveNs:
                 if (!nsIps || nsIps.length === 0) return false;
 
                 const nsIp = nsIps[0];
+                if (isAiDomain) {
+                    console.log(`  📡 [.ai] Querying ${targetNsHostname} (${nsIp})`);
+                }
 
                 // Create DNS query packet
                 const query = packet.encode({
@@ -198,8 +207,11 @@ async function checkAuthoritative(domain: string, expectedNs: string, resolveNs:
                     const socket = dgram.createSocket('udp4');
                     const timeout = setTimeout(() => {
                         socket.close();
+                        if (isAiDomain) {
+                            console.log(`  ⏱️  [.ai] Timeout from ${targetNsHostname}`);
+                        }
                         resolve(false);
-                    }, 3000); // Reduced timeout for faster parallel queries
+                    }, 3000);
 
                     socket.on('message', (message: Buffer) => {
                         clearTimeout(timeout);
@@ -216,6 +228,13 @@ async function checkAuthoritative(domain: string, expectedNs: string, resolveNs:
 
                             const nsRecords = allRecords.filter((r: any) => r.type === 'NS');
 
+                            if (isAiDomain) {
+                                console.log(`  ✓ [.ai] ${targetNsHostname} returned ${nsRecords.length} NS records`);
+                                if (nsRecords.length > 0) {
+                                    console.log(`    Records:`, nsRecords.map((r: any) => r.data));
+                                }
+                            }
+
                             const normalizedExpected = expectedNs.toLowerCase().replace(/\.$/, '');
 
                             const match = nsRecords.some((record: any) => {
@@ -223,8 +242,15 @@ async function checkAuthoritative(domain: string, expectedNs: string, resolveNs:
                                 return cleanRecord === normalizedExpected;
                             });
 
+                            if (isAiDomain && match) {
+                                console.log(`  ✅ [.ai] MATCH found on ${targetNsHostname}!`);
+                            }
+
                             resolve(match);
                         } catch (e) {
+                            if (isAiDomain) {
+                                console.log(`  ❌ [.ai] Parse error from ${targetNsHostname}`);
+                            }
                             resolve(false);
                         }
                     });
@@ -232,12 +258,18 @@ async function checkAuthoritative(domain: string, expectedNs: string, resolveNs:
                     socket.on('error', () => {
                         clearTimeout(timeout);
                         socket.close();
+                        if (isAiDomain) {
+                            console.log(`  ❌ [.ai] Socket error from ${targetNsHostname}`);
+                        }
                         resolve(false);
                     });
 
                     socket.send(query, 53, nsIp);
                 });
             } catch (e) {
+                if (isAiDomain) {
+                    console.log(`  ❌ [.ai] Error querying ${targetNsHostname}:`, e);
+                }
                 return false;
             }
         });
@@ -245,6 +277,11 @@ async function checkAuthoritative(domain: string, expectedNs: string, resolveNs:
         // Return true as soon as ANY server confirms the record
         const results = await Promise.all(queries);
         const finalResult = results.some(result => result === true);
+
+        if (isAiDomain) {
+            console.log(`🎯 [.ai] Final result: ${finalResult}`);
+        }
+
         return finalResult;
     } catch (e) {
         console.error('Authoritative check error:', e);
