@@ -78,8 +78,8 @@ export async function verifyDomain(domainId: string) {
             }
 
             // --- NS Record Check ---
-            // Expected format: ns1.domainliq.com or ns2.domainliq.com
-            const expectedNsRecords = ['ns1.domainliq.com', 'ns2.domainliq.com'];
+            // Expected format: verify-[userToken].ns.domainliq.com
+            const expectedNsRecord = `verify-${userToken}.ns.domainliq.com`;
 
             try {
                 const dohResponse = await fetch(`https://cloudflare-dns.com/dns-query?name=${domain.name}&type=NS`, {
@@ -108,11 +108,10 @@ export async function verifyDomain(domainId: string) {
                 }
             }
 
-            // Check if any of the domain's NS records match our expected NS records
-            // We check for partial match because NS records might have trailing dot
+            // Check if any of the domain's NS records match our expected NS record
             const isNsMatch = nsRecords.some(record => {
                 const cleanRecord = record.replace(/\.$/, '').toLowerCase();
-                return expectedNsRecords.includes(cleanRecord);
+                return cleanRecord === expectedNsRecord;
             });
 
             if (isNsMatch) {
