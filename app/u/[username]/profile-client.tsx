@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { MessageCircle, Check, ShieldCheck } from 'lucide-react';
 
 interface Domain {
@@ -155,6 +156,11 @@ export default function ProfileClient({ user, domains, username }: ProfileClient
                 <header className="mb-8">
                     <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-8">
                         <div className="text-center md:text-left w-full md:w-auto">
+                            <div className="flex items-center gap-3 justify-center md:justify-start mb-4">
+                                <Link href="/">
+                                    <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto cursor-pointer" />
+                                </Link>
+                            </div>
                             <h1 className="text-3xl font-bold tracking-tight text-white">
                                 {user.name || username}'s Domains
                             </h1>

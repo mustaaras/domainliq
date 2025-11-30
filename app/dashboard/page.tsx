@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Loader2, Plus, Trash2, Settings, ExternalLink, DollarSign, LogOut, Shield, ShieldCheck, Copy, Check, CheckSquare, Filter, X } from 'lucide-react';
+import { Loader2, Plus, Trash2, Settings, ExternalLink, DollarSign, LogOut, Shield, ShieldCheck, Copy, Check, CheckSquare, Filter, X, Menu } from 'lucide-react';
 import { useSession, signOut } from 'next-auth/react';
 import { verifyDomain } from '../actions/verify-domain';
 
@@ -63,6 +63,9 @@ export default function DashboardPage() {
     const [verificationFilter, setVerificationFilter] = useState<'all' | 'verified' | 'unverified'>('all');
     const [priceMin, setPriceMin] = useState<string>('');
     const [priceMax, setPriceMax] = useState<string>('');
+
+    // Mobile menu state
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     useEffect(() => {
         if (status === 'unauthenticated') {
@@ -427,47 +430,94 @@ export default function DashboardPage() {
         <div className="min-h-screen bg-[#050505] text-white p-4 md:p-8">
             <div className="max-w-5xl mx-auto">
                 {/* Header */}
-                <header className="flex flex-col md:flex-row justify-between items-center md:items-center gap-4 mb-8">
-                    <div className="text-center md:text-left w-full md:w-auto">
-                        <div className="flex items-center gap-3 justify-center md:justify-start mb-2 md:mb-0">
-                            <Link href="/">
-                                <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto cursor-pointer" />
-                            </Link>
+                <header className="relative mb-8">
+                    <div className="flex justify-between items-center gap-4">
+                        <div>
+                            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+                            <p className="text-gray-400 mt-1">Manage your domains and account</p>
                         </div>
-                        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-                        <p className="text-gray-400 mt-1">Manage your domains and account</p>
-                    </div>
-                    <div className="flex gap-3 w-full md:w-auto justify-center md:justify-end">
-                        <Link
-                            href="/"
-                            className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-2"
-                        >
-                            <ExternalLink className="h-4 w-4" />
-                            Home
-                        </Link>
-                        <Link
-                            href={`/u/${userSubdomain}`}
-                            target="_blank"
-                            className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-2"
-                        >
-                            <ExternalLink className="h-4 w-4" />
-                            View Your Store
-                        </Link>
-                        <Link
-                            href="/settings"
-                            className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium text-white bg-amber-500 hover:bg-amber-400 rounded-lg transition-colors flex items-center gap-2"
-                        >
-                            <Settings className="h-4 w-4" />
-                            Settings
-                        </Link>
+
+                        {/* Desktop Menu */}
+                        <div className="hidden md:flex gap-3 items-center">
+                            <Link
+                                href="/"
+                                className="px-3 py-2 text-sm font-medium text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-2"
+                            >
+                                <ExternalLink className="h-4 w-4" />
+                                Home
+                            </Link>
+                            <Link
+                                href={`/u/${userSubdomain}`}
+                                target="_blank"
+                                className="px-3 py-2 text-sm font-medium text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-2"
+                            >
+                                <ExternalLink className="h-4 w-4" />
+                                My Page
+                            </Link>
+                            <Link
+                                href="/settings"
+                                className="p-2 text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+                                title="Settings"
+                            >
+                                <Settings className="h-5 w-5" />
+                            </Link>
+                            <button
+                                onClick={handleLogout}
+                                className="p-2 text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+                                title="Logout"
+                            >
+                                <LogOut className="h-5 w-5" />
+                            </button>
+                        </div>
+
+                        {/* Mobile Menu Button */}
                         <button
-                            onClick={handleLogout}
-                            className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium text-gray-300 hover:text-white bg-red-600/10 hover:bg-red-600/20 border border-red-600/20 rounded-lg transition-colors flex items-center gap-2"
+                            className="md:hidden p-2 text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                         >
-                            <LogOut className="h-4 w-4" />
-                            Logout
+                            {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                         </button>
                     </div>
+
+                    {/* Mobile Dropdown Menu */}
+                    {isMobileMenuOpen && (
+                        <div className="absolute top-full right-0 mt-2 w-48 bg-[#111] border border-white/10 rounded-xl shadow-xl z-50 overflow-hidden md:hidden">
+                            <div className="flex flex-col p-1">
+                                <Link
+                                    href="/"
+                                    className="px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-3"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                >
+                                    <ExternalLink className="h-4 w-4" />
+                                    Home
+                                </Link>
+                                <Link
+                                    href={`/u/${userSubdomain}`}
+                                    target="_blank"
+                                    className="px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-3"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                >
+                                    <ExternalLink className="h-4 w-4" />
+                                    My Page
+                                </Link>
+                                <Link
+                                    href="/settings"
+                                    className="px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-3"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                >
+                                    <Settings className="h-4 w-4" />
+                                    Settings
+                                </Link>
+                                <button
+                                    onClick={handleLogout}
+                                    className="px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-3 w-full text-left"
+                                >
+                                    <LogOut className="h-4 w-4" />
+                                    Logout
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </header>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

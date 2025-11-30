@@ -1,7 +1,14 @@
+import Link from 'next/link';
+
 export default function PrivacyPage() {
     return (
         <div className="min-h-screen bg-[#050505] text-white p-8">
             <div className="max-w-4xl mx-auto prose prose-invert">
+                <div className="flex justify-center mb-8">
+                    <Link href="/">
+                        <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto cursor-pointer" />
+                    </Link>
+                </div>
                 <h1 className="text-4xl font-bold mb-4">Privacy Policy</h1>
                 <p className="text-gray-400 mb-8">Last Updated: November 29, 2025</p>
 
