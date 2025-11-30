@@ -298,7 +298,13 @@ async function markAsVerified(domainId: string, domainName: string) {
         const whoisData = await new Promise<string>((resolve, reject) => {
             whois.lookup(domainName, (err, data) => {
                 if (err) reject(err);
-                else resolve(data);
+                else {
+                    if (typeof data === 'string') {
+                        resolve(data);
+                    } else {
+                        resolve(JSON.stringify(data));
+                    }
+                }
             });
         });
 
