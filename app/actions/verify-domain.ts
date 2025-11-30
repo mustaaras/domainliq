@@ -223,9 +223,17 @@ async function checkAuthoritative(domain: string, expectedNs: string, resolveNs:
                         const nsRecords = allRecords.filter((r: any) => r.type === 'NS');
                         console.log(`✓ Found ${nsRecords.length} NS records from authoritative server`);
 
+                        // Log actual records for debugging
+                        nsRecords.forEach((r: any, i: number) => {
+                            console.log(`  NS Record ${i + 1}:`, JSON.stringify(r));
+                        });
+
                         const normalizedExpected = expectedNs.toLowerCase().replace(/\.$/, '');
+                        console.log(`Looking for: "${normalizedExpected}"`);
+
                         const match = nsRecords.some((record: any) => {
                             const cleanRecord = (record.data || '').toLowerCase().replace(/\.$/, '');
+                            console.log(`  Comparing "${cleanRecord}" === "${normalizedExpected}"`);
                             return cleanRecord === normalizedExpected;
                         });
 
