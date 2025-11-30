@@ -171,6 +171,8 @@ async function checkAuthoritative(domain: string, expectedNs: string, resolveNs:
         const dns = await import('dns');
         const { resolve4 } = dns.promises;
 
+        console.log(`🔍 Found ${tldNs.length} TLD servers for .${tld}:`, tldNs);
+
         const queries = tldNs.map(async (targetNsHostname: string) => {
             try {
                 const packet = await import('dns-packet');
@@ -181,6 +183,7 @@ async function checkAuthoritative(domain: string, expectedNs: string, resolveNs:
                 if (!nsIps || nsIps.length === 0) return false;
 
                 const nsIp = nsIps[0];
+                console.log(`  📡 Querying ${targetNsHostname} (${nsIp}) for ${domain}`);
 
                 // Create DNS query packet
                 const query = packet.encode({
@@ -198,6 +201,7 @@ async function checkAuthoritative(domain: string, expectedNs: string, resolveNs:
                     const socket = dgram.createSocket('udp4');
                     const timeout = setTimeout(() => {
                         socket.close();
+                        console.log(`  ⏱️  Timeout from ${targetNsHostname}`);
                         resolve(false);
                     }, 3000); // Reduced timeout for faster parallel queries
 
@@ -215,6 +219,12 @@ async function checkAuthoritative(domain: string, expectedNs: string, resolveNs:
                             ];
 
                             const nsRecords = allRecords.filter((r: any) => r.type === 'NS');
+                            console.log(`  ✓ ${targetNsHostname} returned ${nsRecords.length} NS records`);
+
+                            if (nsRecords.length > 0) {
+                                console.log(`    Records:`, nsRecords.map((r: any) => r.data));
+                            }
+
                             const normalizedExpected = expectedNs.toLowerCase().replace(/\.$/, '');
 
                             const match = nsRecords.some((record: any) => {
@@ -222,8 +232,13 @@ async function checkAuthoritative(domain: string, expectedNs: string, resolveNs:
                                 return cleanRecord === normalizedExpected;
                             });
 
+                            if (match) {
+                                console.log(`  ✅ MATCH found on ${targetNsHostname}!`);
+                            }
+
                             resolve(match);
                         } catch (e) {
+                            console.log(`  ❌ Parse error from ${targetNsHostname}:`, e);
                             resolve(false);
                         }
                     });
@@ -231,19 +246,23 @@ async function checkAuthoritative(domain: string, expectedNs: string, resolveNs:
                     socket.on('error', () => {
                         clearTimeout(timeout);
                         socket.close();
+                        console.log(`  ❌ Socket error from ${targetNsHostname}`);
                         resolve(false);
                     });
 
                     socket.send(query, 53, nsIp);
                 });
             } catch (e) {
+                console.log(`  ❌ Error querying ${targetNsHostname}:`, e);
                 return false;
             }
         });
 
         // Return true as soon as ANY server confirms the record
         const results = await Promise.all(queries);
-        return results.some(result => result === true);
+        const finalResult = results.some(result => result === true);
+        console.log(`🎯 Final authoritative check result: ${finalResult}`);
+        return finalResult;
     } catch (e) {
         console.error('Authoritative check error:', e);
         return false;
