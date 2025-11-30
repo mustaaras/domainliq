@@ -13,14 +13,7 @@ export async function verifyDomain(domainId: string) {
 
         // 1. Get the domain and user token from DB
         const domain = await db.domain.findUnique({
-            where: { id: domainId },
-            include: {
-                user: {
-                    select: {
-                        verificationToken: true
-                    }
-                }
-            }
+            where: { id: domainId }
         });
 
         if (!domain) {
@@ -31,11 +24,17 @@ export async function verifyDomain(domainId: string) {
             return { success: true, message: 'Domain is already verified' };
         }
 
-        if (!domain.user.verificationToken) {
+        // Get the user to access their verification token
+        const user = await db.user.findUnique({
+            where: { id: domain.userId },
+            select: { verificationToken: true }
+        });
+
+        if (!user?.verificationToken) {
             return { error: 'Verification token missing. Please refresh the page to generate one.' };
         }
 
-        const userToken = domain.user.verificationToken;
+        const userToken = user.verificationToken;
 
         try {
             // 2. Query DNS using multiple sources for maximum reliability
@@ -108,7 +107,9 @@ export async function verifyDomain(domainId: string) {
             // 3. Fallback: Check Authoritative Nameservers directly
             // This bypasses propagation delays by querying the TLD's nameservers (e.g., a0.nic.bet)
             try {
+                console.log('🌐 Trying authoritative NS check for', domain.name);
                 const authMatch = await checkAuthoritative(domain.name, expectedNsRecord, resolveNs);
+                console.log('📡 Authoritative check result:', authMatch);
                 if (authMatch) {
                     await markAsVerified(domainId);
                     return { success: true };
