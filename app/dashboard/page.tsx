@@ -590,7 +590,8 @@ export default function DashboardPage() {
                             {activeMethod === 'txt' && (
                                 <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded text-xs text-amber-200 animate-in fade-in slide-in-from-top-2">
                                     <p className="font-medium mb-1">How to verify with TXT:</p>
-                                    <p>Go to your domain registrar's DNS settings and add a new TXT record with the value above. It may take a few minutes to propagate.</p>
+                                    <p className="mb-1">Go to your domain registrar's DNS settings and add a new TXT record with the value above.</p>
+                                    <p className="text-amber-400/80">⚡️ Usually takes a few minutes to propagate.</p>
                                 </div>
                             )}
                         </div>
@@ -633,7 +634,8 @@ export default function DashboardPage() {
                             {activeMethod === 'ns' && (
                                 <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded text-xs text-amber-200 animate-in fade-in slide-in-from-top-2">
                                     <p className="font-medium mb-1">How to verify with Nameserver:</p>
-                                    <p>Add this as an <strong>additional nameserver (e.g., NS3)</strong> to your existing list. <br />Do <strong>NOT</strong> remove your current nameservers (NS1, NS2) to keep your landing page working.</p>
+                                    <p className="mb-2">Add this as an <strong>additional nameserver (e.g., NS3)</strong> to your existing list. <br />Do <strong>NOT</strong> remove your current nameservers (NS1, NS2) to keep your landing page working.</p>
+                                    <p className="text-amber-400/80">🕒 Note: NS changes typically take <strong>1-4 hours</strong> to propagate.</p>
                                 </div>
                             )}
                         </div>
