@@ -32,84 +32,64 @@ export async function verifyDomain(domainId: string) {
         const userToken = domain.user.verificationToken;
 
         try {
-            // 2. Query DNS using Cloudflare DNS-over-HTTPS for faster propagation check
-            // Fallback to system DNS if DoH fails
-            let txtRecords: string[][] = [];
-            let nsRecords: string[] = [];
+            // 2. Query DNS using multiple sources for maximum reliability
+            // Sources: Cloudflare DoH, Google DoH, System DNS
+            let txtRecords: Set<string> = new Set();
+            let nsRecords: Set<string> = new Set();
 
             // --- TXT Record Check ---
-            // Expected format: domainliq-verification=[userToken]
             const expectedTxtRecord = `domainliq-verification=${userToken}`;
 
-            try {
-                const dohResponse = await fetch(`https://cloudflare-dns.com/dns-query?name=${domain.name}&type=TXT`, {
-                    headers: { 'Accept': 'application/dns-json' },
-                    cache: 'no-store'
-                });
+            // Parallel DoH lookups
+            const [cfTxt, googleTxt] = await Promise.all([
+                fetchDoh('cloudflare', domain.name, 'TXT'),
+                fetchDoh('google', domain.name, 'TXT')
+            ]);
 
-                if (dohResponse.ok) {
-                    const data = await dohResponse.json();
-                    if (data.Answer) {
-                        txtRecords = data.Answer
-                            .filter((record: any) => record.type === 16) // 16 is TXT
-                            .map((record: any) => [record.data.replace(/^"|"$/g, '')]); // Remove quotes
-                    }
-                }
-            } catch (dohError) {
-                console.error('DoH TXT lookup failed, falling back to system DNS:', dohError);
-            }
+            cfTxt.forEach(r => txtRecords.add(r));
+            googleTxt.forEach(r => txtRecords.add(r));
 
-            // If DoH didn't find it, try system DNS
-            if (txtRecords.length === 0) {
+            // System DNS fallback if DoH returns nothing
+            if (txtRecords.size === 0) {
                 try {
                     const records = await resolveTxt(domain.name);
-                    txtRecords = records;
+                    records.flat().forEach(r => txtRecords.add(r));
                 } catch (e) {
-                    // Ignore error if TXT lookup fails, we'll try NS
+                    // Ignore system DNS errors
                 }
             }
 
-            const flatTxtRecords = txtRecords.flat();
-            const isTxtMatch = flatTxtRecords.some((r) => r.includes(expectedTxtRecord));
-
+            // Check TXT
+            const isTxtMatch = Array.from(txtRecords).some(r => r.includes(expectedTxtRecord));
             if (isTxtMatch) {
                 await markAsVerified(domainId);
                 return { success: true };
             }
 
             // --- NS Record Check ---
-            // Expected format: ns3verify.domainliq.com
             const expectedNsRecord = 'ns3verify.domainliq.com';
 
-            try {
-                const dohResponse = await fetch(`https://cloudflare-dns.com/dns-query?name=${domain.name}&type=NS`, {
-                    headers: { 'Accept': 'application/dns-json' },
-                    cache: 'no-store'
-                });
+            // Parallel DoH lookups for NS
+            const [cfNs, googleNs] = await Promise.all([
+                fetchDoh('cloudflare', domain.name, 'NS'),
+                fetchDoh('google', domain.name, 'NS')
+            ]);
 
-                if (dohResponse.ok) {
-                    const data = await dohResponse.json();
-                    if (data.Answer) {
-                        nsRecords = data.Answer
-                            .filter((record: any) => record.type === 2) // 2 is NS
-                            .map((record: any) => record.data);
-                    }
-                }
-            } catch (dohError) {
-                console.error('DoH NS lookup failed, falling back to system DNS:', dohError);
-            }
+            cfNs.forEach(r => nsRecords.add(r));
+            googleNs.forEach(r => nsRecords.add(r));
 
-            if (nsRecords.length === 0) {
+            // System DNS fallback
+            if (nsRecords.size === 0) {
                 try {
                     const records = await resolveNs(domain.name);
-                    nsRecords = records;
+                    records.forEach(r => nsRecords.add(r));
                 } catch (e) {
-                    // Ignore error
+                    // Ignore system DNS errors
                 }
             }
 
-            // Check if any of the domain's NS records match our expected NS record
-            const isNsMatch = nsRecords.some(record => {
+            // Check NS
+            const isNsMatch = Array.from(nsRecords).some(record => {
                 const cleanRecord = record.replace(/\.$/, '').toLowerCase();
                 return cleanRecord === expectedNsRecord;
             });
@@ -128,6 +108,37 @@ export async function verifyDomain(domainId: string) {
         console.error('Verification error:', error);
         return { error: 'Internal server error during verification.' };
     }
+}
+
+async function fetchDoh(provider: 'cloudflare' | 'google', name: string, type: 'TXT' | 'NS'): Promise<string[]> {
+    try {
+        const url = provider === 'cloudflare'
+            ? `https://cloudflare-dns.com/dns-query?name=${name}&type=${type}`
+            : `https://dns.google/resolve?name=${name}&type=${type}`;
+
+        const res = await fetch(url, {
+            headers: { 'Accept': 'application/dns-json' },
+            cache: 'no-store'
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            if (data.Answer) {
+                return data.Answer
+                    .filter((record: any) => {
+                        // Type 16 is TXT, 2 is NS
+                        return (type === 'TXT' && record.type === 16) || (type === 'NS' && record.type === 2);
+                    })
+                    .map((record: any) => {
+                        // Remove quotes for TXT
+                        return type === 'TXT' ? record.data.replace(/^"|"$/g, '') : record.data;
+                    });
+            }
+        }
+    } catch (error) {
+        console.error(`${provider} DoH lookup failed:`, error);
+    }
+    return [];
 }
 
 async function markAsVerified(domainId: string) {
