@@ -57,7 +57,8 @@ export default function DashboardPage() {
     const [isBulkVerifying, setIsBulkVerifying] = useState(false);
 
     // Filter state
-    const [showFilters, setShowFilters] = useState(false);
+    const [showManagePanel, setShowManagePanel] = useState(false);
+    const [activeTab, setActiveTab] = useState<'filter' | 'select'>('filter');
     const [selectedTLDs, setSelectedTLDs] = useState<Set<string>>(new Set());
     const [verificationFilter, setVerificationFilter] = useState<'all' | 'verified' | 'unverified'>('all');
     const [priceMin, setPriceMin] = useState<string>('');
@@ -589,159 +590,237 @@ export default function DashboardPage() {
                             <div className="p-6 border-b border-white/10 flex items-center justify-between">
                                 <h2 className="text-xl font-semibold">Your Domains</h2>
                                 <div className="flex items-center gap-2">
-                                    {/* Filter Button */}
+                                    {/* Combined Manage Button */}
                                     <div className="relative">
                                         <button
-                                            onClick={() => setShowFilters(!showFilters)}
-                                            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${activeFiltersCount > 0
-                                                ? 'bg-amber-600 hover:bg-amber-500 text-white'
-                                                : 'bg-white/10 hover:bg-white/20 text-white'
+                                            onClick={() => setShowManagePanel(!showManagePanel)}
+                                            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${activeFiltersCount > 0 || isInSelectionMode
+                                                    ? 'bg-amber-600 hover:bg-amber-500 text-white'
+                                                    : 'bg-white/10 hover:bg-white/20 text-white'
                                                 }`}
                                         >
-                                            <Filter className="h-4 w-4" />
-                                            Filter
-                                            {activeFiltersCount > 0 && (
+                                            {isInSelectionMode ? <CheckSquare className="h-4 w-4" /> : <Filter className="h-4 w-4" />}
+                                            Manage
+                                            {(activeFiltersCount > 0 || selectedDomainIds.size > 0) && (
                                                 <span className="ml-1 px-2 py-0.5 bg-white/20 rounded-full text-xs">
-                                                    {activeFiltersCount}
+                                                    {activeFiltersCount + (selectedDomainIds.size > 0 ? 1 : 0)}
                                                 </span>
                                             )}
                                         </button>
 
-                                        {/* Filter Dropdown Panel */}
-                                        {showFilters && (
-                                            <div className="absolute right-0 mt-2 w-80 bg-[#0A0A0A] border border-white/20 rounded-xl p-4 shadow-2xl z-50">
-                                                <div className="flex items-center justify-between mb-4">
-                                                    <h3 className="font-semibold">Filters</h3>
-                                                    {activeFiltersCount > 0 && (
-                                                        <button
-                                                            onClick={clearFilters}
-                                                            className="text-xs text-amber-400 hover:text-amber-300"
-                                                        >
-                                                            Clear all
-                                                        </button>
+                                        {/* Combined Management Panel */}
+                                        {showManagePanel && (
+                                            <div className="absolute right-0 mt-2 w-96 bg-[#0A0A0A] border border-white/20 rounded-xl shadow-2xl z-50">
+                                                {/* Tabs */}
+                                                <div className="flex border-b border-white/10">
+                                                    <button
+                                                        onClick={() => setActiveTab('filter')}
+                                                        className={`flex-1 px-4 py-3 font-medium transition-colors ${activeTab === 'filter'
+                                                                ? 'text-amber-400 border-b-2 border-amber-400'
+                                                                : 'text-gray-400 hover:text-white'
+                                                            }`}
+                                                    >
+                                                        <Filter className="h-4 w-4 inline mr-2" />
+                                                        Filter
+                                                        {activeFiltersCount > 0 && (
+                                                            <span className="ml-2 px-2 py-0.5 bg-amber-600 rounded-full text-xs text-white">
+                                                                {activeFiltersCount}
+                                                            </span>
+                                                        )}
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setActiveTab('select')}
+                                                        className={`flex-1 px-4 py-3 font-medium transition-colors ${activeTab === 'select'
+                                                                ? 'text-amber-400 border-b-2 border-amber-400'
+                                                                : 'text-gray-400 hover:text-white'
+                                                            }`}
+                                                    >
+                                                        <CheckSquare className="h-4 w-4 inline mr-2" />
+                                                        Select & Actions
+                                                        {selectedDomainIds.size > 0 && (
+                                                            <span className="ml-2 px-2 py-0.5 bg-amber-600 rounded-full text-xs text-white">
+                                                                {selectedDomainIds.size}
+                                                            </span>
+                                                        )}
+                                                    </button>
+                                                </div>
+
+                                                <div className="p-4">
+                                                    {/* Filter Tab Content */}
+                                                    {activeTab === 'filter' && (
+                                                        <div>
+                                                            <div className="flex items-center justify-between mb-4">
+                                                                <h3 className="font-semibold">Filter Domains</h3>
+                                                                {activeFiltersCount > 0 && (
+                                                                    <button
+                                                                        onClick={clearFilters}
+                                                                        className="text-xs text-amber-400 hover:text-amber-300"
+                                                                    >
+                                                                        Clear all
+                                                                    </button>
+                                                                )}
+                                                            </div>
+
+                                                            {/* TLD Filter */}
+                                                            <div className="mb-4">
+                                                                <label className="text-sm font-medium text-gray-300 mb-2 block">Extension (TLD)</label>
+                                                                <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+                                                                    {uniqueTLDs.map(tld => (
+                                                                        <button
+                                                                            key={tld}
+                                                                            onClick={() => toggleTLD(tld)}
+                                                                            className={`px-3 py-1 rounded-lg text-sm transition-all ${selectedTLDs.has(tld)
+                                                                                    ? 'bg-amber-600 text-white'
+                                                                                    : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                                                                                }`}
+                                                                        >
+                                                                            .{tld}
+                                                                        </button>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Verification Status Filter */}
+                                                            <div className="mb-4">
+                                                                <label className="text-sm font-medium text-gray-300 mb-2 block">Verification Status</label>
+                                                                <div className="flex gap-2">
+                                                                    <button
+                                                                        onClick={() => setVerificationFilter('all')}
+                                                                        className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${verificationFilter === 'all'
+                                                                                ? 'bg-amber-600 text-white'
+                                                                                : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                                                                            }`}
+                                                                    >
+                                                                        All
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => setVerificationFilter('verified')}
+                                                                        className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${verificationFilter === 'verified'
+                                                                                ? 'bg-green-600 text-white'
+                                                                                : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                                                                            }`}
+                                                                    >
+                                                                        Verified
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => setVerificationFilter('unverified')}
+                                                                        className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${verificationFilter === 'unverified'
+                                                                                ? 'bg-gray-600 text-white'
+                                                                                : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                                                                            }`}
+                                                                    >
+                                                                        Unverified
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Price Filter */}
+                                                            <div>
+                                                                <label className="text-sm font-medium text-gray-300 mb-2 block">Price Range ($)</label>
+                                                                <div className="flex gap-2">
+                                                                    <input
+                                                                        type="number"
+                                                                        placeholder="Min"
+                                                                        value={priceMin}
+                                                                        onChange={(e) => setPriceMin(e.target.value)}
+                                                                        className="flex-1 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-500/50"
+                                                                    />
+                                                                    <span className="text-gray-500 self-center">-</span>
+                                                                    <input
+                                                                        type="number"
+                                                                        placeholder="Max"
+                                                                        value={priceMax}
+                                                                        onChange={(e) => setPriceMax(e.target.value)}
+                                                                        className="flex-1 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-500/50"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     )}
-                                                </div>
 
-                                                {/* TLD Filter */}
-                                                <div className="mb-4">
-                                                    <label className="text-sm font-medium text-gray-300 mb-2 block">Extension (TLD)</label>
-                                                    <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
-                                                        {uniqueTLDs.map(tld => (
-                                                            <button
-                                                                key={tld}
-                                                                onClick={() => toggleTLD(tld)}
-                                                                className={`px-3 py-1 rounded-lg text-sm transition-all ${selectedTLDs.has(tld)
-                                                                    ? 'bg-amber-600 text-white'
-                                                                    : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                                                                    }`}
-                                                            >
-                                                                .{tld}
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                </div>
+                                                    {/* Select & Actions Tab Content */}
+                                                    {activeTab === 'select' && (
+                                                        <div>
+                                                            <h3 className="font-semibold mb-4">Bulk Actions</h3>
 
-                                                {/* Verification Status Filter */}
-                                                <div className="mb-4">
-                                                    <label className="text-sm font-medium text-gray-300 mb-2 block">Verification Status</label>
-                                                    <div className="flex gap-2">
-                                                        <button
-                                                            onClick={() => setVerificationFilter('all')}
-                                                            className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${verificationFilter === 'all'
-                                                                ? 'bg-amber-600 text-white'
-                                                                : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                                                                }`}
-                                                        >
-                                                            All
-                                                        </button>
-                                                        <button
-                                                            onClick={() => setVerificationFilter('verified')}
-                                                            className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${verificationFilter === 'verified'
-                                                                ? 'bg-green-600 text-white'
-                                                                : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                                                                }`}
-                                                        >
-                                                            Verified
-                                                        </button>
-                                                        <button
-                                                            onClick={() => setVerificationFilter('unverified')}
-                                                            className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${verificationFilter === 'unverified'
-                                                                ? 'bg-gray-600 text-white'
-                                                                : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                                                                }`}
-                                                        >
-                                                            Unverified
-                                                        </button>
-                                                    </div>
-                                                </div>
+                                                            {!isInSelectionMode ? (
+                                                                <div className="text-center py-8">
+                                                                    <CheckSquare className="h-12 w-12 mx-auto text-gray-600 mb-3" />
+                                                                    <p className="text-gray-400 mb-4">Enable selection mode to perform bulk actions</p>
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            setIsInSelectionMode(true);
+                                                                            setShowManagePanel(false);
+                                                                        }}
+                                                                        className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg font-medium transition-all"
+                                                                    >
+                                                                        Enable Selection Mode
+                                                                    </button>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="space-y-3">
+                                                                    <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+                                                                        <div className="flex items-center justify-between mb-2">
+                                                                            <span className="text-sm text-gray-400">Selected</span>
+                                                                            <span className="text-lg font-semibold text-amber-400">{selectedDomainIds.size}</span>
+                                                                        </div>
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                toggleSelectAll();
+                                                                            }}
+                                                                            className="w-full px-3 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm transition-all"
+                                                                        >
+                                                                            {selectedDomainIds.size === filteredDomains.slice((currentPage - 1) * domainsPerPage, currentPage * domainsPerPage).length
+                                                                                ? 'Deselect All on Page'
+                                                                                : 'Select All on Page'}
+                                                                        </button>
+                                                                    </div>
 
-                                                {/* Price Filter */}
-                                                <div>
-                                                    <label className="text-sm font-medium text-gray-300 mb-2 block">Price Range ($)</label>
-                                                    <div className="flex gap-2">
-                                                        <input
-                                                            type="number"
-                                                            placeholder="Min"
-                                                            value={priceMin}
-                                                            onChange={(e) => setPriceMin(e.target.value)}
-                                                            className="flex-1 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-500/50"
-                                                        />
-                                                        <span className="text-gray-500 self-center">-</span>
-                                                        <input
-                                                            type="number"
-                                                            placeholder="Max"
-                                                            value={priceMax}
-                                                            onChange={(e) => setPriceMax(e.target.value)}
-                                                            className="flex-1 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-500/50"
-                                                        />
-                                                    </div>
+                                                                    {selectedDomainIds.size > 0 && (
+                                                                        <>
+                                                                            <button
+                                                                                onClick={() => {
+                                                                                    handleBulkVerify();
+                                                                                    setShowManagePanel(false);
+                                                                                }}
+                                                                                disabled={isBulkVerifying}
+                                                                                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition-all disabled:opacity-50"
+                                                                            >
+                                                                                {isBulkVerifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
+                                                                                Verify Selected ({selectedDomainIds.size})
+                                                                            </button>
+                                                                            <button
+                                                                                onClick={() => {
+                                                                                    handleBulkDelete();
+                                                                                    setShowManagePanel(false);
+                                                                                }}
+                                                                                disabled={isDeleting}
+                                                                                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-medium transition-all disabled:opacity-50"
+                                                                            >
+                                                                                {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                                                                                Delete Selected ({selectedDomainIds.size})
+                                                                            </button>
+                                                                        </>
+                                                                    )}
+
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            setIsInSelectionMode(false);
+                                                                            setSelectedDomainIds(new Set());
+                                                                            setShowManagePanel(false);
+                                                                        }}
+                                                                        className="w-full px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg font-medium transition-all"
+                                                                    >
+                                                                        Exit Selection Mode
+                                                                    </button>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         )}
                                     </div>
-
-                                    {/* Selection Mode */}
-                                    {!isInSelectionMode ? (
-                                        <button
-                                            onClick={() => setIsInSelectionMode(true)}
-                                            className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg font-medium transition-all"
-                                        >
-                                            <CheckSquare className="h-4 w-4" />
-                                            Select
-                                        </button>
-                                    ) : (
-                                        <>
-                                            {selectedDomainIds.size > 0 && (
-                                                <>
-                                                    <button
-                                                        onClick={handleBulkVerify}
-                                                        disabled={isBulkVerifying}
-                                                        className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition-all disabled:opacity-50"
-                                                    >
-                                                        {isBulkVerifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
-                                                        Verify Selected ({selectedDomainIds.size})
-                                                    </button>
-                                                    <button
-                                                        onClick={handleBulkDelete}
-                                                        disabled={isDeleting}
-                                                        className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-medium transition-all disabled:opacity-50"
-                                                    >
-                                                        {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-                                                        Delete Selected ({selectedDomainIds.size})
-                                                    </button>
-                                                </>
-                                            )}
-                                            <button
-                                                onClick={() => {
-                                                    setIsInSelectionMode(false);
-                                                    setSelectedDomainIds(new Set());
-                                                }}
-                                                className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg font-medium transition-all"
-                                            >
-                                                Cancel
-                                            </button>
-                                        </>
-                                    )}
                                 </div>
                             </div>
 
