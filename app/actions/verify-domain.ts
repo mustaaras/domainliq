@@ -1,10 +1,12 @@
 'use server';
 
 import { db } from '@/lib/db';
-import { resolveTxt, resolveNs } from 'dns/promises';
 
 export async function verifyDomain(domainId: string) {
     try {
+        // Dynamic imports to avoid client-side bundling issues
+        const { resolveTxt, resolveNs } = await import('dns/promises');
+
         // 1. Get the domain and user token from DB
         const domain = await db.domain.findUnique({
             where: { id: domainId },
@@ -46,14 +48,14 @@ export async function verifyDomain(domainId: string) {
                 fetchDoh('google', domain.name, 'TXT')
             ]);
 
-            cfTxt.forEach(r => txtRecords.add(r));
-            googleTxt.forEach(r => txtRecords.add(r));
+            cfTxt.forEach((r: string) => txtRecords.add(r));
+            googleTxt.forEach((r: string) => txtRecords.add(r));
 
             // System DNS fallback if DoH returns nothing
             if (txtRecords.size === 0) {
                 try {
                     const records = await resolveTxt(domain.name);
-                    records.flat().forEach(r => txtRecords.add(r));
+                    records.flat().forEach((r: string) => txtRecords.add(r));
                 } catch (e) {
                     // Ignore system DNS errors
                 }
@@ -75,21 +77,21 @@ export async function verifyDomain(domainId: string) {
                 fetchDoh('google', domain.name, 'NS')
             ]);
 
-            cfNs.forEach(r => nsRecords.add(r));
-            googleNs.forEach(r => nsRecords.add(r));
+            cfNs.forEach((r: string) => nsRecords.add(r));
+            googleNs.forEach((r: string) => nsRecords.add(r));
 
             // System DNS fallback
             if (nsRecords.size === 0) {
                 try {
                     const records = await resolveNs(domain.name);
-                    records.forEach(r => nsRecords.add(r));
+                    records.forEach((r: string) => nsRecords.add(r));
                 } catch (e) {
                     // Ignore system DNS errors
                 }
             }
 
-            // Check NS
-            const isNsMatch = Array.from(nsRecords).some(record => {
+            // Check NS via DNS/DoH
+            const isNsMatch = Array.from(nsRecords).some((record: string) => {
                 const cleanRecord = record.replace(/\.$/, '').toLowerCase();
                 return cleanRecord === expectedNsRecord;
             });
@@ -97,6 +99,18 @@ export async function verifyDomain(domainId: string) {
             if (isNsMatch) {
                 await markAsVerified(domainId);
                 return { success: true };
+            }
+
+            // 3. Fallback: Check WHOIS
+            // Sometimes WHOIS updates faster than DNS propagation
+            try {
+                const whoisMatch = await checkWhois(domain.name, expectedNsRecord);
+                if (whoisMatch) {
+                    await markAsVerified(domainId);
+                    return { success: true };
+                }
+            } catch (whoisError) {
+                console.error('WHOIS lookup failed:', whoisError);
             }
 
             return { error: 'Verification record not found. Please ensure you have added the correct TXT or NS record and wait a few minutes for DNS propagation.' };
@@ -139,6 +153,30 @@ async function fetchDoh(provider: 'cloudflare' | 'google', name: string, type: '
         console.error(`${provider} DoH lookup failed:`, error);
     }
     return [];
+}
+
+async function checkWhois(domain: string, expectedNs: string): Promise<boolean> {
+    try {
+        const lookup = (await import('whois-json')).default;
+        const results: any = await lookup(domain);
+
+        // WHOIS results structure varies wildly. We look for nameServer or nserver fields.
+        // They can be strings or arrays of strings.
+        const nsData = results.nameServer || results.nserver || results.NameServer || results.nameserver || results['Name Server'] || results['Name server'];
+
+        if (!nsData) return false;
+
+        const nsList = Array.isArray(nsData) ? nsData : [nsData];
+        const normalizedExpected = expectedNs.toLowerCase();
+
+        return nsList.some((ns: any) => {
+            if (typeof ns !== 'string') return false;
+            return ns.toLowerCase().includes(normalizedExpected);
+        });
+    } catch (e) {
+        console.error('WHOIS check error:', e);
+        return false;
+    }
 }
 
 async function markAsVerified(domainId: string) {
