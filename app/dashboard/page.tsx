@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Loader2, Plus, Trash2, Settings, ExternalLink, DollarSign, LogOut, Shield, ShieldCheck, Copy, Check, CheckSquare } from 'lucide-react';
+import { Loader2, Plus, Trash2, Settings, ExternalLink, DollarSign, LogOut, Shield, ShieldCheck, Copy, Check, CheckSquare, Filter, X } from 'lucide-react';
 import { useSession, signOut } from 'next-auth/react';
 import { verifyDomain } from '../actions/verify-domain';
 
@@ -55,6 +55,13 @@ export default function DashboardPage() {
     const [isDeleting, setIsDeleting] = useState(false);
     const [isInSelectionMode, setIsInSelectionMode] = useState(false);
     const [isBulkVerifying, setIsBulkVerifying] = useState(false);
+
+    // Filter state
+    const [showFilters, setShowFilters] = useState(false);
+    const [selectedTLDs, setSelectedTLDs] = useState<Set<string>>(new Set());
+    const [verificationFilter, setVerificationFilter] = useState<'all' | 'verified' | 'unverified'>('all');
+    const [priceMin, setPriceMin] = useState<string>('');
+    const [priceMax, setPriceMax] = useState<string>('');
 
     useEffect(() => {
         if (status === 'unauthenticated') {
@@ -293,6 +300,54 @@ export default function DashboardPage() {
         setIsBulkVerifying(false);
         fetchUserDomains(); // Refresh the list
     };
+
+    // Get unique TLDs from domains
+    const uniqueTLDs = Array.from(new Set(domains.map(d => {
+        const parts = d.name.split('.');
+        return parts[parts.length - 1];
+    }))).sort();
+
+    // Apply filters
+    const filteredDomains = domains.filter(domain => {
+        // TLD filter
+        if (selectedTLDs.size > 0) {
+            const tld = domain.name.split('.').pop() || '';
+            if (!selectedTLDs.has(tld)) return false;
+        }
+
+        // Verification filter
+        if (verificationFilter === 'verified' && domain.status !== 'verified') return false;
+        if (verificationFilter === 'unverified' && domain.status === 'verified') return false;
+
+        // Price filter
+        if (priceMin && domain.price < parseFloat(priceMin)) return false;
+        if (priceMax && domain.price > parseFloat(priceMax)) return false;
+
+        return true;
+    });
+
+    const toggleTLD = (tld: string) => {
+        setSelectedTLDs(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(tld)) {
+                newSet.delete(tld);
+            } else {
+                newSet.add(tld);
+            }
+            return newSet;
+        });
+    };
+
+    const clearFilters = () => {
+        setSelectedTLDs(new Set());
+        setVerificationFilter('all');
+        setPriceMin('');
+        setPriceMax('');
+    };
+
+    const activeFiltersCount = selectedTLDs.size +
+        (verificationFilter !== 'all' ? 1 : 0) +
+        (priceMin || priceMax ? 1 : 0);
 
     const handleVerifyDomain = async () => {
         if (!selectedDomain) return;
@@ -534,6 +589,118 @@ export default function DashboardPage() {
                             <div className="p-6 border-b border-white/10 flex items-center justify-between">
                                 <h2 className="text-xl font-semibold">Your Domains</h2>
                                 <div className="flex items-center gap-2">
+                                    {/* Filter Button */}
+                                    <div className="relative">
+                                        <button
+                                            onClick={() => setShowFilters(!showFilters)}
+                                            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${activeFiltersCount > 0
+                                                    ? 'bg-amber-600 hover:bg-amber-500 text-white'
+                                                    : 'bg-white/10 hover:bg-white/20 text-white'
+                                                }`}
+                                        >
+                                            <Filter className="h-4 w-4" />
+                                            Filter
+                                            {activeFiltersCount > 0 && (
+                                                <span className="ml-1 px-2 py-0.5 bg-white/20 rounded-full text-xs">
+                                                    {activeFiltersCount}
+                                                </span>
+                                            )}
+                                        </button>
+
+                                        {/* Filter Dropdown Panel */}
+                                        {showFilters && (
+                                            <div className="absolute right-0 mt-2 w-80 bg-[#0A0A0A] border border-white/20 rounded-xl p-4 shadow-2xl z-50">
+                                                <div className="flex items-center justify-between mb-4">
+                                                    <h3 className="font-semibold">Filters</h3>
+                                                    {activeFiltersCount > 0 && (
+                                                        <button
+                                                            onClick={clearFilters}
+                                                            className="text-xs text-amber-400 hover:text-amber-300"
+                                                        >
+                                                            Clear all
+                                                        </button>
+                                                    )}
+                                                </div>
+
+                                                {/* TLD Filter */}
+                                                <div className="mb-4">
+                                                    <label className="text-sm font-medium text-gray-300 mb-2 block">Extension (TLD)</label>
+                                                    <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+                                                        {uniqueTLDs.map(tld => (
+                                                            <button
+                                                                key={tld}
+                                                                onClick={() => toggleTLD(tld)}
+                                                                className={`px-3 py-1 rounded-lg text-sm transition-all ${selectedTLDs.has(tld)
+                                                                        ? 'bg-amber-600 text-white'
+                                                                        : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                                                                    }`}
+                                                            >
+                                                                .{tld}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                {/* Verification Status Filter */}
+                                                <div className="mb-4">
+                                                    <label className="text-sm font-medium text-gray-300 mb-2 block">Verification Status</label>
+                                                    <div className="flex gap-2">
+                                                        <button
+                                                            onClick={() => setVerificationFilter('all')}
+                                                            className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${verificationFilter === 'all'
+                                                                    ? 'bg-amber-600 text-white'
+                                                                    : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                                                                }`}
+                                                        >
+                                                            All
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setVerificationFilter('verified')}
+                                                            className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${verificationFilter === 'verified'
+                                                                    ? 'bg-green-600 text-white'
+                                                                    : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                                                                }`}
+                                                        >
+                                                            Verified
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setVerificationFilter('unverified')}
+                                                            className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${verificationFilter === 'unverified'
+                                                                    ? 'bg-gray-600 text-white'
+                                                                    : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                                                                }`}
+                                                        >
+                                                            Unverified
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                {/* Price Filter */}
+                                                <div>
+                                                    <label className="text-sm font-medium text-gray-300 mb-2 block">Price Range ($)</label>
+                                                    <div className="flex gap-2">
+                                                        <input
+                                                            type="number"
+                                                            placeholder="Min"
+                                                            value={priceMin}
+                                                            onChange={(e) => setPriceMin(e.target.value)}
+                                                            className="flex-1 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-500/50"
+                                                        />
+                                                        <span className="text-gray-500 self-center">-</span>
+                                                        <input
+                                                            type="number"
+                                                            placeholder="Max"
+                                                            value={priceMax}
+                                                            onChange={(e) => setPriceMax(e.target.value)}
+                                                            className="flex-1 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-500/50"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Selection Mode */}
                                     {!isInSelectionMode ? (
                                         <button
                                             onClick={() => setIsInSelectionMode(true)}
@@ -578,18 +745,18 @@ export default function DashboardPage() {
                                 </div>
                             </div>
 
-                            {domains.length === 0 ? (
+                            {filteredDomains.length === 0 ? (
                                 <div className="p-12 text-center text-gray-500">
                                     You haven't added any domains yet.
                                 </div>
                             ) : (
                                 <div className="divide-y divide-white/5">
                                     {/* Select All Row - Only show in selection mode */}
-                                    {isInSelectionMode && domains.length > 0 && (
+                                    {isInSelectionMode && filteredDomains.length > 0 && (
                                         <div className="p-4 bg-white/5 flex items-center gap-3">
                                             <input
                                                 type="checkbox"
-                                                checked={selectedDomainIds.size > 0 && selectedDomainIds.size === domains.slice((currentPage - 1) * domainsPerPage, currentPage * domainsPerPage).length}
+                                                checked={selectedDomainIds.size > 0 && selectedDomainIds.size === filteredDomains.slice((currentPage - 1) * domainsPerPage, currentPage * domainsPerPage).length}
                                                 onChange={toggleSelectAll}
                                                 className="h-4 w-4 rounded border-white/20 bg-black/20 text-amber-500 focus:ring-amber-500/50"
                                             />
@@ -599,7 +766,7 @@ export default function DashboardPage() {
                                         </div>
                                     )}
 
-                                    {domains.slice((currentPage - 1) * domainsPerPage, currentPage * domainsPerPage).map(domain => (
+                                    {filteredDomains.slice((currentPage - 1) * domainsPerPage, currentPage * domainsPerPage).map(domain => (
                                         <div key={domain.id} className="p-4 flex items-center gap-3 hover:bg-white/5 transition-colors">
                                             {isInSelectionMode && (
                                                 <input
@@ -670,7 +837,7 @@ export default function DashboardPage() {
                             )}
 
                             {/* Pagination */}
-                            {domains.length > 0 && (
+                            {filteredDomains.length > 0 && (
                                 <div className="p-4 border-t border-white/10 flex items-center justify-between">
                                     <div className="flex items-center gap-2">
                                         <span className="text-sm text-gray-500">Show:</span>
@@ -698,11 +865,11 @@ export default function DashboardPage() {
                                             Previous
                                         </button>
                                         <span className="text-sm text-gray-500">
-                                            Page {currentPage} of {Math.ceil(domains.length / domainsPerPage)}
+                                            Page {currentPage} of {Math.ceil(filteredDomains.length / domainsPerPage)}
                                         </span>
                                         <button
-                                            onClick={() => setCurrentPage(p => Math.min(Math.ceil(domains.length / domainsPerPage), p + 1))}
-                                            disabled={currentPage >= Math.ceil(domains.length / domainsPerPage)}
+                                            onClick={() => setCurrentPage(p => Math.min(Math.ceil(filteredDomains.length / domainsPerPage), p + 1))}
+                                            disabled={currentPage >= Math.ceil(filteredDomains.length / domainsPerPage)}
                                             className="px-3 py-1 text-sm text-gray-400 hover:text-white disabled:opacity-50 disabled:hover:text-gray-400 transition-colors"
                                         >
                                             Next
