@@ -17,7 +17,7 @@ export async function GET(
                 domains: {
                     where: { status: 'available' },
                     orderBy: { createdAt: 'desc' },
-                    take: 7, // Show up to 7 domains
+                    take: 8, // Show up to 8 domains
                 },
             },
         });
@@ -40,20 +40,7 @@ export async function GET(
                         padding: '40px',
                     }}
                 >
-                    {/* Header */}
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginBottom: '40px',
-                        width: '100%'
-                    }}>
-                        <div style={{ color: '#FFFFFF', fontSize: 32, fontWeight: 600, opacity: 0.5 }}>
-                            {user.name || username}'s Premium Domains
-                        </div>
-                    </div>
-
-                    {/* Domain List */}
+                    {/* Domain List - ONLY domains, no header/footer */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', alignItems: 'center' }}>
                         {user.domains.length > 0 ? (
                             user.domains.map((domain: any) => (
@@ -63,17 +50,17 @@ export async function GET(
                                         display: 'flex',
                                         justifyContent: 'space-between',
                                         alignItems: 'center',
-                                        width: '90%',
+                                        width: '100%',
                                         backgroundColor: 'rgba(255, 255, 255, 0.03)',
                                         border: '1px solid rgba(255, 255, 255, 0.1)',
                                         borderRadius: '16px',
-                                        padding: '16px 40px',
+                                        padding: '12px 40px',
                                     }}
                                 >
-                                    <div style={{ color: '#FFFFFF', fontSize: 42, fontWeight: 700, letterSpacing: '-0.02em' }}>
+                                    <div style={{ color: '#FFFFFF', fontSize: 46, fontWeight: 700, letterSpacing: '-0.02em' }}>
                                         {domain.name}
                                     </div>
-                                    <div style={{ color: '#F59E0B', fontSize: 42, fontWeight: 600 }}>
+                                    <div style={{ color: '#F59E0B', fontSize: 46, fontWeight: 600 }}>
                                         ${domain.price.toLocaleString()}
                                     </div>
                                 </div>
@@ -83,17 +70,6 @@ export async function GET(
                                 No domains listed yet
                             </div>
                         )}
-                    </div>
-
-                    {/* Footer */}
-                    <div style={{
-                        position: 'absolute',
-                        bottom: '30px',
-                        color: '#4B5563',
-                        fontSize: 20,
-                        fontWeight: 500
-                    }}>
-                        domainliq.com/u/{username}
                     </div>
                 </div>
             ),
