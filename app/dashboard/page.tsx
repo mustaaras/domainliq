@@ -982,14 +982,25 @@ export default function DashboardPage() {
                                                         )}
                                                     </div>
                                                     <p className="text-sm text-gray-500 flex items-center gap-2">
-                                                        <span>Listed on {new Date(domain.createdAt).toLocaleDateString()}</span>
-                                                        {domain.expiresAt && (
+                                                        {domain.expiresAt ? (
                                                             <>
+                                                                <span className="text-amber-500/80">
+                                                                    Expires {new Date(domain.expiresAt).toLocaleDateString()}
+                                                                </span>
                                                                 <span className="text-gray-700">•</span>
-                                                                <span className="text-amber-500/80" title="Expiration Date">
-                                                                    Exp: {new Date(domain.expiresAt).toLocaleDateString()}
+                                                                <span>
+                                                                    {(() => {
+                                                                        const daysRemaining = Math.ceil((new Date(domain.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                                                                        return daysRemaining > 0
+                                                                            ? `${daysRemaining} days to expire`
+                                                                            : daysRemaining === 0
+                                                                                ? 'Expires today'
+                                                                                : `Expired ${Math.abs(daysRemaining)} days ago`;
+                                                                    })()}
                                                                 </span>
                                                             </>
+                                                        ) : (
+                                                            <span className="text-gray-600">No expiration data</span>
                                                         )}
                                                     </p>
                                                 </div>
