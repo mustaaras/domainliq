@@ -277,12 +277,7 @@ export default function ProfileClient({ user, domains, username }: ProfileClient
                 </div>
             </div>
 
-            {/* Footer */}
-            <div className="border-t border-white/5 mt-12 py-8 text-center">
-                <a href="/" className="inline-flex items-center gap-2 opacity-50 hover:opacity-100 transition-opacity">
-                    <img src="/logo.svg" alt="DomainLiq" className="h-6 w-auto" />
-                </a>
-            </div>
+
 
             {/* Floating Contact Button */}
             {selectedIds.length > 0 && (
