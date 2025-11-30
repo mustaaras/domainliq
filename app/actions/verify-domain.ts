@@ -171,39 +171,81 @@ async function checkAuthoritative(domain: string, expectedNs: string, resolveNs:
         const targetNsHostname = tldNs[Math.floor(Math.random() * tldNs.length)];
         console.log(`📡 Querying authoritative NS: ${targetNsHostname}`);
 
-        // 4. Query it using Node.js dns.Resolver (doesn't require dig to be installed)
+        // 4. Query using low-level DNS packet to access AUTHORITY section
         try {
             const dns = await import('dns');
-            const { Resolver } = dns.promises;
             const { resolve4 } = dns.promises;
+            const packet = await import('dns-packet');
+            const dgram = await import('dgram');
 
-            // Resolve the TLD NS hostname to an IP (setServers requires IPs)
+            // Resolve the TLD NS hostname to an IP
             const nsIps = await resolve4(targetNsHostname);
             if (!nsIps || nsIps.length === 0) {
                 console.log('Could not resolve TLD NS hostname to IP');
                 return false;
             }
 
-            const resolver = new Resolver();
-            resolver.setServers([nsIps[0]]);
+            const nsIp = nsIps[0];
 
-            const records = await resolver.resolveNs(domain);
-            const normalizedExpected = expectedNs.toLowerCase().replace(/\.$/, '');
-
-            const match = records.some(record => {
-                const cleanRecord = record.toLowerCase().replace(/\.$/, '');
-                return cleanRecord === normalizedExpected;
+            // Create DNS query packet
+            const query = packet.encode({
+                type: 'query',
+                id: Math.floor(Math.random() * 65535),
+                flags: packet.RECURSION_DESIRED,
+                questions: [{
+                    type: 'NS',
+                    name: domain
+                }]
             });
 
-            console.log(`✓ Found ${records.length} NS records from authoritative server`);
-            return match;
+            // Send query via UDP
+            return new Promise((resolve) => {
+                const socket = dgram.createSocket('udp4');
+                const timeout = setTimeout(() => {
+                    socket.close();
+                    console.log('DNS query timeout');
+                    resolve(false);
+                }, 5000);
+
+                socket.on('message', (message: Buffer) => {
+                    clearTimeout(timeout);
+                    socket.close();
+
+                    try {
+                        const response = packet.decode(message);
+
+                        // Check both ANSWER and AUTHORITY sections
+                        const allRecords = [
+                            ...(response.answers || []),
+                            ...(response.authorities || [])
+                        ];
+
+                        const nsRecords = allRecords.filter((r: any) => r.type === 'NS');
+                        console.log(`✓ Found ${nsRecords.length} NS records from authoritative server`);
+
+                        const normalizedExpected = expectedNs.toLowerCase().replace(/\.$/, '');
+                        const match = nsRecords.some((record: any) => {
+                            const cleanRecord = (record.data || '').toLowerCase().replace(/\.$/, '');
+                            return cleanRecord === normalizedExpected;
+                        });
+
+                        resolve(match);
+                    } catch (e) {
+                        console.error('Failed to parse DNS response:', e);
+                        resolve(false);
+                    }
+                });
+
+                socket.on('error', (err: Error) => {
+                    clearTimeout(timeout);
+                    socket.close();
+                    console.error('DNS socket error:', err.message);
+                    resolve(false);
+                });
+
+                socket.send(query, 53, nsIp);
+            });
         } catch (e: any) {
-            // If the authoritative server returns NXDOMAIN or similar, it might throw
-            // Check if error contains NS records in the authority section
-            if (e.code === 'ENOTFOUND' || e.code === 'ENODATA') {
-                console.log('Domain not found at authoritative server or no NS records');
-                return false;
-            }
             console.error('Authoritative NS query failed:', e.message);
             return false;
         }
