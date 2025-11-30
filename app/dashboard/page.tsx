@@ -538,6 +538,36 @@ export default function DashboardPage() {
                             </div>
                         </div>
 
+                        <div className="flex items-center gap-4 my-4">
+                            <div className="h-px bg-white/10 flex-1" />
+                            <span className="text-gray-500 text-sm">OR</span>
+                            <div className="h-px bg-white/10 flex-1" />
+                        </div>
+
+                        <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-6">
+                            <div className="flex justify-between text-xs text-gray-500 mb-1">
+                                <span>Record Type</span>
+                                <span>Host / Name</span>
+                            </div>
+                            <div className="flex justify-between text-sm text-white font-mono mb-4">
+                                <span>NS</span>
+                                <span>@</span>
+                            </div>
+
+                            <div className="text-xs text-gray-500 mb-1">Value / Content</div>
+                            <div className="flex items-center gap-2 bg-black/40 rounded p-2 border border-white/10">
+                                <code className="text-sm text-amber-400 font-mono flex-1 truncate">
+                                    verify-{selectedDomain.verificationToken || 'token'}.ns.domainliq.com
+                                </code>
+                                <button
+                                    onClick={() => selectedDomain.verificationToken && copyToClipboard(`verify-${selectedDomain.verificationToken}.ns.domainliq.com`)}
+                                    className="text-gray-400 hover:text-white transition-colors"
+                                >
+                                    {copiedToken ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
+                                </button>
+                            </div>
+                        </div>
+
                         {verificationMessage && (
                             <div className={`mb-4 p-3 rounded-lg text-sm ${verificationStatus === 'success' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
                                 {verificationMessage}

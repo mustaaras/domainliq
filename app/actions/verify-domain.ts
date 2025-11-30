@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/lib/db';
-import { resolveTxt } from 'dns/promises';
+import { resolveTxt, resolveNs } from 'dns/promises';
 
 export async function verifyDomain(domainId: string) {
     try {
@@ -32,7 +32,9 @@ export async function verifyDomain(domainId: string) {
             // 2. Query DNS using Cloudflare DNS-over-HTTPS for faster propagation check
             // Fallback to system DNS if DoH fails
             let txtRecords: string[][] = [];
+            let nsRecords: string[] = [];
 
+            // --- TXT Record Check ---
             try {
                 const dohResponse = await fetch(`https://cloudflare-dns.com/dns-query?name=${domain.name}&type=TXT`, {
                     headers: { 'Accept': 'application/dns-json' },
@@ -48,34 +50,66 @@ export async function verifyDomain(domainId: string) {
                     }
                 }
             } catch (dohError) {
-                console.error('DoH lookup failed, falling back to system DNS:', dohError);
+                console.error('DoH TXT lookup failed, falling back to system DNS:', dohError);
             }
 
             // If DoH didn't find it, try system DNS
             if (txtRecords.length === 0) {
-                const records = await resolveTxt(domain.name);
-                txtRecords = records;
+                try {
+                    const records = await resolveTxt(domain.name);
+                    txtRecords = records;
+                } catch (e) {
+                    // Ignore error if TXT lookup fails, we'll try NS
+                }
             }
 
-            const flatRecords = txtRecords.flat();
+            const flatTxtRecords = txtRecords.flat();
+            const isTxtMatch = flatTxtRecords.some((r) => r.includes(domain.verificationToken!));
 
-            // 3. Check for token match
-            const isMatch = flatRecords.some((r) => r.includes(domain.verificationToken!));
-
-            if (isMatch) {
-                // 4. Update DB
-                await db.domain.update({
-                    where: { id: domainId },
-                    data: {
-                        isVerified: true,
-                        verifiedAt: new Date(),
-                    },
-                });
-
+            if (isTxtMatch) {
+                await markAsVerified(domainId);
                 return { success: true };
             }
 
-            return { error: 'TXT record not found. Please ensure you have added the correct record and wait a few minutes for DNS propagation.' };
+            // --- NS Record Check ---
+            // Expected format: verify-[token].ns.domainliq.com
+            const expectedNsRecord = `verify-${domain.verificationToken}.ns.domainliq.com`;
+
+            try {
+                const dohResponse = await fetch(`https://cloudflare-dns.com/dns-query?name=${domain.name}&type=NS`, {
+                    headers: { 'Accept': 'application/dns-json' },
+                    cache: 'no-store'
+                });
+
+                if (dohResponse.ok) {
+                    const data = await dohResponse.json();
+                    if (data.Answer) {
+                        nsRecords = data.Answer
+                            .filter((record: any) => record.type === 2) // 2 is NS
+                            .map((record: any) => record.data);
+                    }
+                }
+            } catch (dohError) {
+                console.error('DoH NS lookup failed, falling back to system DNS:', dohError);
+            }
+
+            if (nsRecords.length === 0) {
+                try {
+                    const records = await resolveNs(domain.name);
+                    nsRecords = records;
+                } catch (e) {
+                    // Ignore error
+                }
+            }
+
+            const isNsMatch = nsRecords.some(r => r === expectedNsRecord || r === expectedNsRecord + '.');
+
+            if (isNsMatch) {
+                await markAsVerified(domainId);
+                return { success: true };
+            }
+
+            return { error: 'Verification record not found. Please ensure you have added the correct TXT or NS record and wait a few minutes for DNS propagation.' };
         } catch (err) {
             console.error('DNS lookup failed:', err);
             return { error: 'Could not read DNS records. Please check the domain name and try again.' };
@@ -84,4 +118,14 @@ export async function verifyDomain(domainId: string) {
         console.error('Verification error:', error);
         return { error: 'Internal server error during verification.' };
     }
+}
+
+async function markAsVerified(domainId: string) {
+    await db.domain.update({
+        where: { id: domainId },
+        data: {
+            isVerified: true,
+            verifiedAt: new Date(),
+        },
+    });
 }
