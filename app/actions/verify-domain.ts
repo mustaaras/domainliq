@@ -1,6 +1,10 @@
 'use server';
 
 import { db } from '@/lib/db';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
 
 export async function verifyDomain(domainId: string) {
     try {
@@ -101,16 +105,16 @@ export async function verifyDomain(domainId: string) {
                 return { success: true };
             }
 
-            // 3. Fallback: Check WHOIS
-            // Sometimes WHOIS updates faster than DNS propagation
+            // 3. Fallback: Check Authoritative Nameservers directly
+            // This bypasses propagation delays by querying the TLD's nameservers (e.g., a0.nic.bet)
             try {
-                const whoisMatch = await checkWhois(domain.name, expectedNsRecord);
-                if (whoisMatch) {
+                const authMatch = await checkAuthoritative(domain.name, expectedNsRecord, resolveNs);
+                if (authMatch) {
                     await markAsVerified(domainId);
                     return { success: true };
                 }
-            } catch (whoisError) {
-                console.error('WHOIS lookup failed:', whoisError);
+            } catch (authError) {
+                console.error('Authoritative check failed:', authError);
             }
 
             return { error: 'Verification record not found. Please ensure you have added the correct TXT or NS record and wait a few minutes for DNS propagation.' };
@@ -155,26 +159,38 @@ async function fetchDoh(provider: 'cloudflare' | 'google', name: string, type: '
     return [];
 }
 
-async function checkWhois(domain: string, expectedNs: string): Promise<boolean> {
+async function checkAuthoritative(domain: string, expectedNs: string, resolveNs: any): Promise<boolean> {
     try {
-        const lookup = (await import('whois-json')).default;
-        const results: any = await lookup(domain);
+        // 1. Get TLD
+        const parts = domain.split('.');
+        if (parts.length < 2) return false;
+        const tld = parts[parts.length - 1];
 
-        // WHOIS results structure varies wildly. We look for nameServer or nserver fields.
-        // They can be strings or arrays of strings.
-        const nsData = results.nameServer || results.nserver || results.NameServer || results.nameserver || results['Name Server'] || results['Name server'];
+        // 2. Get TLD Nameservers
+        const tldNs = await resolveNs(tld);
+        if (!tldNs || tldNs.length === 0) return false;
 
-        if (!nsData) return false;
+        // 3. Pick one random TLD NS
+        const targetNs = tldNs[Math.floor(Math.random() * tldNs.length)];
 
-        const nsList = Array.isArray(nsData) ? nsData : [nsData];
-        const normalizedExpected = expectedNs.toLowerCase();
+        // 4. Query it using dig (requires dig to be installed)
+        // We use dig because Node's dns module doesn't support specifying the server
+        try {
+            const { stdout } = await execAsync(`dig @${targetNs} ns ${domain} +short`);
+            if (!stdout) return false;
 
-        return nsList.some((ns: any) => {
-            if (typeof ns !== 'string') return false;
-            return ns.toLowerCase().includes(normalizedExpected);
-        });
+            const records = stdout.split('\n').filter(Boolean);
+            const normalizedExpected = expectedNs.toLowerCase();
+
+            return records.some(record => {
+                return record.toLowerCase().includes(normalizedExpected);
+            });
+        } catch (e) {
+            console.error('dig command failed (might not be installed):', e);
+            return false;
+        }
     } catch (e) {
-        console.error('WHOIS check error:', e);
+        console.error('Authoritative check error:', e);
         return false;
     }
 }
