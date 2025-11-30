@@ -32,6 +32,7 @@ export default function DashboardPage() {
     const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null);
     const [verificationStatus, setVerificationStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
     const [verificationMessage, setVerificationMessage] = useState('');
+    const [activeMethod, setActiveMethod] = useState<'txt' | 'ns' | null>(null);
     const [copiedToken, setCopiedToken] = useState(false);
 
     // New domain form state
@@ -514,7 +515,10 @@ export default function DashboardPage() {
                             To verify ownership of <span className="font-bold text-white">{selectedDomain.name}</span>, please add the following TXT record to your DNS settings.
                         </p>
 
-                        <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-6">
+                        <div
+                            className={`bg-white/5 border rounded-lg p-4 mb-6 cursor-pointer transition-colors ${activeMethod === 'txt' ? 'border-amber-500/50 bg-amber-500/5' : 'border-white/10 hover:border-white/20'}`}
+                            onClick={() => setActiveMethod('txt')}
+                        >
                             <div className="flex justify-between text-xs text-gray-500 mb-1">
                                 <span>Record Type</span>
                                 <span>Host / Name</span>
@@ -530,12 +534,22 @@ export default function DashboardPage() {
                                     domainliq-verification={selectedDomain.verificationToken || 'Loading...'}
                                 </code>
                                 <button
-                                    onClick={() => selectedDomain.verificationToken && copyToClipboard(`domainliq-verification=${selectedDomain.verificationToken}`)}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        selectedDomain.verificationToken && copyToClipboard(`domainliq-verification=${selectedDomain.verificationToken}`);
+                                    }}
                                     className="text-gray-400 hover:text-white transition-colors"
                                 >
                                     {copiedToken ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
                                 </button>
                             </div>
+
+                            {activeMethod === 'txt' && (
+                                <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded text-xs text-amber-200 animate-in fade-in slide-in-from-top-2">
+                                    <p className="font-medium mb-1">How to verify with TXT:</p>
+                                    <p>Go to your domain registrar's DNS settings and add a new TXT record with the value above. It may take a few minutes to propagate.</p>
+                                </div>
+                            )}
                         </div>
 
                         <div className="flex items-center gap-4 my-4">
@@ -544,7 +558,10 @@ export default function DashboardPage() {
                             <div className="h-px bg-white/10 flex-1" />
                         </div>
 
-                        <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-6">
+                        <div
+                            className={`bg-white/5 border rounded-lg p-4 mb-6 cursor-pointer transition-colors ${activeMethod === 'ns' ? 'border-amber-500/50 bg-amber-500/5' : 'border-white/10 hover:border-white/20'}`}
+                            onClick={() => setActiveMethod('ns')}
+                        >
                             <div className="flex justify-between text-xs text-gray-500 mb-1">
                                 <span>Record Type</span>
                                 <span>Host / Name</span>
@@ -560,12 +577,22 @@ export default function DashboardPage() {
                                     ns3verify.domainliq.com
                                 </code>
                                 <button
-                                    onClick={() => copyToClipboard('ns3verify.domainliq.com')}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        copyToClipboard('ns3verify.domainliq.com');
+                                    }}
                                     className="text-gray-400 hover:text-white transition-colors"
                                 >
                                     {copiedToken ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
                                 </button>
                             </div>
+
+                            {activeMethod === 'ns' && (
+                                <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded text-xs text-amber-200 animate-in fade-in slide-in-from-top-2">
+                                    <p className="font-medium mb-1">How to verify with Nameserver:</p>
+                                    <p>Add this as an <strong>additional nameserver (e.g., NS3)</strong> to your existing list. <br />Do <strong>NOT</strong> remove your current nameservers (NS1, NS2) to keep your landing page working.</p>
+                                </div>
+                            )}
                         </div>
 
                         {verificationMessage && (
