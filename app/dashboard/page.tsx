@@ -126,8 +126,8 @@ export default function DashboardPage() {
             if (lines.length === 0) {
                 throw new Error('Please enter at least one domain');
             }
-            if (lines.length > 50) {
-                throw new Error('Maximum 50 domains per bulk upload');
+            if (lines.length > 500) {
+                throw new Error('Maximum 500 domains per bulk upload');
             }
 
             const domainsToAdd = [];
@@ -144,27 +144,24 @@ export default function DashboardPage() {
                 domainsToAdd.push({ name, price });
             }
 
-            // Add all domains
-            const results = [];
-            for (const domain of domainsToAdd) {
-                const res = await fetch('/api/user/domains', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(domain)
-                });
+            // Add all domains in one request
+            const res = await fetch('/api/user/domains', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(domainsToAdd)
+            });
 
-                if (!res.ok) {
-                    const data = await res.json();
-                    throw new Error(data.error || `Failed to add ${domain.name}`);
-                }
-
-                const addedDomain = await res.json();
-                results.push(addedDomain);
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.error || 'Failed to add domains');
             }
 
-            setDomains([...results, ...domains]);
+            // Refresh domains list
+            await fetchUserDomains();
+
             setBulkText('');
             setAddError('');
+            alert('Domains added successfully!');
         } catch (error: any) {
             setBulkError(error.message);
         } finally {
@@ -399,7 +396,7 @@ export default function DashboardPage() {
                             <form onSubmit={handleBulkUpload} className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-300 mb-1">
-                                        Bulk Upload (max 50 domains)
+                                        Bulk Upload (max 500 domains)
                                     </label>
                                     <textarea
                                         value={bulkText}

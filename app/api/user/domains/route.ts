@@ -28,11 +28,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { name, price } = await req.json();
-
-        if (!name || !price) {
-            return NextResponse.json({ error: 'Name and price are required' }, { status: 400 });
-        }
+        const body = await req.json();
 
         // Get user ID
         const user = await db.user.findUnique({
@@ -41,6 +37,34 @@ export async function POST(req: NextRequest) {
 
         if (!user) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
+
+        // Handle Bulk Upload (Array)
+        if (Array.isArray(body)) {
+            const domains = body.map((item: any) => ({
+                name: item.name,
+                price: item.price,
+                userId: user.id,
+                status: 'available',
+            }));
+
+            if (domains.length === 0) {
+                return NextResponse.json({ error: 'No domains provided' }, { status: 400 });
+            }
+
+            const result = await db.domain.createMany({
+                data: domains,
+                skipDuplicates: true, // Optional: skip if domain already exists (needs unique constraint on name)
+            });
+
+            return NextResponse.json({ count: result.count, message: `Successfully added ${result.count} domains` });
+        }
+
+        // Handle Single Upload (Object)
+        const { name, price } = body;
+
+        if (!name || !price) {
+            return NextResponse.json({ error: 'Name and price are required' }, { status: 400 });
         }
 
         const domain = await db.domain.create({
