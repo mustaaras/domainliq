@@ -23,6 +23,7 @@ export const metadata: Metadata = {
   description: "Sell and buy domains quickly. The easiest way to liquidate your domain portfolio.",
   icons: {
     icon: "/favicon.svg",
+    apple: "/logo.svg", // For iOS devices
   },
 };
 

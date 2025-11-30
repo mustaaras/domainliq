@@ -193,11 +193,10 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-amber-500/30">
       <div className="max-w-3xl mx-auto px-4 py-8 pb-32 md:pb-12">
-        {/* Header */}
-        <header className="mb-8">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8">
-            <div>
-              <div className="flex items-center gap-3">
+        {/* Header */}\n        <header className="mb-8">
+          <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-6 mb-8">
+            <div className="text-center md:text-left w-full md:w-auto">
+              <div className="flex items-center gap-3 justify-center md:justify-start">
                 <Link href="/">
                   <img src="/logo.svg" alt="DomainLiq" className="h-12 w-auto cursor-pointer" />
                 </Link>
@@ -205,7 +204,7 @@ export default function Home() {
               <p className="text-gray-500 mt-1">Domain Liquidation Listing Platform</p>
             </div>
 
-            <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+            <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto items-center">
               <div className="relative w-full md:w-72 group">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Search className="h-4 w-4 text-gray-600 group-focus-within:text-gray-400 transition-colors" />
