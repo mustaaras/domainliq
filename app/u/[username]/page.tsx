@@ -20,8 +20,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         include: {
             domains: {
                 where: { status: 'available' },
-                take: 3,
+                take: 10,
+                orderBy: { createdAt: 'desc' },
             },
+            _count: {
+                select: { domains: { where: { status: 'available' } } }
+            }
         },
     });
 
@@ -31,10 +35,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         };
     }
 
-    const domainCount = user.domains.length;
+    const totalCount = user._count.domains;
     const domainList = user.domains.map((d: any) => d.name).join(', ');
-    const description = domainCount > 0
-        ? `${domainCount} domains available: ${domainList}`
+    const description = totalCount > 0
+        ? `${totalCount} domains available: ${domainList}${totalCount > 10 ? '...' : ''}`
         : `Check out ${user.name || username}'s domain marketplace`;
 
     return {
