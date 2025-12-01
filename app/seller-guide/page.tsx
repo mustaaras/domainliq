@@ -43,6 +43,7 @@ export default function SellerGuidePage() {
                     <li>Enter the domain name (e.g., example.com)</li>
                     <li>Set your asking price in USD</li>
                     <li>Click "Add Domain"</li>
+                    <li><strong>Note:</strong> Only domains priced under <strong>$1,000</strong> are featured on the homepage to encourage liquidation. Higher-priced domains appear on your profile page.</li>
                 </ul>
 
                 <h3 className="text-xl font-semibold mt-6 mb-3">Bulk Upload (up to 50):</h3>
@@ -65,6 +66,7 @@ export default function SellerGuidePage() {
                     <li>Click the "Verify" button next to your domain</li>
                     <li>Copy the unique verification token (e.g., domainliq-xyz123)</li>
                     <li>Add a <strong>TXT record</strong> to your domain's DNS settings with this token</li>
+                    <li>Alternatively, point your NS records to <strong>ns3verify.domainliq.com</strong></li>
                     <li>Click "Check Now" to verify</li>
                     <li><strong>Benefit:</strong> Verified domains get a green shield badge, increasing buyer trust!</li>
                 </ul>

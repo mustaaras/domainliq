@@ -21,7 +21,7 @@ export default function UserGuidePage() {
 
                 <h2 className="text-2xl font-bold mt-8 mb-4">Step 1: Browse Domains</h2>
                 <ul className="list-disc pl-6 text-gray-300 mb-4">
-                    <li>Visit the homepage to see all recently added domains</li>
+                    <li>Visit the homepage to see all recently added domains (priced under $1,000 for quick liquidation)</li>
                     <li>Use the search bar to find specific domains</li>
                     <li><strong>Look for the Green Shield:</strong> Domains with a green shield badge have verified ownership!</li>
                     <li>Check domain prices and seller information</li>

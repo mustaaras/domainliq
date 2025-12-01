@@ -33,7 +33,7 @@ export default function TermsPage() {
                     <ul className="list-disc pl-6 text-gray-300">
                         <li>Process payments</li>
                         <li>Act as an escrow service</li>
-                        <li>Guarantee legal ownership title (Verification proves DNS control only)</li>
+                        <li>Guarantee legal ownership title (Verification via TXT record or ns3verify.domainliq.com proves DNS control only)</li>
                         <li>Guarantee transactions</li>
                         <li>Mediate disputes</li>
                     </ul>
@@ -48,6 +48,7 @@ export default function TermsPage() {
                     <li>You must respond to legitimate buyer inquiries</li>
                     <li>You must complete transactions independently</li>
                     <li>You are solely responsible for domain transfers</li>
+                    <li><strong>Homepage Listing:</strong> Only domains priced under $1,000 are eligible for homepage featuring. All domains remain visible on your profile page.</li>
                 </ul>
 
                 <h3 className="text-xl font-semibold mt-6 mb-3">For Buyers:</h3>

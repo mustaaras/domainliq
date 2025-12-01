@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Share2, MessageCircle, Check, Search, Loader2, ShieldCheck, Filter, X, ChevronDown } from 'lucide-react';
+import { Share2, MessageCircle, Check, Search, Loader2, ShieldCheck, Filter, X, ChevronDown, Trophy, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 
@@ -28,16 +28,24 @@ interface Domain {
   expiresAt?: string | null;
 }
 
+interface TopSeller {
+  id: string;
+  name: string;
+  subdomain: string;
+  domainCount: number;
+}
+
 export default function Home() {
   const { data: session } = useSession();
   const [domains, setDomains] = useState<Domain[]>([]);
+  const [topSellers, setTopSellers] = useState<TopSeller[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [itemsPerPage, setItemsPerPage] = useState(30);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
   const [totalDomains, setTotalDomains] = useState(0);
   const [showContactModal, setShowContactModal] = useState(false);
 
@@ -83,6 +91,22 @@ export default function Home() {
       setIsLoadingMore(false);
     }
   };
+
+  const fetchTopSellers = async () => {
+    try {
+      const res = await fetch('/api/sellers/top');
+      if (res.ok) {
+        const data = await res.json();
+        setTopSellers(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch top sellers:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTopSellers();
+  }, []);
 
   useEffect(() => {
     // Debounce search
@@ -226,19 +250,6 @@ export default function Home() {
             </div>
 
             <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto items-center">
-              <div className="relative w-full md:w-72 group">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-4 w-4 text-gray-600 group-focus-within:text-gray-400 transition-colors" />
-                </div>
-                <input
-                  type="text"
-                  placeholder="Search domains..."
-                  className="block w-full pl-9 pr-4 py-2 border border-white/10 rounded-lg bg-white/5 text-gray-300 placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-amber-500/50 focus:border-amber-500/50 focus:bg-white/10 transition-all text-sm"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-
               <div className="flex gap-2 shrink-0">
                 {session ? (
                   <Link
@@ -309,277 +320,347 @@ export default function Home() {
           })()}
         </header>
 
-        {/* Section Title & Controls */}
-        <div className="mb-6 flex flex-col md:flex-row justify-between items-center gap-4 relative">
-          <div className="text-center md:text-left w-full md:w-auto">
-            <h2 className="text-xl font-bold text-white">Recently Added Domains</h2>
-            <p className="text-gray-400 text-xs mt-1">Fresh listing from the sellers</p>
-          </div>
+        {/* Main Content Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-          <div className="flex items-center gap-2 w-full md:w-auto justify-center md:justify-end">
-            <button
-              onClick={() => setShowFilterPanel(!showFilterPanel)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${showFilterPanel || filterTLD.length > 0 || filterPrice.min || filterPrice.max || filterVerified
-                ? 'bg-amber-500 text-white'
-                : 'bg-white/10 hover:bg-white/20 text-white'
-                }`}
-            >
-              <Filter className="h-4 w-4" />
-              Filter
-              {(filterTLD.length > 0 || filterPrice.min || filterPrice.max || filterVerified) && (
-                <span className="ml-1 px-1.5 py-0.5 bg-white/20 rounded-full text-xs">
-                  •
-                </span>
-              )}
-            </button>
-          </div>
+          {/* Left Column: Domains (2/3) */}
+          <div className="lg:col-span-2 bg-[#0A0A0A] border border-white/10 rounded-xl p-6 h-fit">
+            {/* Section Title & Controls */}
+            <div className="mb-6 flex flex-col md:flex-row justify-between items-center gap-4 relative">
+              <div className="text-center md:text-left w-full md:w-auto">
+                <h2 className="text-xl font-bold text-white">Recently Added Domains</h2>
+                <p className="text-gray-400 text-xs mt-1">Fresh listing from the sellers</p>
+              </div>
 
-          {/* Filter Panel */}
-          {showFilterPanel && (
-            <div className="absolute top-full right-0 mt-2 w-full md:w-80 bg-[#0A0A0A] border border-white/20 rounded-xl shadow-2xl z-40 p-4">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="font-semibold text-white">Filters</h3>
-                <button onClick={() => setShowFilterPanel(false)} className="text-gray-400 hover:text-white">
-                  <X className="h-4 w-4" />
+              <div className="flex flex-col md:flex-row items-center gap-3 w-full md:w-auto justify-center md:justify-end">
+                {/* Search Box */}
+                <div className="relative w-full md:w-64 group">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Search className="h-4 w-4 text-gray-600 group-focus-within:text-gray-400 transition-colors" />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Search domains..."
+                    className="block w-full pl-9 pr-4 py-2 border border-white/10 rounded-lg bg-white/5 text-gray-300 placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-amber-500/50 focus:border-amber-500/50 focus:bg-white/10 transition-all text-sm"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+
+                <button
+                  onClick={() => setShowFilterPanel(!showFilterPanel)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${showFilterPanel || filterTLD.length > 0 || filterPrice.min || filterPrice.max || filterVerified
+                    ? 'bg-amber-500 text-white'
+                    : 'bg-white/10 hover:bg-white/20 text-white'
+                    }`}
+                >
+                  <Filter className="h-4 w-4" />
+                  Filter
+                  {(filterTLD.length > 0 || filterPrice.min || filterPrice.max || filterVerified) && (
+                    <span className="ml-1 px-1.5 py-0.5 bg-white/20 rounded-full text-xs">
+                      •
+                    </span>
+                  )}
                 </button>
               </div>
 
-              {/* TLDs */}
-              <div className="mb-4">
-                <label className="text-xs font-medium text-gray-400 mb-2 block">Extensions</label>
-                <div className="flex flex-wrap gap-2">
-                  {commonTLDs.map(tld => (
-                    <button
-                      key={tld}
-                      onClick={() => {
-                        setFilterTLD(prev =>
-                          prev.includes(tld) ? prev.filter(t => t !== tld) : [...prev, tld]
-                        );
-                        setPage(1);
-                      }}
-                      className={`px-2 py-1 text-xs rounded-md border transition-colors ${filterTLD.includes(tld)
-                        ? 'bg-amber-500 border-amber-500 text-white'
-                        : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'
-                        }`}
-                    >
-                      .{tld}
+              {/* Filter Panel */}
+              {showFilterPanel && (
+                <div className="absolute top-full right-0 mt-2 w-full md:w-80 bg-[#0A0A0A] border border-white/20 rounded-xl shadow-2xl z-40 p-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="font-semibold text-white">Filters</h3>
+                    <button onClick={() => setShowFilterPanel(false)} className="text-gray-400 hover:text-white">
+                      <X className="h-4 w-4" />
                     </button>
-                  ))}
-                </div>
-              </div>
+                  </div>
 
-              {/* Price Range */}
-              <div className="mb-4">
-                <label className="text-xs font-medium text-gray-400 mb-2 block">Price Range ($)</label>
-                <div className="flex gap-2">
-                  <input
-                    type="number"
-                    placeholder="Min"
-                    value={filterPrice.min}
-                    onChange={e => {
-                      setFilterPrice(prev => ({ ...prev, min: e.target.value }));
-                      setPage(1);
-                    }}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500/50"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Max"
-                    value={filterPrice.max}
-                    onChange={e => {
-                      setFilterPrice(prev => ({ ...prev, max: e.target.value }));
-                      setPage(1);
-                    }}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500/50"
-                  />
-                </div>
-              </div>
-
-              {/* Status & Sort */}
-              <div className="mb-4 space-y-3">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={filterVerified}
-                    onChange={e => {
-                      setFilterVerified(e.target.checked);
-                      setPage(1);
-                    }}
-                    className="rounded border-white/10 bg-white/5 text-amber-500 focus:ring-amber-500/50"
-                  />
-                  <span className="text-sm text-gray-300">Verified Only</span>
-                </label>
-
-                <div>
-                  <label className="text-xs font-medium text-gray-400 mb-2 block">Sort By</label>
-                  <select
-                    value={sortBy}
-                    onChange={e => {
-                      setSortBy(e.target.value);
-                      setPage(1);
-                    }}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500/50"
-                  >
-                    <option value="newest">Newest Listed</option>
-                    <option value="price_asc">Price: Low to High</option>
-                    <option value="price_desc">Price: High to Low</option>
-                    <option value="expires_asc">Expiring Soon</option>
-                    <option value="expires_desc">Expiring Later</option>
-                  </select>
-                </div>
-              </div>
-
-              <button
-                onClick={() => {
-                  setFilterTLD([]);
-                  setFilterPrice({ min: '', max: '' });
-                  setFilterVerified(false);
-                  setSortBy('newest');
-                  setPage(1);
-                }}
-                className="w-full py-2 text-xs text-gray-400 hover:text-white transition-colors border-t border-white/10"
-              >
-                Clear Filters
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* List */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {isLoading ? (
-            // Skeleton loading
-            [...Array(9)].map((_, i) => (
-              <div key={i} className="h-48 rounded-xl bg-white/5 animate-pulse" />
-            ))
-          ) : domains.length > 0 ? (
-            <>
-              {domains.map(domain => {
-                const isSelected = selectedIds.includes(domain.id);
-                const isSold = domain.status === 'sold';
-
-                return (
-                  <div
-                    key={domain.id}
-                    onClick={() => !isSold && toggleSelection(domain.id)}
-                    className={`
-                      group flex flex-col justify-center p-3 rounded-lg border transition-all duration-200 cursor-pointer relative
-                      ${isSold
-                        ? 'bg-transparent border-transparent opacity-40 cursor-not-allowed'
-                        : isSelected
-                          ? 'bg-indigo-900/10 border-amber-500/50'
-                          : 'bg-white/5 border-transparent hover:bg-white/10 hover:border-white/10 hover:shadow-xl hover:shadow-black/20'
-                      }
-                    `}
-                  >
-                    {/* Selection Indicator */}
-                    {!isSold && (
-                      <div className={`
-                        absolute top-1/2 -translate-y-1/2 right-3 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all z-10
-                        ${isSelected
-                          ? 'bg-amber-500 border-amber-500'
-                          : 'border-white/10 bg-black/20 opacity-0 group-hover:opacity-100'
-                        }
-                      `}>
-                        {isSelected && (
-                          <Check className="w-3 h-3 text-white" strokeWidth={3} />
-                        )}
-                      </div>
-                    )}
-
-                    <div className="flex flex-col gap-0.5 pr-8">
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <h3 className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors truncate leading-tight" title={domain.name}>
-                            {domain.name}
-                          </h3>
-                          {domain.isVerified && (
-                            <div className="group/tooltip relative">
-                              <ShieldCheck className="h-3.5 w-3.5 text-green-500 shrink-0 cursor-help" />
-                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-medium text-white bg-black/90 rounded whitespace-nowrap opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none z-20 border border-white/10">
-                                It is a verified domain
-                                <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-black/90"></div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                        <div className={`font-mono text-sm shrink-0 ${isSold ? 'text-gray-600' : 'text-gray-400'}`}>
-                          ${domain.price.toLocaleString()}
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2 text-[10px] text-gray-500">
-                        <Link
-                          href={`/u/${domain.user.subdomain}`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="hover:text-amber-400 transition-colors truncate max-w-[100px]"
+                  {/* TLDs */}
+                  <div className="mb-4">
+                    <label className="text-xs font-medium text-gray-400 mb-2 block">Extensions</label>
+                    <div className="flex flex-wrap gap-2">
+                      {commonTLDs.map(tld => (
+                        <button
+                          key={tld}
+                          onClick={() => {
+                            setFilterTLD(prev =>
+                              prev.includes(tld) ? prev.filter(t => t !== tld) : [...prev, tld]
+                            );
+                            setPage(1);
+                          }}
+                          className={`px-2 py-1 text-xs rounded-md border transition-colors ${filterTLD.includes(tld)
+                            ? 'bg-amber-500 border-amber-500 text-white'
+                            : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'
+                            }`}
                         >
-                          {domain.user.name || domain.user.subdomain}
-                        </Link>
-                        {isSold && (
-                          <span className="px-1 py-0.5 text-[9px] font-medium bg-amber-500/20 text-amber-400 rounded-full">
-                            SOLD
-                          </span>
-                        )}
-                        {domain.expiresAt && (
-                          <>
-                            <span className="text-gray-700">•</span>
-                            <span>
-                              Exp: {new Date(domain.expiresAt).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric', year: '2-digit' })}
-                            </span>
-                          </>
-                        )}
-                      </div>
+                          .{tld}
+                        </button>
+                      ))}
                     </div>
                   </div>
-                );
-              })}
-            </>
-          ) : (
-            <div className="col-span-full text-center py-12 text-gray-600">
-              No domains found.
-            </div>
-          )}
-        </div>
 
-        {/* Pagination Controls */}
-        {domains.length > 0 && (
-          <div className="mt-8 flex flex-col md:flex-row items-center justify-between border-t border-white/10 pt-4 gap-4">
-            <div className="flex items-center gap-4">
-              <div className="text-sm text-gray-400">
-                Showing <span className="font-medium text-white">{(page - 1) * itemsPerPage + 1}</span> to <span className="font-medium text-white">{Math.min(page * itemsPerPage, totalDomains)}</span> of <span className="font-medium text-white">{totalDomains}</span> results
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-400">Show:</span>
-                <select
-                  value={itemsPerPage}
-                  onChange={handleLimitChange}
-                  className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500/50"
-                >
-                  <option value={30}>30</option>
-                  <option value={60}>60</option>
-                  <option value={90}>90</option>
-                </select>
-              </div>
+                  {/* Price Range */}
+                  <div className="mb-4">
+                    <label className="text-xs font-medium text-gray-400 mb-2 block">Price Range ($)</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="number"
+                        placeholder="Min"
+                        value={filterPrice.min}
+                        onChange={e => {
+                          setFilterPrice(prev => ({ ...prev, min: e.target.value }));
+                          setPage(1);
+                        }}
+                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+                      />
+                      <input
+                        type="number"
+                        placeholder="Max"
+                        value={filterPrice.max}
+                        onChange={e => {
+                          setFilterPrice(prev => ({ ...prev, max: e.target.value }));
+                          setPage(1);
+                        }}
+                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Status & Sort */}
+                  <div className="mb-4 space-y-3">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={filterVerified}
+                        onChange={e => {
+                          setFilterVerified(e.target.checked);
+                          setPage(1);
+                        }}
+                        className="rounded border-white/10 bg-white/5 text-amber-500 focus:ring-amber-500/50"
+                      />
+                      <span className="text-sm text-gray-300">Verified Only</span>
+                    </label>
+
+                    <div>
+                      <label className="text-xs font-medium text-gray-400 mb-2 block">Sort By</label>
+                      <select
+                        value={sortBy}
+                        onChange={e => {
+                          setSortBy(e.target.value);
+                          setPage(1);
+                        }}
+                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+                      >
+                        <option value="newest">Newest Listed</option>
+                        <option value="price_asc">Price: Low to High</option>
+                        <option value="price_desc">Price: High to Low</option>
+                        <option value="expires_asc">Expiring Soon</option>
+                        <option value="expires_desc">Expiring Later</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setFilterTLD([]);
+                      setFilterPrice({ min: '', max: '' });
+                      setFilterVerified(false);
+                      setSortBy('newest');
+                      setPage(1);
+                    }}
+                    className="w-full py-2 text-xs text-gray-400 hover:text-white transition-colors border-t border-white/10"
+                  >
+                    Clear Filters
+                  </button>
+                </div>
+              )}
             </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => handlePageChange(page - 1)}
-                disabled={page === 1 || isLoading}
-                className="px-3 py-1 text-sm bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Previous
-              </button>
-              <button
-                onClick={() => handlePageChange(page + 1)}
-                disabled={!hasMore || isLoading}
-                className="px-3 py-1 text-sm bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Next
-              </button>
+
+            {/* List */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {isLoading ? (
+                // Skeleton loading
+                [...Array(6)].map((_, i) => (
+                  <div key={i} className="h-24 rounded-xl bg-white/5 animate-pulse" />
+                ))
+              ) : domains.length > 0 ? (
+                <>
+                  {domains.map(domain => {
+                    const isSelected = selectedIds.includes(domain.id);
+                    const isSold = domain.status === 'sold';
+
+                    return (
+                      <div
+                        key={domain.id}
+                        onClick={() => !isSold && toggleSelection(domain.id)}
+                        className={`
+                          group flex flex-col justify-center p-3 rounded-lg border transition-all duration-200 cursor-pointer relative
+                          ${isSold
+                            ? 'bg-transparent border-transparent opacity-40 cursor-not-allowed'
+                            : isSelected
+                              ? 'bg-indigo-900/10 border-amber-500/50'
+                              : 'bg-white/5 border-transparent hover:bg-white/10 hover:border-white/10 hover:shadow-xl hover:shadow-black/20'
+                          }
+                        `}
+                      >
+                        {/* Selection Indicator */}
+                        {!isSold && (
+                          <div className={`
+                            absolute top-1/2 -translate-y-1/2 right-3 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all z-10
+                            ${isSelected
+                              ? 'bg-amber-500 border-amber-500'
+                              : 'border-white/10 bg-black/20 opacity-0 group-hover:opacity-100'
+                            }
+                          `}>
+                            {isSelected && (
+                              <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                            )}
+                          </div>
+                        )}
+
+                        <div className="flex flex-col gap-0.5 pr-8">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <h3 className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors truncate leading-tight" title={domain.name}>
+                                {domain.name}
+                              </h3>
+                              {domain.isVerified && (
+                                <div className="group/tooltip relative">
+                                  <ShieldCheck className="h-3.5 w-3.5 text-green-500 shrink-0 cursor-help" />
+                                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-medium text-white bg-black/90 rounded whitespace-nowrap opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none z-20 border border-white/10">
+                                    It is a verified domain
+                                    <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-black/90"></div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                            <div className={`font-mono text-sm shrink-0 ${isSold ? 'text-gray-600' : 'text-gray-400'}`}>
+                              ${domain.price.toLocaleString()}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 text-[10px] text-gray-500">
+                            <Link
+                              href={`/u/${domain.user.subdomain}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="hover:text-amber-400 transition-colors truncate max-w-[100px]"
+                            >
+                              {domain.user.name || domain.user.subdomain}
+                            </Link>
+                            {isSold && (
+                              <span className="px-1 py-0.5 text-[9px] font-medium bg-amber-500/20 text-amber-400 rounded-full">
+                                SOLD
+                              </span>
+                            )}
+                            {domain.expiresAt && (
+                              <>
+                                <span className="text-gray-700">•</span>
+                                <span>
+                                  Exp: {new Date(domain.expiresAt).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric', year: '2-digit' })}
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </>
+              ) : (
+                <div className="col-span-full text-center py-12 text-gray-600">
+                  No domains found.
+                </div>
+              )}
+            </div>
+
+            {/* Pagination Controls */}
+            {domains.length > 0 && (
+              <div className="mt-8 flex flex-col md:flex-row items-center justify-between border-t border-white/10 pt-4 gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="text-sm text-gray-400">
+                    Showing <span className="font-medium text-white">{(page - 1) * itemsPerPage + 1}</span> to <span className="font-medium text-white">{Math.min(page * itemsPerPage, totalDomains)}</span> of <span className="font-medium text-white">{totalDomains}</span> results
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-400">Show:</span>
+                    <select
+                      value={itemsPerPage}
+                      onChange={handleLimitChange}
+                      className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+                    >
+                      <option value={20}>20</option>
+                      <option value={40}>40</option>
+                      <option value={60}>60</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handlePageChange(page - 1)}
+                    disabled={page === 1 || isLoading}
+                    className="px-3 py-1 text-sm bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={() => handlePageChange(page + 1)}
+                    disabled={!hasMore || isLoading}
+                    className="px-3 py-1 text-sm bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right Column: Top Liquidators (1/3) */}
+          <div className="lg:col-span-1 lg:col-start-3">
+            <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <Trophy className="h-5 w-5 text-amber-500" />
+                <h2 className="text-xl font-bold text-white">Top Liquidators</h2>
+              </div>
+
+              <div className="space-y-4">
+                {topSellers.length > 0 ? (
+                  topSellers.map((seller, index) => (
+                    <Link
+                      key={seller.id}
+                      href={`/u/${seller.subdomain}`}
+                      className="flex items-center justify-between p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10 transition-all group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`
+                          w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm
+                          ${index === 0 ? 'bg-amber-500 text-white' :
+                            index === 1 ? 'bg-gray-300 text-black' :
+                              index === 2 ? 'bg-amber-700 text-white' :
+                                'bg-white/10 text-gray-400'}
+                        `}>
+                          {index + 1}
+                        </div>
+                        <div>
+                          <h3 className="font-medium text-white group-hover:text-amber-400 transition-colors">
+                            {seller.name}
+                          </h3>
+                          <p className="text-xs text-gray-500">@{seller.subdomain}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-400 group-hover:text-white transition-colors">
+                        <span className="text-sm font-medium">{seller.domainCount}</span>
+                        <ExternalLink className="h-3 w-3" />
+                      </div>
+                    </Link>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-600">
+                    Loading top sellers...
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        )}
+
+        </div>
       </div>
 
       {/* Floating Action Bar (Mobile Optimized) */}
