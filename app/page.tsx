@@ -37,7 +37,7 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [itemsPerPage, setItemsPerPage] = useState(30);
   const [totalDomains, setTotalDomains] = useState(0);
   const [showContactModal, setShowContactModal] = useState(false);
 
@@ -212,7 +212,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-amber-500/30">
-      <div className="max-w-3xl mx-auto px-4 py-8 pb-32 md:pb-12">
+      <div className="max-w-7xl mx-auto px-4 py-8 pb-32 md:pb-12">
         {/* Header */}
         <header className="mb-8">
           <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-6 mb-8">
@@ -446,11 +446,11 @@ export default function Home() {
         </div>
 
         {/* List */}
-        <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {isLoading ? (
             // Skeleton loading
-            [...Array(6)].map((_, i) => (
-              <div key={i} className="h-16 rounded-xl bg-white/5 animate-pulse" />
+            [...Array(9)].map((_, i) => (
+              <div key={i} className="h-48 rounded-xl bg-white/5 animate-pulse" />
             ))
           ) : domains.length > 0 ? (
             <>
@@ -463,117 +463,123 @@ export default function Home() {
                     key={domain.id}
                     onClick={() => !isSold && toggleSelection(domain.id)}
                     className={`
-                      group flex items-center justify-between p-4 rounded-xl border transition-all duration-200 cursor-pointer
+                      group flex flex-col justify-center p-3 rounded-lg border transition-all duration-200 cursor-pointer relative
                       ${isSold
                         ? 'bg-transparent border-transparent opacity-40 cursor-not-allowed'
                         : isSelected
                           ? 'bg-indigo-900/10 border-amber-500/50'
-                          : 'bg-white/5 border-transparent hover:bg-white/10'
+                          : 'bg-white/5 border-transparent hover:bg-white/10 hover:border-white/10 hover:shadow-xl hover:shadow-black/20'
                       }
                     `}
                   >
-                    <div className="flex items-center gap-4 min-w-0">
-                      {!isSold && (
-                        <div className={`
-                          shrink-0 w-5 h-5 rounded border-2 transition-all
-                          ${isSelected
-                            ? 'bg-amber-500 border-amber-500'
-                            : 'border-gray-600 group-hover:border-amber-500/50'
-                          }
-                        `}>
-                          {isSelected && (
-                            <svg className="w-full h-full text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                            </svg>
-                          )}
-                        </div>
-                      )}
+                    {/* Selection Indicator */}
+                    {!isSold && (
+                      <div className={`
+                        absolute top-1/2 -translate-y-1/2 right-3 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all z-10
+                        ${isSelected
+                          ? 'bg-amber-500 border-amber-500'
+                          : 'border-white/10 bg-black/20 opacity-0 group-hover:opacity-100'
+                        }
+                      `}>
+                        {isSelected && (
+                          <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                        )}
+                      </div>
+                    )}
 
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="font-medium text-white group-hover:text-amber-400 transition-colors truncate">
+                    <div className="flex flex-col gap-0.5 pr-8">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <h3 className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors truncate leading-tight" title={domain.name}>
                             {domain.name}
                           </h3>
-                          {isSold && (
-                            <span className="px-2 py-0.5 text-xs font-medium bg-amber-500/20 text-amber-400 rounded-full whitespace-nowrap">
-                              SOLD
-                            </span>
-                          )}
                           {domain.isVerified && (
-                            <ShieldCheck className="h-4 w-4 text-green-500 shrink-0" />
+                            <div className="group/tooltip relative">
+                              <ShieldCheck className="h-3.5 w-3.5 text-green-500 shrink-0 cursor-help" />
+                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-medium text-white bg-black/90 rounded whitespace-nowrap opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none z-20 border border-white/10">
+                                It is a verified domain
+                                <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-black/90"></div>
+                              </div>
+                            </div>
                           )}
                         </div>
-                        <div className="flex items-center gap-2 flex-wrap text-xs text-gray-500">
-                          <Link
-                            href={`/u/${domain.user.subdomain}`}
-                            onClick={(e) => e.stopPropagation()}
-                            className="hover:text-amber-400 transition-colors"
-                          >
-                            by {domain.user.name || domain.user.subdomain}
-                          </Link>
-                          {domain.expiresAt && (
-                            <>
-                              <span>•</span>
-                              <span>
-                                Expires {new Date(domain.expiresAt).toLocaleDateString()}
-                              </span>
-                            </>
-                          )}
+                        <div className={`font-mono text-sm shrink-0 ${isSold ? 'text-gray-600' : 'text-gray-400'}`}>
+                          ${domain.price.toLocaleString()}
                         </div>
                       </div>
-                    </div>
 
-                    <div className={`shrink-0 font-mono transition-colors ${isSold ? 'text-gray-600' : 'text-gray-400'}`}>
-                      ${domain.price.toLocaleString()}
+                      <div className="flex items-center gap-2 text-[10px] text-gray-500">
+                        <Link
+                          href={`/u/${domain.user.subdomain}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="hover:text-amber-400 transition-colors truncate max-w-[100px]"
+                        >
+                          {domain.user.name || domain.user.subdomain}
+                        </Link>
+                        {isSold && (
+                          <span className="px-1 py-0.5 text-[9px] font-medium bg-amber-500/20 text-amber-400 rounded-full">
+                            SOLD
+                          </span>
+                        )}
+                        {domain.expiresAt && (
+                          <>
+                            <span className="text-gray-700">•</span>
+                            <span>
+                              Exp: {new Date(domain.expiresAt).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric', year: '2-digit' })}
+                            </span>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
                 );
               })}
-
-              {/* Pagination Controls */}
-              <div className="mt-8 flex flex-col md:flex-row items-center justify-between border-t border-white/10 pt-4 gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="text-sm text-gray-400">
-                    Showing <span className="font-medium text-white">{(page - 1) * itemsPerPage + 1}</span> to <span className="font-medium text-white">{Math.min(page * itemsPerPage, totalDomains)}</span> of <span className="font-medium text-white">{totalDomains}</span> results
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-400">Show:</span>
-                    <select
-                      value={itemsPerPage}
-                      onChange={handleLimitChange}
-                      className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500/50"
-                    >
-                      <option value={20}>20</option>
-                      <option value={50}>50</option>
-                      <option value={100}>100</option>
-                      <option value={200}>200</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handlePageChange(page - 1)}
-                    disabled={page === 1 || isLoading}
-                    className="px-3 py-1 text-sm bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    onClick={() => handlePageChange(page + 1)}
-                    disabled={!hasMore || isLoading}
-                    className="px-3 py-1 text-sm bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
             </>
           ) : (
-            <div className="text-center py-12 text-gray-600">
+            <div className="col-span-full text-center py-12 text-gray-600">
               No domains found.
             </div>
           )}
         </div>
+
+        {/* Pagination Controls */}
+        {domains.length > 0 && (
+          <div className="mt-8 flex flex-col md:flex-row items-center justify-between border-t border-white/10 pt-4 gap-4">
+            <div className="flex items-center gap-4">
+              <div className="text-sm text-gray-400">
+                Showing <span className="font-medium text-white">{(page - 1) * itemsPerPage + 1}</span> to <span className="font-medium text-white">{Math.min(page * itemsPerPage, totalDomains)}</span> of <span className="font-medium text-white">{totalDomains}</span> results
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-400">Show:</span>
+                <select
+                  value={itemsPerPage}
+                  onChange={handleLimitChange}
+                  className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+                >
+                  <option value={30}>30</option>
+                  <option value={60}>60</option>
+                  <option value={90}>90</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => handlePageChange(page - 1)}
+                disabled={page === 1 || isLoading}
+                className="px-3 py-1 text-sm bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => handlePageChange(page + 1)}
+                disabled={!hasMore || isLoading}
+                className="px-3 py-1 text-sm bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Floating Action Bar (Mobile Optimized) */}
