@@ -1,7 +1,7 @@
 {
     "name": "DomainLiq",
     "short_name": "DomainLiq",
-    "description": "Domain Liquidation Listing Platform",
+    "description": "Domain Liquidation Platform",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#050505",

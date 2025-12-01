@@ -13,7 +13,7 @@ export default function Footer() {
                             <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto mb-4 cursor-pointer" />
                         </Link>
                         <p className="text-xs text-gray-400">
-                            Free and open domain liquidation listing platform. Connect sellers with buyers directly.
+                            Free and open domain liquidation platform. Connect sellers with buyers directly.
                         </p>
                     </div>
 

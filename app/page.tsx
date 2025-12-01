@@ -246,7 +246,7 @@ export default function Home() {
                   <img src="/logo.svg" alt="DomainLiq" className="h-12 w-auto cursor-pointer" />
                 </Link>
               </div>
-              <p className="text-gray-500 mt-1">Domain Liquidation Listing Platform</p>
+              <p className="text-gray-500 mt-1">Domain Liquidation Platform</p>
             </div>
 
             <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto items-center">

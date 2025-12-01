@@ -215,7 +215,7 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
                     <h1 className="text-3xl font-bold tracking-tight text-white">
                         {user.name || username}'s Domains
                     </h1>
-                    <p className="text-gray-500 mt-1">Domain Liquidation Listing Platform</p>
+                    <p className="text-gray-500 mt-1">Domain Liquidation Platform</p>
                 </header>
 
                 <div className="flex flex-col lg:flex-row gap-8">
@@ -256,8 +256,8 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
                                             key={tld}
                                             onClick={() => toggleTLD(tld)}
                                             className={`px-2 py-1 rounded text-xs transition-colors ${selectedTLDs.has(tld)
-                                                    ? 'bg-amber-600 text-white'
-                                                    : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                                                ? 'bg-amber-600 text-white'
+                                                : 'bg-white/5 text-gray-400 hover:bg-white/10'
                                                 }`}
                                         >
                                             .{tld}
