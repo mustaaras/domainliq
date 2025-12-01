@@ -1,6 +1,9 @@
 import { MetadataRoute } from 'next';
 import { db } from '@/lib/db';
 
+// Force dynamic generation to access runtime DATABASE_URL
+export const dynamic = 'force-dynamic';
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = 'https://domainliq.com';
 
