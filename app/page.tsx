@@ -60,7 +60,7 @@ export default function Home() {
         sort: sortBy,
         ...(filterTLD.length && { tld: filterTLD.join(',') }),
         ...(filterPrice.min && { minPrice: filterPrice.min }),
-        ...(filterPrice.max && { maxPrice: filterPrice.max }),
+        maxPrice: filterPrice.max ? Math.min(parseInt(filterPrice.max), 1000).toString() : '1000',
         ...(filterVerified && { verified: 'true' }),
       });
       const res = await fetch(`/api/domains?${params}`);
