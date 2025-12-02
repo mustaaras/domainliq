@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Logo } from '@/components/logo';
 import { Loader2 } from 'lucide-react';
 
 export default function SignupPage() {
@@ -50,13 +52,11 @@ export default function SignupPage() {
     return (
         <div className="min-h-screen bg-[#050505] flex items-center justify-center p-4">
             <div className="w-full max-w-md space-y-8">
-                <div className="text-center">
-                    <div className="flex justify-center mb-6">
-                        <Link href="/">
-                            <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto cursor-pointer" />
-                        </Link>
-                    </div>
-                    <h1 className="text-3xl font-bold tracking-tight text-white">Create an account</h1>
+                <div className="text-center mb-8">
+                    <Link href="/">
+                        <Logo className="h-12 w-auto mx-auto mb-6 cursor-pointer" />
+                    </Link>
+                    <h1 className="text-3xl font-bold dark:text-white text-gray-900 mb-2">Create Account</h1>
                     <p className="mt-2 text-gray-400">Start selling your domains today</p>
                 </div>
 

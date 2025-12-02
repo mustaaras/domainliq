@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { MessageCircle, Check, ShieldCheck, Search, Filter, X, Loader2 } from 'lucide-react';
 import { useDebounce } from '@/hooks/use-debounce';
+import { Logo } from '@/components/logo';
 
 interface Domain {
     id: string;
@@ -210,7 +211,7 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
                 {/* Header */}
                 <header className="mb-8 text-center">
                     <Link href="/" className="inline-block mb-6">
-                        <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto dark:bg-transparent bg-black rounded p-1" />
+                        <Logo className="h-8 w-auto" />
                     </Link>
                     <h1 className="text-3xl font-bold tracking-tight dark:text-white text-gray-900">
                         {user.name || username}'s Domains

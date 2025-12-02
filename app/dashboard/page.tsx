@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Loader2, Plus, Trash2, Settings, ExternalLink, DollarSign, LogOut, Shield, ShieldCheck, Copy, Check, CheckSquare, Filter, X, Menu, Pencil } from 'lucide-react';
 import { useSession, signOut } from 'next-auth/react';
 import { verifyDomain } from '../actions/verify-domain';
+import { Logo } from '@/components/logo';
 
 interface Domain {
     id: string;
@@ -527,7 +528,7 @@ export default function DashboardPage() {
                 <header className="relative mb-8">
                     <div className="flex justify-center mb-6">
                         <Link href="/">
-                            <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto cursor-pointer dark:bg-transparent bg-black rounded p-1" />
+                            <Logo className="h-8 w-auto cursor-pointer" />
                         </Link>
                     </div>
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4">

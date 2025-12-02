@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Sun, Moon } from 'lucide-react';
 import { useTheme } from './theme-provider';
+import { Logo } from './logo';
 
 export default function Footer() {
     const { theme, toggleTheme } = useTheme();
@@ -14,11 +15,32 @@ export default function Footer() {
                     {/* About */}
                     <div>
                         <Link href="/">
-                            <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto mb-4 cursor-pointer dark:bg-transparent bg-black rounded p-1" />
+                            <Logo className="h-8 w-auto mb-4 cursor-pointer" />
                         </Link>
                         <p className="text-xs dark:text-gray-400 text-gray-600">
                             Free and open domain liquidation platform. Connect sellers with buyers directly.
                         </p>
+
+                        {/* Theme Toggle */}
+                        <div className="mt-6">
+                            <button
+                                onClick={toggleTheme}
+                                className="flex items-center gap-2 px-3 py-2 rounded-lg dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 transition-colors"
+                                aria-label="Toggle theme"
+                            >
+                                {theme === 'dark' ? (
+                                    <>
+                                        <Sun className="h-4 w-4" />
+                                        <span className="text-xs">Light Mode</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Moon className="h-4 w-4" />
+                                        <span className="text-xs">Dark Mode</span>
+                                    </>
+                                )}
+                            </button>
+                        </div>
                     </div>
 
                     {/* Guides */}
@@ -74,27 +96,6 @@ export default function Footer() {
                             <li>✓ 100% Free Listing Service</li>
                             <li className="text-amber-500">⚠ Secure Escrow Recommended</li>
                         </ul>
-
-                        {/* Theme Toggle */}
-                        <div className="mt-6">
-                            <button
-                                onClick={toggleTheme}
-                                className="flex items-center gap-2 px-3 py-2 rounded-lg dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 transition-colors"
-                                aria-label="Toggle theme"
-                            >
-                                {theme === 'dark' ? (
-                                    <>
-                                        <Sun className="h-4 w-4" />
-                                        <span className="text-xs">Light Mode</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Moon className="h-4 w-4" />
-                                        <span className="text-xs">Dark Mode</span>
-                                    </>
-                                )}
-                            </button>
-                        </div>
                     </div>
                 </div>
 

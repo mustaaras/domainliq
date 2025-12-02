@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Logo } from '@/components/logo';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -56,12 +57,13 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen dark:bg-[#050505] bg-gray-50 flex items-center justify-center p-4">
             <div className="w-full max-w-md dark:bg-white/5 bg-white p-8 rounded-2xl border dark:border-white/10 border-gray-200 shadow-lg">
-                <div className="flex justify-center mb-6">
+                <div className="text-center mb-8">
                     <Link href="/">
-                        <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto cursor-pointer dark:bg-transparent bg-black rounded p-1" />
+                        <Logo className="h-12 w-auto mx-auto mb-6 cursor-pointer" />
                     </Link>
+                    <h1 className="text-3xl font-bold dark:text-white text-gray-900 mb-2">Welcome Back</h1>
+                    <h1 className="text-2xl font-bold dark:text-white text-gray-900 mb-6 text-center">Login to DomainLiq</h1>
                 </div>
-                <h1 className="text-2xl font-bold dark:text-white text-gray-900 mb-6 text-center">Login to DomainLiq</h1>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium dark:text-gray-400 text-gray-700 mb-1">Email</label>

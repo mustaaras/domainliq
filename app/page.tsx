@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { Share2, MessageCircle, Check, Search, Loader2, ShieldCheck, Filter, X, ChevronDown, Trophy, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
+import { Logo } from '@/components/logo';
+import { ArrowRight, TrendingUp, Shield, Zap, Globe, DollarSign, CheckCircle } from 'lucide-react';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -245,8 +247,8 @@ export default function Home() {
           <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-6 mb-8">
             <div className="text-center md:text-left w-full md:w-auto">
               <div className="flex items-center gap-3 justify-center md:justify-start">
-                <Link href="/">
-                  <img src="/logo.svg" alt="DomainLiq" className="h-12 w-auto cursor-pointer dark:bg-transparent bg-black rounded p-1.5" />
+                <Link href="/" className="flex-shrink-0">
+                  <Logo className="h-8 w-auto" />
                 </Link>
               </div>
               <p className="dark:text-gray-500 text-gray-600 mt-1">Domain Liquidation Platform</p>

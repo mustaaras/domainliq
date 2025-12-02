@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ArrowLeft, User, Puzzle } from 'lucide-react';
+import { User, CreditCard, Shield, Settings, LogOut, LayoutDashboard, ArrowLeft } from 'lucide-react';
+import { Logo } from '@/components/logo';
 
 export default function SettingsLayout({
     children,
@@ -13,7 +14,7 @@ export default function SettingsLayout({
 
     const tabs = [
         { name: 'Profile', href: '/settings', icon: User },
-        { name: 'Integrations', href: '/settings/integrations', icon: Puzzle },
+        { name: 'Integrations', href: '/settings/integrations', icon: LayoutDashboard },
     ];
 
     return (
@@ -23,7 +24,7 @@ export default function SettingsLayout({
                     {/* Logo */}
                     <div className="flex justify-center mb-6">
                         <Link href="/">
-                            <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto cursor-pointer dark:bg-transparent bg-black rounded p-1" />
+                            <Logo className="h-8 w-auto cursor-pointer" />
                         </Link>
                     </div>
 
@@ -70,7 +71,7 @@ export default function SettingsLayout({
                         {children}
                     </main>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }

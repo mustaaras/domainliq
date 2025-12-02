@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Send, CheckCircle } from 'lucide-react';
+import { Logo } from '@/components/logo';
 
 export default function ContactPage() {
     const [formData, setFormData] = useState({
@@ -65,7 +66,7 @@ export default function ContactPage() {
             <div className="max-w-2xl mx-auto">
                 <div className="text-center mb-8">
                     <Link href="/">
-                        <img src="/logo.svg" alt="DomainLiq" className="h-10 w-auto mx-auto mb-6 cursor-pointer dark:bg-transparent bg-black rounded p-1" />
+                        <Logo className="h-10 w-auto mx-auto mb-6 cursor-pointer" />
                     </Link>
                     <h1 className="text-4xl font-bold mb-4 dark:text-white text-gray-900">Contact Us</h1>
                     <p className="dark:text-gray-400 text-gray-600">

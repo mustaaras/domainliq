@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Logo } from '@/components/logo';
 
 export default function TermsPage() {
     return (
@@ -6,7 +7,7 @@ export default function TermsPage() {
             <div className="max-w-4xl mx-auto prose dark:prose-invert">
                 <div className="flex justify-center mb-8">
                     <Link href="/">
-                        <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto cursor-pointer dark:bg-transparent bg-black rounded p-1" />
+                        <Logo className="h-8 w-auto cursor-pointer" />
                     </Link>
                 </div>
                 <h1 className="text-4xl font-bold mb-4 dark:text-white text-gray-900">Terms of Service</h1>
