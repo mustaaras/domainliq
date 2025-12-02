@@ -60,7 +60,7 @@ export async function verifyDomain(domainId: string) {
             // Check TXT
             const isTxtMatch = Array.from(txtRecords).some(r => r.includes(expectedTxtRecord));
             if (isTxtMatch) {
-                await markAsVerified(domainId, domain.name);
+                await markAsVerified(domainId, domain.name, 'txt');
                 return { success: true };
             }
 
@@ -93,7 +93,7 @@ export async function verifyDomain(domainId: string) {
             });
 
             if (isNsMatch) {
-                await markAsVerified(domainId, domain.name);
+                await markAsVerified(domainId, domain.name, 'ns');
                 return { success: true };
             }
 
@@ -107,7 +107,7 @@ export async function verifyDomain(domainId: string) {
 
                 if (aRecords.includes(SERVER_IP)) {
                     console.log(`[DNS] ✅ A record matches!`);
-                    await markAsVerified(domainId, domain.name);
+                    await markAsVerified(domainId, domain.name, 'a');
                     return { success: true };
                 } else {
                     console.log(`[DNS] ❌ A record found but doesn't match server IP`);
@@ -123,7 +123,7 @@ export async function verifyDomain(domainId: string) {
                 const authMatch = await checkAuthoritative(domain.name, expectedNsRecord, resolveNs);
                 console.log('📡 Authoritative check result:', authMatch);
                 if (authMatch) {
-                    await markAsVerified(domainId, domain.name);
+                    await markAsVerified(domainId, domain.name, 'ns');
                     return { success: true };
                 }
             } catch (authError) {
@@ -305,7 +305,7 @@ async function checkAuthoritative(domain: string, expectedNs: string, resolveNs:
     }
 }
 
-async function markAsVerified(domainId: string, domainName: string) {
+async function markAsVerified(domainId: string, domainName: string, method: 'txt' | 'a' | 'ns') {
     let expiresAt: Date | null = null;
 
     try {
@@ -358,7 +358,44 @@ async function markAsVerified(domainId: string, domainName: string) {
         data: {
             isVerified: true,
             verifiedAt: new Date(),
+            verificationMethod: method,
             expiresAt: expiresAt
         },
     });
+
+    // Only register with Coolify if verified via A record (pointing to our server)
+    if (method === 'a') {
+        try {
+            const COOLIFY_URL = process.env.COOLIFY_URL || 'http://localhost';
+            const COOLIFY_TOKEN = process.env.COOLIFY_API_TOKEN;
+            const APPLICATION_ID = process.env.COOLIFY_APPLICATION_ID;
+
+            if (COOLIFY_TOKEN && APPLICATION_ID) {
+                const response = await fetch(
+                    `${COOLIFY_URL}/api/v1/applications/${APPLICATION_ID}/domains`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            Authorization: `Bearer ${COOLIFY_TOKEN}`,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            domain: `https://${domainName}`,
+                        }),
+                    }
+                );
+
+                if (response.ok) {
+                    console.log(`✅ [Coolify] Registered ${domainName} for SSL (A record verified)`);
+                } else {
+                    console.error(`❌ [Coolify] Failed to register ${domainName}`);
+                }
+            }
+        } catch (coolifyError) {
+            console.error('[Coolify] Registration error:', coolifyError);
+            // Don't fail verification if Coolify fails
+        }
+    } else {
+        console.log(`ℹ️  [Coolify] Skipping registration for ${domainName} (verified via ${method.toUpperCase()}, not pointing to server)`);
+    }
 }
