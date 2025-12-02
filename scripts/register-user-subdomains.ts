@@ -56,7 +56,7 @@ async function main() {
     const users = await db.user.findMany({
         where: {
             subdomain: {
-                not: null,
+                not: undefined,
             },
         },
         select: {
@@ -64,29 +64,30 @@ async function main() {
             email: true,
         },
     });
+});
 
-    console.log(`Found ${users.length} users with subdomains\n`);
+console.log(`Found ${users.length} users with subdomains\n`);
 
-    let successCount = 0;
-    let failCount = 0;
+let successCount = 0;
+let failCount = 0;
 
-    for (const user of users) {
-        if (user.subdomain) {
-            const success = await registerSubdomain(user.subdomain);
-            if (success) {
-                successCount++;
-            } else {
-                failCount++;
-            }
-            // Add delay to avoid rate limiting
-            await new Promise(resolve => setTimeout(resolve, 500));
+for (const user of users) {
+    if (user.subdomain) {
+        const success = await registerSubdomain(user.subdomain);
+        if (success) {
+            successCount++;
+        } else {
+            failCount++;
         }
+        // Add delay to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 500));
     }
+}
 
-    console.log(`\n✅ Successfully registered: ${successCount}`);
-    console.log(`❌ Failed: ${failCount}`);
+console.log(`\n✅ Successfully registered: ${successCount}`);
+console.log(`❌ Failed: ${failCount}`);
 
-    await db.$disconnect();
+await db.$disconnect();
 }
 
 main().catch(console.error);
