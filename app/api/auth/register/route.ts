@@ -51,6 +51,25 @@ export async function POST(req: NextRequest) {
             },
         });
 
+        // Register subdomain with Coolify for automatic SSL
+        const userSubdomain = `${subdomain.toLowerCase()}.domainliq.com`;
+        try {
+            const coolifyResponse = await fetch(`${req.nextUrl.origin}/api/coolify/add-domain`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ domain: userSubdomain }),
+            });
+
+            if (!coolifyResponse.ok) {
+                console.error(`[Coolify] Failed to register subdomain: ${userSubdomain}`);
+            } else {
+                console.log(`[Coolify] Successfully registered subdomain: ${userSubdomain}`);
+            }
+        } catch (coolifyError) {
+            console.error('[Coolify] Error registering subdomain:', coolifyError);
+            // Don't fail registration if Coolify fails
+        }
+
         const { password: _, ...userWithoutPassword } = user;
 
         return NextResponse.json(userWithoutPassword);
