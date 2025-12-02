@@ -1180,33 +1180,33 @@ export default function DashboardPage() {
             {/* Verification Modal */}
             {showVerifyModal && selectedDomain && (
                 <div className="fixed inset-0 bg-black/70 dark:bg-black/70 flex items-center justify-center p-4 z-50" onClick={() => setShowVerifyModal(false)}>
-                    <div className="bg-white dark:bg-[#0A0A0A] border border-gray-200 dark:border-white/20 rounded-xl p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
-                        <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
-                            <ShieldCheck className="h-6 w-6 text-amber-500" />
+                    <div className="bg-white dark:bg-[#0A0A0A] border border-gray-200 dark:border-white/20 rounded-lg p-4 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
+                        <h3 className="text-base font-bold mb-2 text-gray-900 dark:text-white flex items-center gap-2">
+                            <ShieldCheck className="h-4 w-4 text-amber-500" />
                             Verify Domain Ownership
                         </h3>
 
-                        <p className="text-gray-600 dark:text-gray-300 text-sm mb-6">
-                            To verify ownership of <span className="font-bold text-gray-900 dark:text-white">{selectedDomain.name}</span>, choose one of the verification methods below.
+                        <p className="text-gray-600 dark:text-gray-300 text-xs mb-3">
+                            Choose one of the verification methods below.
                         </p>
 
                         {/* TXT Record */}
                         <div
-                            className={`bg-gray-50 dark:bg-white/5 border rounded-lg p-4 mb-4 cursor-pointer transition-colors ${activeMethod === 'txt' ? 'border-amber-500 bg-amber-50 dark:bg-amber-500/5' : 'border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20'}`}
+                            className={`bg-gray-50 dark:bg-white/5 border rounded-lg p-2 mb-2 cursor-pointer transition-colors ${activeMethod === 'txt' ? 'border-amber-500 bg-amber-50 dark:bg-amber-500/5' : 'border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20'}`}
                             onClick={() => setActiveMethod(activeMethod === 'txt' ? null : 'txt')}
                         >
-                            <div className="flex justify-between text-xs text-gray-500 dark:text-gray-500 mb-1">
+                            <div className="flex justify-between text-[10px] text-gray-500 dark:text-gray-500 mb-0.5">
                                 <span>Record Type</span>
                                 <span>Host / Name</span>
                             </div>
-                            <div className="flex justify-between text-sm text-gray-900 dark:text-white font-mono mb-4">
+                            <div className="flex justify-between text-xs text-gray-900 dark:text-white font-mono mb-2">
                                 <span>TXT</span>
                                 <span>@</span>
                             </div>
 
-                            <div className="text-xs text-gray-500 dark:text-gray-500 mb-1">Value / Content</div>
-                            <div className="flex items-center gap-2 bg-gray-100 dark:bg-black/40 rounded p-2 border border-gray-200 dark:border-white/10">
-                                <code className="text-sm text-amber-600 dark:text-amber-400 font-mono flex-1 truncate">
+                            <div className="text-[10px] text-gray-500 dark:text-gray-500 mb-0.5">Value / Content</div>
+                            <div className="flex items-center gap-1 bg-gray-100 dark:bg-black/40 rounded p-1.5 border border-gray-200 dark:border-white/10">
+                                <code className="text-[11px] text-amber-600 dark:text-amber-400 font-mono flex-1 truncate">
                                     domainliq-verification={selectedDomain.verificationToken || 'Loading...'}
                                 </code>
                                 <button
@@ -1216,15 +1216,14 @@ export default function DashboardPage() {
                                     }}
                                     className="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
                                 >
-                                    {copiedToken ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                                    {copiedToken ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
                                 </button>
                             </div>
 
                             {activeMethod === 'txt' && (
-                                <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded text-xs text-amber-900 dark:text-amber-200 animate-in fade-in slide-in-from-top-2">
-                                    <p className="font-medium mb-1">How to verify with TXT:</p>
-                                    <p className="mb-1">Go to your domain registrar's DNS settings and add a new TXT record with the value above.</p>
-                                    <p className="text-amber-700 dark:text-amber-400/80">⏱️ Verification typically takes 5-15 minutes after DNS propagation.</p>
+                                <div className="mt-2 p-2 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded text-[10px] text-amber-900 dark:text-amber-200">
+                                    <p className="font-medium mb-0.5">How to verify:</p>
+                                    <p>Add TXT record to your DNS settings.</p>
                                 </div>
                             )}
                         </div>
@@ -1274,7 +1273,7 @@ export default function DashboardPage() {
                                         <li>🌐 Enable your domain lander page</li>
                                         <li>🔒 Get automatic SSL certificate</li>
                                     </ul>
-                                    <p className="text-green-700 dark:text-green-400 font-medium">⚡️ Your lander will be live at https://{selectedDomain.name}</p>
+                                    <p className="text-green-700 dark:text-green-400 font-medium">⚡️ Your lander will be live with automatic SSL!</p>
                                 </div>
                             )}
                         </div>

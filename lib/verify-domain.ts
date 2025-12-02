@@ -42,16 +42,22 @@ export async function verifyDomainOwnership(
         // Method 2: Check A record
         try {
             const aRecords = await dns.resolve4(cleanDomain);
+            console.log(`[DNS] A records for ${cleanDomain}:`, aRecords);
+            console.log(`[DNS] Looking for server IP: ${SERVER_IP}`);
             const pointsToServer = aRecords.includes(SERVER_IP);
 
             if (pointsToServer) {
+                console.log(`[DNS] ✅ A record matches!`);
                 return {
                     verified: true,
                     method: 'a',
                     pointsToServer: true,
                 };
+            } else {
+                console.log(`[DNS] ❌ A record found but doesn't match server IP`);
             }
-        } catch (error) {
+        } catch (error: any) {
+            console.log(`[DNS] ❌ A record lookup failed:`, error.message);
             // A record not found or invalid, continue to next method
         }
 
