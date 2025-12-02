@@ -11,15 +11,6 @@ services:
       - AUTH_SECRET=${AUTH_SECRET}
     labels:
       - "traefik.enable=true"
-      # Catch-all rule for any domain pointing to this IP
-      - "traefik.http.routers.domainliq.rule=HostRegexp(`{host:.+}`)"
-      - "traefik.http.routers.domainliq.entrypoints=http,https"
-      - "traefik.http.routers.domainliq.tls=true"
-      - "traefik.http.routers.domainliq.tls.certresolver=letsencrypt"
-      # Explicitly link router to service
-      - "traefik.http.routers.domainliq.service=app"
-      # Port configuration
-      - "traefik.http.services.app.loadbalancer.server.port=3000"
     networks:
       - coolify
 
