@@ -1246,7 +1246,7 @@ export default function DashboardPage() {
                             </div>
                             <div className="flex justify-between text-sm text-gray-900 dark:text-white font-mono mb-4">
                                 <span>A</span>
-                                <span className="text-gray-500 dark:text-gray-400">@ or {selectedDomain.name}</span>
+                                <span className="text-gray-500 dark:text-gray-400">@</span>
                             </div>
 
                             <div className="text-xs text-gray-500 dark:text-gray-500 mb-1">Value / Content</div>
