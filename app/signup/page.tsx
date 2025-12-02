@@ -21,11 +21,16 @@ export default function SignupPage() {
             return;
         }
 
-        setIsLoading(true);
-        setError('');
-
         const formData = new FormData(e.currentTarget);
         const data = Object.fromEntries(formData.entries());
+
+        if (data.password !== data.confirmPassword) {
+            setError('Passwords do not match');
+            return;
+        }
+
+        setIsLoading(true);
+        setError('');
 
         try {
             const res = await fetch('/api/auth/register', {
@@ -33,7 +38,12 @@ export default function SignupPage() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data),
+                body: JSON.stringify({
+                    name: data.name,
+                    email: data.email,
+                    subdomain: data.subdomain,
+                    password: data.password,
+                }),
             });
 
             if (!res.ok) {
@@ -41,7 +51,19 @@ export default function SignupPage() {
                 throw new Error(json.error || 'Failed to register');
             }
 
-            router.push('/login?registered=true');
+            // Auto-login and redirect to settings
+            const result = await signIn('credentials', {
+                redirect: false,
+                email: data.email,
+                password: data.password,
+            });
+
+            if (result?.error) {
+                // Fallback to login page if auto-login fails
+                router.push('/login?registered=true');
+            } else {
+                router.push('/settings');
+            }
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -50,26 +72,26 @@ export default function SignupPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#050505] flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gray-50 dark:bg-[#050505] flex items-center justify-center p-4 transition-colors duration-300">
             <div className="w-full max-w-md space-y-8">
                 <div className="text-center mb-8">
                     <Link href="/">
                         <Logo className="h-12 w-auto mx-auto mb-6 cursor-pointer" />
                     </Link>
-                    <h1 className="text-3xl font-bold dark:text-white text-gray-900 mb-2">Create Account</h1>
-                    <p className="mt-2 text-gray-400">Start selling your domains today</p>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Create Account</h1>
+                    <p className="mt-2 text-gray-600 dark:text-gray-400">Start selling your domains today</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="mt-8 space-y-6">
                     {error && (
-                        <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
+                        <div className="p-3 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 text-sm text-center">
                             {error}
                         </div>
                     )}
 
                     <div className="space-y-4">
                         <div>
-                            <label htmlFor="name" className="block text-sm font-medium text-gray-300">
+                            <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Full Name
                             </label>
                             <input
@@ -77,13 +99,13 @@ export default function SignupPage() {
                                 name="name"
                                 type="text"
                                 required
-                                className="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                                className="mt-1 block w-full px-3 py-2 bg-white dark:bg-white/5 border border-gray-300 dark:border-white/10 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
                                 placeholder="John Doe"
                             />
                         </div>
 
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-300">
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Email address
                             </label>
                             <input
@@ -92,17 +114,17 @@ export default function SignupPage() {
                                 type="email"
                                 autoComplete="email"
                                 required
-                                className="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                                className="mt-1 block w-full px-3 py-2 bg-white dark:bg-white/5 border border-gray-300 dark:border-white/10 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
                                 placeholder="john@example.com"
                             />
                         </div>
 
                         <div>
-                            <label htmlFor="subdomain" className="block text-sm font-medium text-gray-300">
+                            <label htmlFor="subdomain" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Username (for your URL)
                             </label>
                             <div className="mt-1 flex rounded-lg shadow-sm">
-                                <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-white/10 bg-white/5 text-gray-500 sm:text-sm">
+                                <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-gray-500 sm:text-sm">
                                     domainliq.com/
                                 </span>
                                 <input
@@ -110,14 +132,14 @@ export default function SignupPage() {
                                     name="subdomain"
                                     id="subdomain"
                                     required
-                                    className="flex-1 min-w-0 block w-full px-3 py-2 bg-white/5 border border-white/10 rounded-r-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                                    className="flex-1 min-w-0 block w-full px-3 py-2 bg-white dark:bg-white/5 border border-gray-300 dark:border-white/10 rounded-r-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
                                     placeholder="john"
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-300">
+                            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Password
                             </label>
                             <input
@@ -126,7 +148,22 @@ export default function SignupPage() {
                                 type="password"
                                 autoComplete="new-password"
                                 required
-                                className="mt-1 block w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                                className="mt-1 block w-full px-3 py-2 bg-white dark:bg-white/5 border border-gray-300 dark:border-white/10 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                                placeholder="••••••••"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Confirm Password
+                            </label>
+                            <input
+                                id="confirmPassword"
+                                name="confirmPassword"
+                                type="password"
+                                autoComplete="new-password"
+                                required
+                                className="mt-1 block w-full px-3 py-2 bg-white dark:bg-white/5 border border-gray-300 dark:border-white/10 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
                                 placeholder="••••••••"
                             />
                         </div>
@@ -138,15 +175,15 @@ export default function SignupPage() {
                             type="checkbox"
                             checked={acceptedTerms}
                             onChange={(e) => setAcceptedTerms(e.target.checked)}
-                            className="mt-1 mr-3 h-4 w-4"
+                            className="mt-1 mr-3 h-4 w-4 border-gray-300 dark:border-white/10 rounded text-amber-500 focus:ring-amber-500"
                         />
-                        <label htmlFor="terms" className="text-sm text-gray-300">
+                        <label htmlFor="terms" className="text-sm text-gray-600 dark:text-gray-300">
                             I agree to the{' '}
-                            <a href="/terms" target="_blank" className="text-amber-400 hover:text-amber-300 underline">
+                            <a href="/terms" target="_blank" className="text-amber-600 dark:text-amber-400 hover:text-amber-500 dark:hover:text-amber-300 underline">
                                 Terms of Service
                             </a>
                             {' '}and{' '}
-                            <a href="/privacy" target="_blank" className="text-amber-400 hover:text-amber-300 underline">
+                            <a href="/privacy" target="_blank" className="text-amber-600 dark:text-amber-400 hover:text-amber-500 dark:hover:text-amber-300 underline">
                                 Privacy Policy
                             </a>. I understand that DomainLiq does not process payments and I should only transact with trusted sellers using escrow services.
                         </label>
@@ -164,9 +201,9 @@ export default function SignupPage() {
                         )}
                     </button>
 
-                    <p className="text-center text-sm text-gray-400">
+                    <p className="text-center text-sm text-gray-600 dark:text-gray-400">
                         Already have an account?{' '}
-                        <Link href="/login" className="font-medium text-amber-400 hover:text-indigo-300 transition-colors">
+                        <Link href="/login" className="font-medium text-amber-600 dark:text-amber-400 hover:text-amber-500 dark:hover:text-amber-300 transition-colors">
                             Sign in
                         </Link>
                     </p>

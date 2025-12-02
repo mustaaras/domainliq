@@ -259,9 +259,13 @@ export default function Home() {
                 {session ? (
                   <Link
                     href="/dashboard"
-                    className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium text-white bg-amber-500 hover:bg-amber-400 rounded-lg transition-colors"
+                    className="group relative px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 hover:-translate-y-0.5 transition-all duration-300 overflow-hidden"
                   >
-                    Dashboard
+                    <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <span className="relative flex items-center gap-2 text-sm">
+                      Dashboard
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </span>
                   </Link>
                 ) : (
                   <>
@@ -606,14 +610,14 @@ export default function Home() {
                         {/* Selection Indicator */}
                         {!isSold && (
                           <div className={`
-                            absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all z-20
+                            absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all z-20
                             ${isSelected
                               ? 'bg-amber-500 border-amber-500 scale-100 opacity-100'
                               : 'dark:border-white/20 border-gray-300 dark:bg-black/40 bg-white/60 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 backdrop-blur-sm'
                             }
                           `}>
                             {isSelected && (
-                              <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                              <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
                             )}
                           </div>
                         )}
@@ -683,10 +687,10 @@ export default function Home() {
                             <Link
                               href={`/d/${domain.name}`}
                               onClick={(e) => e.stopPropagation()}
-                              className="group/visit flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-medium dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 rounded-full border dark:border-white/5 border-gray-200 dark:hover:border-white/20 hover:border-gray-300 transition-all shrink-0"
+                              className="group/visit flex items-center gap-1 px-2 py-0.5 text-[9px] font-medium dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 rounded-full border dark:border-white/5 border-gray-200 dark:hover:border-white/20 hover:border-gray-300 transition-all shrink-0"
                             >
                               <span className="uppercase tracking-wider">Visit</span>
-                              <ExternalLink className="w-2.5 h-2.5 opacity-50 group-hover/visit:opacity-100 transition-opacity" />
+                              <ExternalLink className="w-2 h-2 opacity-50 group-hover/visit:opacity-100 transition-opacity" />
                             </Link>
                           </div>
                         </div>
@@ -703,17 +707,17 @@ export default function Home() {
 
             {/* Pagination Controls */}
             {domains.length > 0 && (
-              <div className="mt-8 flex flex-col md:flex-row items-center justify-between border-t border-white/10 pt-4 gap-4">
+              <div className="mt-8 flex flex-col md:flex-row items-center justify-between border-t border-gray-200 dark:border-white/10 pt-4 gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="text-sm text-gray-400">
-                    Showing <span className="font-medium text-white">{(page - 1) * itemsPerPage + 1}</span> to <span className="font-medium text-white">{Math.min(page * itemsPerPage, totalDomains)}</span> of <span className="font-medium text-white">{totalDomains}</span> results
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    Showing <span className="font-medium text-gray-900 dark:text-white">{(page - 1) * itemsPerPage + 1}</span> to <span className="font-medium text-gray-900 dark:text-white">{Math.min(page * itemsPerPage, totalDomains)}</span> of <span className="font-medium text-gray-900 dark:text-white">{totalDomains}</span> results
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-400">Show:</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Show:</span>
                     <select
                       value={itemsPerPage}
                       onChange={handleLimitChange}
-                      className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+                      className="bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-2 py-1 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500/50"
                     >
                       <option value={20}>20</option>
                       <option value={40}>40</option>
@@ -725,14 +729,14 @@ export default function Home() {
                   <button
                     onClick={() => handlePageChange(page - 1)}
                     disabled={page === 1 || isLoading}
-                    className="px-3 py-1 text-sm bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="px-3 py-1 text-sm bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 rounded-lg text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     Previous
                   </button>
                   <button
                     onClick={() => handlePageChange(page + 1)}
                     disabled={!hasMore || isLoading}
-                    className="px-3 py-1 text-sm bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="px-3 py-1 text-sm bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 rounded-lg text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     Next
                   </button>
