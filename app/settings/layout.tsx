@@ -17,28 +17,28 @@ export default function SettingsLayout({
     ];
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white p-4 md:p-8">
+        <div className="min-h-screen dark:bg-[#050505] bg-gray-50 dark:text-white text-gray-900 p-4 md:p-8">
             <div className="max-w-4xl mx-auto">
                 <header className="mb-8">
                     {/* Logo */}
                     <div className="flex justify-center mb-6">
                         <Link href="/">
-                            <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto cursor-pointer" />
+                            <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto cursor-pointer dark:bg-transparent bg-black rounded p-1" />
                         </Link>
                     </div>
 
                     <div className="flex items-center gap-4 mb-4">
                         <Link
                             href="/dashboard"
-                            className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                            className="p-2 dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 dark:hover:bg-white/5 hover:bg-gray-200 rounded-lg transition-colors"
                         >
                             <ArrowLeft className="h-5 w-5" />
                         </Link>
                         <div>
-                            <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+                            <h1 className="text-3xl font-bold tracking-tight dark:text-white text-gray-900">Settings</h1>
                         </div>
                     </div>
-                    <p className="text-gray-400 ml-14">Manage your profile and integrations</p>
+                    <p className="dark:text-gray-400 text-gray-600 ml-14">Manage your profile and integrations</p>
                 </header>
 
                 <div className="flex flex-col md:flex-row gap-8">
@@ -53,8 +53,8 @@ export default function SettingsLayout({
                                         key={tab.name}
                                         href={tab.href}
                                         className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive
-                                            ? 'bg-amber-500 text-white'
-                                            : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                            ? 'bg-amber-500 text-white shadow-md'
+                                            : 'dark:text-gray-400 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:hover:bg-white/5 hover:bg-gray-200'
                                             }`}
                                     >
                                         <Icon className="h-4 w-4" />

@@ -205,29 +205,29 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
     const activeFiltersCount = (search ? 1 : 0) + selectedTLDs.size + (verificationFilter !== 'all' ? 1 : 0) + (priceMin || priceMax ? 1 : 0);
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-amber-500/30">
+        <div className="min-h-screen dark:bg-[#050505] bg-white dark:text-white text-gray-900 font-sans selection:bg-amber-500/30">
             <div className="max-w-7xl mx-auto px-4 py-8 pb-32 md:pb-12">
                 {/* Header */}
                 <header className="mb-8 text-center">
                     <Link href="/" className="inline-block mb-6">
-                        <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto" />
+                        <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto dark:bg-transparent bg-black rounded p-1" />
                     </Link>
-                    <h1 className="text-3xl font-bold tracking-tight text-white">
+                    <h1 className="text-3xl font-bold tracking-tight dark:text-white text-gray-900">
                         {user.name || username}'s Domains
                     </h1>
-                    <p className="text-gray-500 mt-1">Domain Liquidation Platform</p>
+                    <p className="dark:text-gray-500 text-gray-600 mt-1">Domain Liquidation Platform</p>
                 </header>
 
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Filters Sidebar - Desktop */}
                     <div className="hidden lg:block w-64 flex-shrink-0 space-y-6">
-                        <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-4 sticky top-4">
+                        <div className="dark:bg-[#0A0A0A] bg-white border dark:border-white/10 border-gray-200 rounded-xl p-4 sticky top-4 shadow-sm">
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="font-semibold flex items-center gap-2">
                                     <Filter className="h-4 w-4" /> Filters
                                 </h3>
                                 {activeFiltersCount > 0 && (
-                                    <button onClick={clearFilters} className="text-xs text-amber-400 hover:text-amber-300">
+                                    <button onClick={clearFilters} className="text-xs dark:text-amber-400 text-amber-600 dark:hover:text-amber-300 hover:text-amber-700">
                                         Clear all
                                     </button>
                                 )}
@@ -236,20 +236,20 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
                             {/* Search */}
                             <div className="mb-4">
                                 <div className="relative">
-                                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+                                    <Search className="absolute left-3 top-2.5 h-4 w-4 dark:text-gray-500 text-gray-400" />
                                     <input
                                         type="text"
                                         placeholder="Search domains..."
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
-                                        className="w-full bg-white/5 border border-white/10 rounded-lg pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500/50"
+                                        className="w-full dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg pl-9 pr-3 py-2 text-sm dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:border-amber-500/50"
                                     />
                                 </div>
                             </div>
 
                             {/* TLDs */}
                             <div className="mb-4">
-                                <label className="text-sm font-medium text-gray-400 mb-2 block">Extensions</label>
+                                <label className="text-sm font-medium dark:text-gray-400 text-gray-700 mb-2 block">Extensions</label>
                                 <div className="flex flex-wrap gap-2">
                                     {uniqueTLDs.map(tld => (
                                         <button
@@ -257,7 +257,7 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
                                             onClick={() => toggleTLD(tld)}
                                             className={`px-2 py-1 rounded text-xs transition-colors ${selectedTLDs.has(tld)
                                                 ? 'bg-amber-600 text-white'
-                                                : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                                                : 'dark:bg-white/5 bg-gray-100 dark:text-gray-400 text-gray-700 dark:hover:bg-white/10 hover:bg-gray-200'
                                                 }`}
                                         >
                                             .{tld}
@@ -268,56 +268,56 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
 
                             {/* Price */}
                             <div className="mb-4">
-                                <label className="text-sm font-medium text-gray-400 mb-2 block">Price Range</label>
+                                <label className="text-sm font-medium dark:text-gray-400 text-gray-700 mb-2 block">Price Range</label>
                                 <div className="flex gap-2">
                                     <input
                                         type="number"
                                         placeholder="Min"
                                         value={priceMin}
                                         onChange={(e) => setPriceMin(e.target.value)}
-                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500/50"
+                                        className="w-full dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-3 py-2 text-sm dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:border-amber-500/50"
                                     />
                                     <input
                                         type="number"
                                         placeholder="Max"
                                         value={priceMax}
                                         onChange={(e) => setPriceMax(e.target.value)}
-                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500/50"
+                                        className="w-full dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-3 py-2 text-sm dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:border-amber-500/50"
                                     />
                                 </div>
                             </div>
 
                             {/* Verification */}
                             <div className="mb-4">
-                                <label className="text-sm font-medium text-gray-400 mb-2 block">Status</label>
+                                <label className="text-sm font-medium dark:text-gray-400 text-gray-700 mb-2 block">Status</label>
                                 <div className="space-y-2">
-                                    <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+                                    <label className="flex items-center gap-2 text-sm dark:text-gray-300 text-gray-700 cursor-pointer">
                                         <input
                                             type="radio"
                                             name="verification"
                                             checked={verificationFilter === 'all'}
                                             onChange={() => setVerificationFilter('all')}
-                                            className="text-amber-500 focus:ring-amber-500 bg-transparent border-white/20"
+                                            className="text-amber-500 focus:ring-amber-500 bg-transparent dark:border-white/20 border-gray-300"
                                         />
                                         All
                                     </label>
-                                    <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+                                    <label className="flex items-center gap-2 text-sm dark:text-gray-300 text-gray-700 cursor-pointer">
                                         <input
                                             type="radio"
                                             name="verification"
                                             checked={verificationFilter === 'verified'}
                                             onChange={() => setVerificationFilter('verified')}
-                                            className="text-amber-500 focus:ring-amber-500 bg-transparent border-white/20"
+                                            className="text-amber-500 focus:ring-amber-500 bg-transparent dark:border-white/20 border-gray-300"
                                         />
                                         Verified Only
                                     </label>
-                                    <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+                                    <label className="flex items-center gap-2 text-sm dark:text-gray-300 text-gray-700 cursor-pointer">
                                         <input
                                             type="radio"
                                             name="verification"
                                             checked={verificationFilter === 'unverified'}
                                             onChange={() => setVerificationFilter('unverified')}
-                                            className="text-amber-500 focus:ring-amber-500 bg-transparent border-white/20"
+                                            className="text-amber-500 focus:ring-amber-500 bg-transparent dark:border-white/20 border-gray-300"
                                         />
                                         Unverified Only
                                     </label>
@@ -330,7 +330,7 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
                     <div className="lg:hidden mb-4">
                         <button
                             onClick={() => setShowMobileFilters(!showMobileFilters)}
-                            className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[#0A0A0A] border border-white/10 rounded-lg text-white"
+                            className="w-full flex items-center justify-center gap-2 px-4 py-2 dark:bg-[#0A0A0A] bg-white border dark:border-white/10 border-gray-300 rounded-lg dark:text-white text-gray-900 shadow-sm"
                         >
                             <Filter className="h-4 w-4" />
                             Filters {activeFiltersCount > 0 && `(${activeFiltersCount})`}
@@ -339,7 +339,7 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
 
                     {/* Mobile Filters Panel */}
                     {showMobileFilters && (
-                        <div className="lg:hidden mb-6 bg-[#0A0A0A] border border-white/10 rounded-xl p-4">
+                        <div className="lg:hidden mb-6 dark:bg-[#0A0A0A] bg-white border dark:border-white/10 border-gray-300 rounded-xl p-4 shadow-sm">
                             {/* Same filters as desktop, simplified for brevity in this view */}
                             <div className="space-y-4">
                                 <input
@@ -347,12 +347,12 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
                                     placeholder="Search..."
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
-                                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white"
+                                    className="w-full dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-3 py-2 text-sm dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400"
                                 />
                                 {/* Add other mobile filters here if needed, keeping it simple for now */}
                                 <div className="flex gap-2">
-                                    <button onClick={clearFilters} className="flex-1 py-2 text-sm text-gray-400 border border-white/10 rounded-lg">Reset</button>
-                                    <button onClick={() => setShowMobileFilters(false)} className="flex-1 py-2 text-sm bg-amber-600 text-white rounded-lg">Apply</button>
+                                    <button onClick={clearFilters} className="flex-1 py-2 text-sm dark:text-gray-400 text-gray-600 border dark:border-white/10 border-gray-300 rounded-lg">Reset</button>
+                                    <button onClick={() => setShowMobileFilters(false)} className="flex-1 py-2 text-sm bg-amber-600 dark:hover:bg-amber-500 hover:bg-amber-700 text-white rounded-lg">Apply</button>
                                 </div>
                             </div>
                         </div>
@@ -362,14 +362,14 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
                     <div className="flex-1">
                         {/* Sort and Limit Controls */}
                         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-                            <div className="text-sm text-gray-400">
-                                Found <span className="text-white font-medium">{totalDomains}</span> domains
+                            <div className="text-sm dark:text-gray-400 text-gray-600">
+                                Found <span className="dark:text-white text-gray-900 font-medium">{totalDomains}</span> domains
                             </div>
                             <div className="flex items-center gap-4">
                                 <select
                                     value={sortBy}
                                     onChange={(e) => setSortBy(e.target.value)}
-                                    className="bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-amber-500/50"
+                                    className="dark:bg-[#0A0A0A] bg-white border dark:border-white/10 border-gray-300 rounded-lg px-3 py-1.5 text-sm dark:text-white text-gray-900 focus:outline-none focus:border-amber-500/50"
                                 >
                                     <option value="newest">Newest Listed</option>
                                     <option value="price_asc">Price: Low to High</option>
@@ -383,7 +383,7 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
                                         setLimit(Number(e.target.value));
                                         setPage(1);
                                     }}
-                                    className="bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-amber-500/50"
+                                    className="dark:bg-[#0A0A0A] bg-white border dark:border-white/10 border-gray-300 rounded-lg px-3 py-1.5 text-sm dark:text-white text-gray-900 focus:outline-none focus:border-amber-500/50"
                                 >
                                     <option value={20}>20 per page</option>
                                     <option value={50}>50 per page</option>
@@ -406,10 +406,10 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
                                         className={`
                                             group flex items-center justify-between p-4 rounded-xl border transition-all duration-200
                                             ${domain.status === 'sold'
-                                                ? 'bg-transparent border-transparent opacity-40 cursor-not-allowed'
+                                                ? 'dark:bg-transparent bg-gray-50/50 border-transparent opacity-40 cursor-not-allowed'
                                                 : selectedIds.includes(domain.id)
-                                                    ? 'bg-amber-500/10 border-amber-500/30'
-                                                    : 'bg-white/5 border-transparent hover:bg-white/10 cursor-pointer'
+                                                    ? 'dark:bg-amber-500/10 bg-amber-50 dark:border-amber-500/30 border-amber-400'
+                                                    : 'dark:bg-white/5 bg-white border-transparent dark:hover:bg-white/10 hover:bg-gray-50 cursor-pointer shadow-sm dark:shadow-none'
                                             }
                                         `}
                                     >
@@ -417,14 +417,14 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
                                             <div className={`
                                                 w-5 h-5 rounded-full border flex items-center justify-center transition-all duration-200 flex-shrink-0
                                                 ${domain.status === 'sold'
-                                                    ? 'border-gray-700 bg-gray-800'
+                                                    ? 'dark:border-gray-700 border-gray-300 dark:bg-gray-800 bg-gray-100'
                                                     : selectedIds.includes(domain.id)
                                                         ? 'border-amber-500 bg-amber-500'
-                                                        : 'border-gray-600 group-hover:border-gray-500'
+                                                        : 'dark:border-gray-600 border-gray-300 dark:group-hover:border-gray-500 group-hover:border-gray-400'
                                                 }
                                             `}>
                                                 {domain.status === 'sold' ? (
-                                                    <div className="w-2 h-2 rounded-full bg-gray-600" />
+                                                    <div className="w-2 h-2 rounded-full dark:bg-gray-600 bg-gray-400" />
                                                 ) : selectedIds.includes(domain.id) ? (
                                                     <Check className="h-3 w-3 text-white" />
                                                 ) : null}
@@ -432,20 +432,20 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
 
                                             <div className="flex flex-col">
                                                 <div className="flex items-center gap-2">
-                                                    <span className={`text-lg font-medium ${domain.status === 'sold' ? 'line-through text-gray-500' : 'text-gray-200'}`}>
+                                                    <span className={`text-lg font-medium ${domain.status === 'sold' ? 'line-through dark:text-gray-500 text-gray-400' : 'dark:text-gray-200 text-gray-900'}`}>
                                                         {domain.name}
                                                     </span>
                                                     {domain.isVerified && (
                                                         <div className="group relative">
-                                                            <ShieldCheck className="h-4 w-4 text-green-400" />
-                                                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                                                            <ShieldCheck className="h-4 w-4 text-green-500 dark:text-green-400" />
+                                                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 dark:bg-gray-800 bg-gray-900 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                                                                 Ownership Verified
                                                             </div>
                                                         </div>
                                                     )}
                                                 </div>
                                                 {domain.expiresAt && (
-                                                    <span className="text-xs text-gray-500">
+                                                    <span className="text-xs dark:text-gray-500 text-gray-600">
                                                         Exp: {new Date(domain.expiresAt).toLocaleDateString()}
                                                     </span>
                                                 )}
@@ -454,9 +454,9 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
 
                                         <div className="flex items-center gap-4">
                                             {domain.status === 'sold' ? (
-                                                <span className="text-xs font-medium text-red-400 uppercase tracking-wider">Sold</span>
+                                                <span className="text-xs font-medium dark:text-red-400 text-red-600 uppercase tracking-wider">Sold</span>
                                             ) : (
-                                                <span className="font-mono text-gray-400">
+                                                <span className="font-mono dark:text-gray-400 text-gray-700 font-medium">
                                                     ${domain.price.toLocaleString()}
                                                 </span>
                                             )}
@@ -464,7 +464,7 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
                                     </div>
                                 ))
                             ) : (
-                                <div className="text-center py-12 text-gray-600">
+                                <div className="text-center py-12 dark:text-gray-600 text-gray-500">
                                     No domains found matching your filters.
                                 </div>
                             )}
@@ -472,21 +472,21 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
 
                         {/* Pagination */}
                         {totalDomains > 0 && (
-                            <div className="mt-8 flex items-center justify-between border-t border-white/10 pt-4">
+                            <div className="mt-8 flex items-center justify-between border-t dark:border-white/10 border-gray-200 pt-4">
                                 <button
                                     onClick={() => setPage(p => Math.max(1, p - 1))}
                                     disabled={page === 1}
-                                    className="px-4 py-2 text-sm text-gray-400 hover:text-white disabled:opacity-50"
+                                    className="px-4 py-2 text-sm dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 disabled:opacity-50"
                                 >
                                     Previous
                                 </button>
-                                <span className="text-sm text-gray-500">
+                                <span className="text-sm dark:text-gray-500 text-gray-600">
                                     Page {page} of {Math.ceil(totalDomains / limit)}
                                 </span>
                                 <button
                                     onClick={() => setPage(p => Math.min(Math.ceil(totalDomains / limit), p + 1))}
                                     disabled={page >= Math.ceil(totalDomains / limit)}
-                                    className="px-4 py-2 text-sm text-gray-400 hover:text-white disabled:opacity-50"
+                                    className="px-4 py-2 text-sm dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 disabled:opacity-50"
                                 >
                                     Next
                                 </button>
@@ -498,11 +498,11 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
 
             {/* Floating Contact Button */}
             {selectedIds.length > 0 && (
-                <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#050505] via-[#050505]/95 to-transparent pointer-events-none z-40">
+                <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t dark:from-[#050505] from-white dark:via-[#050505]/95 via-white/95 to-transparent pointer-events-none z-40">
                     <div className="max-w-3xl mx-auto pointer-events-auto">
                         <button
                             onClick={handleContact}
-                            className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-amber-500 hover:bg-amber-400 text-white rounded-xl font-medium shadow-lg transition-all hover:shadow-amber-500/50"
+                            className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-amber-500 dark:hover:bg-amber-400 hover:bg-amber-600 text-white rounded-xl font-medium shadow-lg transition-all dark:shadow-amber-500/50 shadow-amber-500/40"
                         >
                             <MessageCircle className="h-5 w-5" />
                             Contact Seller ({selectedIds.length} {selectedIds.length === 1 ? 'domain' : 'domains'})
@@ -514,9 +514,9 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
             {/* Contact Method Selection Modal */}
             {showContactModal && (
                 <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50" onClick={() => setShowContactModal(false)}>
-                    <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
-                        <h3 className="text-xl font-bold mb-4 text-white">Choose Contact Method</h3>
-                        <p className="text-gray-400 text-sm mb-6">How would you like to contact the seller?</p>
+                    <div className="dark:bg-[#0A0A0A] bg-white border dark:border-white/10 border-gray-300 rounded-xl p-6 max-w-md w-full shadow-xl" onClick={(e) => e.stopPropagation()}>
+                        <h3 className="text-xl font-bold mb-4 dark:text-white text-gray-900">Choose Contact Method</h3>
+                        <p className="dark:text-gray-400 text-gray-600 text-sm mb-6">How would you like to contact the seller?</p>
 
                         <div className="space-y-3">
                             {availableMethods.map((method) => (
@@ -526,17 +526,17 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
                                         contactViaMethod(method.type);
                                         setShowContactModal(false);
                                     }}
-                                    className="w-full flex items-center justify-between p-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-500/50 rounded-lg transition-all group"
+                                    className="w-full flex items-center justify-between p-4 dark:bg-white/5 bg-gray-50 dark:hover:bg-white/10 hover:bg-gray-100 border dark:border-white/10 border-gray-300 dark:hover:border-amber-500/50 hover:border-amber-400 rounded-lg transition-all group"
                                 >
-                                    <span className="text-white font-medium">{method.label}</span>
-                                    <span className="text-gray-400 text-sm group-hover:text-amber-400 transition-colors">→</span>
+                                    <span className="dark:text-white text-gray-900 font-medium">{method.label}</span>
+                                    <span className="dark:text-gray-400 text-gray-500 text-sm dark:group-hover:text-amber-400 group-hover:text-amber-600 transition-colors">→</span>
                                 </button>
                             ))}
                         </div>
 
                         <button
                             onClick={() => setShowContactModal(false)}
-                            className="w-full mt-6 px-4 py-2 text-gray-400 hover:text-white transition-colors"
+                            className="w-full mt-6 px-4 py-2 dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 transition-colors"
                         >
                             Cancel
                         </button>

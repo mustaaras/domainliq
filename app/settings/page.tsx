@@ -156,7 +156,7 @@ export default function SettingsPage() {
 
     if (status === 'loading' || isLoading) {
         return (
-            <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+            <div className="min-h-screen dark:bg-[#050505] bg-white flex items-center justify-center">
                 <Loader2 className="h-8 w-8 text-indigo-500 animate-spin" />
             </div>
         );
@@ -167,73 +167,73 @@ export default function SettingsPage() {
 
             <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Basic Info */}
-                <div className="bg-white/5 border border-white/10 rounded-xl p-6 space-y-6">
-                    <h2 className="text-xl font-semibold flex items-center gap-2">
-                        <User className="h-5 w-5 text-amber-400" />
+                <div className="dark:bg-white/5 bg-white border dark:border-white/10 border-gray-200 rounded-xl p-6 space-y-6 shadow-sm">
+                    <h2 className="text-xl font-semibold flex items-center gap-2 dark:text-white text-gray-900">
+                        <User className="h-5 w-5 text-amber-500 dark:text-amber-400" />
                         Basic Information
                     </h2>
 
                     <div className="grid gap-6 md:grid-cols-2">
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">Full Name</label>
+                            <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-1">Full Name</label>
                             <input
                                 type="text"
                                 value={formData.name}
                                 onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                                className="w-full dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-4 py-2 dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">Username (Subdomain)</label>
+                            <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-1">Username (Subdomain)</label>
                             <input
                                 type="text"
                                 value={formData.subdomain}
                                 disabled
-                                className="w-full bg-black/40 border border-white/5 rounded-lg px-4 py-2 text-gray-500 cursor-not-allowed"
+                                className="w-full dark:bg-black/40 bg-gray-100 border dark:border-white/5 border-gray-200 rounded-lg px-4 py-2 dark:text-gray-500 text-gray-500 cursor-not-allowed"
                             />
                         </div>
                     </div>
                 </div>
 
                 {/* Contact Methods */}
-                <div className="bg-white/5 border border-white/10 rounded-xl p-6 space-y-6">
-                    <h2 className="text-xl font-semibold flex items-center gap-2">
-                        <Mail className="h-5 w-5 text-amber-400" />
+                <div className="dark:bg-white/5 bg-white border dark:border-white/10 border-gray-200 rounded-xl p-6 space-y-6 shadow-sm">
+                    <h2 className="text-xl font-semibold flex items-center gap-2 dark:text-white text-gray-900">
+                        <Mail className="h-5 w-5 text-amber-500 dark:text-amber-400" />
                         Contact Methods
                     </h2>
 
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">Contact Email</label>
+                            <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-1">Contact Email</label>
                             <input
                                 type="email"
                                 value={formData.contactEmail}
                                 onChange={e => setFormData({ ...formData, contactEmail: e.target.value })}
                                 placeholder="Where buyers should email you"
-                                className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                                className="w-full dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-4 py-2 dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">
+                            <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-1">
                                 <span className="flex items-center gap-2">
                                     <Twitter className="h-4 w-4" /> X (Twitter) Handle
                                 </span>
                             </label>
                             <div className="relative">
-                                <span className="absolute left-4 top-2 text-gray-500">@</span>
+                                <span className="absolute left-4 top-2 dark:text-gray-500 text-gray-400">@</span>
                                 <input
                                     type="text"
                                     value={formData.twitterHandle}
                                     onChange={e => setFormData({ ...formData, twitterHandle: e.target.value.replace('@', '') })}
                                     placeholder="username"
-                                    className="w-full bg-black/20 border border-white/10 rounded-lg pl-8 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                                    className="w-full dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg pl-8 pr-4 py-2 dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">
+                            <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-1">
                                 <span className="flex items-center gap-2">
                                     <Phone className="h-4 w-4" /> WhatsApp Number
                                 </span>
@@ -243,12 +243,12 @@ export default function SettingsPage() {
                                 value={formData.whatsappNumber}
                                 onChange={e => setFormData({ ...formData, whatsappNumber: e.target.value })}
                                 placeholder="+1234567890"
-                                className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                                className="w-full dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-4 py-2 dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">
+                            <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-1">
                                 <span className="flex items-center gap-2">
                                     <Linkedin className="h-4 w-4" /> LinkedIn Profile URL
                                 </span>
@@ -258,31 +258,31 @@ export default function SettingsPage() {
                                 value={formData.linkedinProfile}
                                 onChange={e => setFormData({ ...formData, linkedinProfile: e.target.value })}
                                 placeholder="https://linkedin.com/in/username"
-                                className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                                className="w-full dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-4 py-2 dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">
+                            <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-1">
                                 <span className="flex items-center gap-2">
                                     <Send className="h-4 w-4" /> Telegram Username
                                 </span>
                             </label>
                             <div className="relative">
-                                <span className="absolute left-3 top-2.5 text-gray-500">@</span>
+                                <span className="absolute left-3 top-2.5 dark:text-gray-500 text-gray-400">@</span>
                                 <input
                                     type="text"
                                     value={formData.telegramUsername}
                                     onChange={e => setFormData({ ...formData, telegramUsername: e.target.value.replace('@', '') })}
                                     placeholder="username"
-                                    className="w-full bg-black/20 border border-white/10 rounded-lg pl-8 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                                    className="w-full dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg pl-8 pr-4 py-2 dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                                 />
                             </div>
                         </div>
                     </div>
 
-                    <div className="pt-4 border-t border-white/10">
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Preferred Contact Method</label>
+                    <div className="pt-4 border-t dark:border-white/10 border-gray-200">
+                        <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-2">Preferred Contact Method</label>
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                             {['email', 'twitter', 'whatsapp', 'linkedin', 'telegram'].map((method) => (
                                 <button
@@ -292,8 +292,8 @@ export default function SettingsPage() {
                                     className={`
                       px-4 py-2 rounded-lg text-sm font-medium capitalize transition-all
                       ${formData.preferredContact === method
-                                            ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20'
-                                            : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                                            ? 'bg-amber-500 text-white shadow-lg dark:shadow-amber-500/20 shadow-amber-500/40'
+                                            : 'dark:bg-white/5 bg-gray-100 dark:text-gray-400 text-gray-700 dark:hover:bg-white/10 hover:bg-gray-200'
                                         }
                     `}
                                 >
@@ -305,7 +305,7 @@ export default function SettingsPage() {
                 </div>
 
                 {message.text && (
-                    <div className={`p-4 rounded-lg text-sm ${message.type === 'error' ? 'bg-red-500/10 text-red-400' : 'bg-green-500/10 text-green-400'}`}>
+                    <div className={`p-4 rounded-lg text-sm ${message.type === 'error' ? 'dark:bg-red-500/10 bg-red-50 dark:text-red-400 text-red-700' : 'dark:bg-green-500/10 bg-green-50 dark:text-green-400 text-green-700'}`}>
                         {message.text}
                     </div>
                 )}
@@ -314,7 +314,7 @@ export default function SettingsPage() {
                     <button
                         type="submit"
                         disabled={isSaving}
-                        className="flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-400 text-white rounded-lg font-medium transition-all disabled:opacity-50"
+                        className="flex items-center gap-2 px-6 py-3 bg-amber-500 dark:hover:bg-amber-400 hover:bg-amber-600 text-white rounded-lg font-medium transition-all disabled:opacity-50"
                     >
                         {isSaving ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
                         Save Changes
@@ -323,14 +323,14 @@ export default function SettingsPage() {
             </form>
 
             {/* Danger Zone */}
-            <div className="mt-8 bg-red-500/10 border border-red-500/30 rounded-xl p-6">
-                <h2 className="text-xl font-semibold text-red-500 mb-4">Danger Zone</h2>
-                <p className="text-gray-400 mb-6">
+            <div className="mt-8 dark:bg-red-500/10 bg-red-50 border dark:border-red-500/30 border-red-300 rounded-xl p-6">
+                <h2 className="text-xl font-semibold dark:text-red-500 text-red-700 mb-4">Danger Zone</h2>
+                <p className="dark:text-gray-400 text-gray-700 mb-6">
                     Once you delete your account, there is no going back. Please be certain.
                 </p>
 
                 <div className="flex justify-between items-center">
-                    <div className="text-sm text-gray-400">
+                    <div className="text-sm dark:text-gray-400 text-gray-700">
                         <p>This action will permanently delete:</p>
                         <ul className="list-disc pl-5 mt-2 space-y-1">
                             <li>Your user profile and settings</li>
@@ -351,10 +351,10 @@ export default function SettingsPage() {
             {
                 showDeleteModal && (
                     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                        <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl max-w-md w-full p-6 shadow-2xl">
-                            <h3 className="text-xl font-bold text-white mb-2">Delete Account?</h3>
-                            <p className="text-gray-400 mb-6">
-                                This action cannot be undone. To confirm, please type <span className="font-mono font-bold text-white">DELETE</span> below.
+                        <div className="dark:bg-[#0A0A0A] bg-white border dark:border-white/10 border-gray-300 rounded-2xl max-w-md w-full p-6 shadow-2xl">
+                            <h3 className="text-xl font-bold dark:text-white text-gray-900 mb-2">Delete Account?</h3>
+                            <p className="dark:text-gray-400 text-gray-700 mb-6">
+                                This action cannot be undone. To confirm, please type <span className="font-mono font-bold dark:text-white text-gray-900">DELETE</span> below.
                             </p>
 
                             <input
@@ -362,7 +362,7 @@ export default function SettingsPage() {
                                 value={deleteConfirmation}
                                 onChange={(e) => setDeleteConfirmation(e.target.value)}
                                 placeholder="Type DELETE to confirm"
-                                className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 mb-6 focus:outline-none focus:border-red-500 text-white"
+                                className="w-full dark:bg-black/40 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-4 py-3 mb-6 focus:outline-none focus:border-red-500 dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400"
                             />
 
                             <div className="flex gap-3 justify-end">
@@ -371,7 +371,7 @@ export default function SettingsPage() {
                                         setShowDeleteModal(false);
                                         setDeleteConfirmation('');
                                     }}
-                                    className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+                                    className="px-4 py-2 dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 transition-colors"
                                 >
                                     Cancel
                                 </button>

@@ -238,7 +238,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-amber-500/30">
+    <div className="min-h-screen dark:bg-[#050505] bg-gray-50 dark:text-white text-gray-900 font-sans dark:selection:bg-amber-500/30 selection:bg-amber-500/20">
       <div className="max-w-7xl mx-auto px-4 py-8 pb-32 md:pb-12">
         {/* Header */}
         <header className="mb-8">
@@ -246,10 +246,10 @@ export default function Home() {
             <div className="text-center md:text-left w-full md:w-auto">
               <div className="flex items-center gap-3 justify-center md:justify-start">
                 <Link href="/">
-                  <img src="/logo.svg" alt="DomainLiq" className="h-12 w-auto cursor-pointer" />
+                  <img src="/logo.svg" alt="DomainLiq" className="h-12 w-auto cursor-pointer dark:bg-transparent bg-black rounded p-1.5" />
                 </Link>
               </div>
-              <p className="text-gray-500 mt-1">Domain Liquidation Platform</p>
+              <p className="dark:text-gray-500 text-gray-600 mt-1">Domain Liquidation Platform</p>
             </div>
 
             <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto items-center">
@@ -265,7 +265,7 @@ export default function Home() {
                   <>
                     <Link
                       href="/login"
-                      className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium text-gray-300 hover:text-white transition-colors"
+                      className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 transition-colors"
                     >
                       Sign In
                     </Link>
@@ -424,24 +424,23 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
           {/* Left Column: Domains (2/3) */}
-          <div className="lg:col-span-2 bg-[#0A0A0A] border border-white/10 rounded-xl p-6 h-fit">
+          <div className="lg:col-span-2 dark:bg-[#0A0A0A] bg-white border dark:border-white/10 border-gray-200 rounded-xl p-6 h-fit shadow-sm">
             {/* Section Title & Controls */}
             <div className="mb-6 flex flex-col md:flex-row justify-between items-center gap-4 relative">
               <div className="text-center md:text-left w-full md:w-auto">
-                <h2 className="text-xl font-bold text-white">Recently Added Domains</h2>
-                <p className="text-gray-400 text-xs mt-1">Fresh listing from the sellers</p>
+                <h2 className="text-xl font-bold dark:text-white text-gray-900">Recently Added Domains</h2>
+                <p className="dark:text-gray-400 text-gray-600 text-xs mt-1">Fresh listing from the sellers</p>
               </div>
 
               <div className="flex flex-col md:flex-row items-center gap-3 w-full md:w-auto justify-center md:justify-end">
-                {/* Search Box */}
                 <div className="relative w-full md:w-64 group">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Search className="h-4 w-4 text-gray-600 group-focus-within:text-gray-400 transition-colors" />
+                    <Search className="h-4 w-4 dark:text-gray-600 text-gray-400 group-focus-within:text-gray-500 transition-colors" />
                   </div>
                   <input
                     type="text"
                     placeholder="Search domains..."
-                    className="block w-full pl-9 pr-4 py-2 border border-white/10 rounded-lg bg-white/5 text-gray-300 placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-amber-500/50 focus:border-amber-500/50 focus:bg-white/10 transition-all text-sm"
+                    className="block w-full pl-9 pr-4 py-2 dark:border-white/10 border-gray-300 rounded-lg dark:bg-white/5 bg-gray-50 dark:text-gray-300 text-gray-900 dark:placeholder-gray-600 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-amber-500/50 focus:border-amber-500/50 dark:focus:bg-white/10 focus:bg-white transition-all text-sm"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
@@ -466,17 +465,17 @@ export default function Home() {
 
               {/* Filter Panel */}
               {showFilterPanel && (
-                <div className="absolute top-full right-0 mt-2 w-full md:w-80 bg-[#0A0A0A] border border-white/20 rounded-xl shadow-2xl z-40 p-4">
+                <div className="absolute top-full right-0 mt-2 w-full md:w-80 dark:bg-[#0A0A0A] bg-gray-100 border dark:border-white/20 border-gray-200 rounded-xl shadow-2xl z-40 p-4">
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-semibold text-white">Filters</h3>
-                    <button onClick={() => setShowFilterPanel(false)} className="text-gray-400 hover:text-white">
+                    <h3 className="font-semibold dark:text-white text-gray-900">Filters</h3>
+                    <button onClick={() => setShowFilterPanel(false)} className="dark:text-gray-400 text-gray-600 hover:text-white dark:hover:text-gray-900">
                       <X className="h-4 w-4" />
                     </button>
                   </div>
 
                   {/* TLDs */}
                   <div className="mb-4">
-                    <label className="text-xs font-medium text-gray-400 mb-2 block">Extensions</label>
+                    <label className="text-xs font-medium dark:text-gray-400 text-gray-600 mb-2 block">Extensions</label>
                     <div className="flex flex-wrap gap-2">
                       {commonTLDs.map(tld => (
                         <button
@@ -489,7 +488,7 @@ export default function Home() {
                           }}
                           className={`px-2 py-1 text-xs rounded-md border transition-colors ${filterTLD.includes(tld)
                             ? 'bg-amber-500 border-amber-500 text-white'
-                            : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'
+                            : 'dark:bg-white/5 bg-gray-50 dark:border-white/10 border-gray-300 dark:text-gray-300 text-gray-600 dark:hover:bg-white/10 hover:bg-gray-100'
                             }`}
                         >
                           .{tld}
@@ -500,7 +499,7 @@ export default function Home() {
 
                   {/* Price Range */}
                   <div className="mb-4">
-                    <label className="text-xs font-medium text-gray-400 mb-2 block">Price Range ($)</label>
+                    <label className="text-xs font-medium dark:text-gray-400 text-gray-600 mb-2 block">Price Range ($)</label>
                     <div className="flex gap-2">
                       <input
                         type="number"
@@ -510,7 +509,7 @@ export default function Home() {
                           setFilterPrice(prev => ({ ...prev, min: e.target.value }));
                           setPage(1);
                         }}
-                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+                        className="w-full dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-3 py-1.5 text-sm dark:text-white text-gray-900 focus:outline-none focus:ring-1 focus:ring-amber-500/50"
                       />
                       <input
                         type="number"
@@ -520,7 +519,7 @@ export default function Home() {
                           setFilterPrice(prev => ({ ...prev, max: e.target.value }));
                           setPage(1);
                         }}
-                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+                        className="w-full dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-3 py-1.5 text-sm dark:text-white text-gray-900 focus:outline-none focus:ring-1 focus:ring-amber-500/50"
                       />
                     </div>
                   </div>
@@ -535,20 +534,20 @@ export default function Home() {
                           setFilterVerified(e.target.checked);
                           setPage(1);
                         }}
-                        className="rounded border-white/10 bg-white/5 text-amber-500 focus:ring-amber-500/50"
+                        className="rounded dark:border-white/10 border-gray-300 dark:bg-white/5 bg-gray-50 text-amber-500 focus:ring-amber-500/50"
                       />
-                      <span className="text-sm text-gray-300">Verified Only</span>
+                      <span className="text-sm dark:text-gray-300 text-gray-700">Verified Only</span>
                     </label>
 
                     <div>
-                      <label className="text-xs font-medium text-gray-400 mb-2 block">Sort By</label>
+                      <label className="text-xs font-medium dark:text-gray-400 text-gray-600 mb-2 block">Sort By</label>
                       <select
                         value={sortBy}
                         onChange={e => {
                           setSortBy(e.target.value);
                           setPage(1);
                         }}
-                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+                        className="w-full dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-3 py-1.5 text-sm dark:text-white text-gray-900 focus:outline-none focus:ring-1 focus:ring-amber-500/50"
                       >
                         <option value="newest">Newest Listed</option>
                         <option value="price_asc">Price: Low to High</option>
@@ -595,20 +594,20 @@ export default function Home() {
                         className={`
                           group flex flex-col justify-center p-3 rounded-lg border transition-all duration-200 cursor-pointer relative
                           ${isSold
-                            ? 'bg-transparent border-transparent opacity-40 cursor-not-allowed'
+                            ? 'dark:bg-transparent bg-gray-100 border-transparent opacity-40 cursor-not-allowed'
                             : isSelected
-                              ? 'bg-indigo-900/10 border-amber-500/50'
-                              : 'bg-white/5 border-transparent hover:bg-white/10 hover:border-white/10 hover:shadow-xl hover:shadow-black/20'
+                              ? 'dark:bg-indigo-900/10 bg-amber-50 dark:border-amber-500/50 border-amber-400'
+                              : 'dark:bg-white/5 bg-gray-50 border-transparent dark:hover:bg-white/10 hover:bg-white hover:border-gray-200 dark:hover:shadow-xl dark:hover:shadow-black/20 shadow-sm hover:shadow-md'
                           }
                         `}
                       >
                         {/* Selection Indicator */}
                         {!isSold && (
                           <div className={`
-                            absolute top-1/2 -translate-y-1/2 right-3 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all z-10
+                            absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all z-20
                             ${isSelected
-                              ? 'bg-amber-500 border-amber-500'
-                              : 'border-white/10 bg-black/20 opacity-0 group-hover:opacity-100'
+                              ? 'bg-amber-500 border-amber-500 scale-100 opacity-100'
+                              : 'dark:border-white/20 border-gray-300 dark:bg-black/40 bg-white/60 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 backdrop-blur-sm'
                             }
                           `}>
                             {isSelected && (
@@ -617,10 +616,11 @@ export default function Home() {
                           </div>
                         )}
 
-                        <div className="flex flex-col gap-0.5 pr-8">
-                          <div className="flex items-center justify-between gap-2">
+                        <div className="flex flex-col gap-3 h-full justify-between">
+                          {/* Top Row: Name and Price */}
+                          <div className="flex items-start justify-between gap-4">
                             <div className="flex items-center gap-1.5 min-w-0">
-                              <h3 className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors truncate leading-tight" title={domain.name}>
+                              <h3 className="text-sm font-bold dark:text-white text-gray-900 group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors truncate leading-tight" title={domain.name}>
                                 {domain.name}
                               </h3>
                               {domain.isVerified && (
@@ -633,45 +633,59 @@ export default function Home() {
                                 </div>
                               )}
                             </div>
-                            <div className={`font-mono text-sm shrink-0 ${isSold ? 'text-gray-600' : 'text-gray-400'}`}>
+                            <div className={`font-mono text-sm shrink-0 ${isSold ? 'dark:text-gray-600 text-gray-400' : 'dark:text-gray-400 text-gray-600'}`}>
                               ${domain.price.toLocaleString()}
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-2 text-[10px] text-gray-500">
+                          {/* Bottom Row: Seller/Status and Visit Button */}
+                          <div className="flex items-end justify-between gap-4">
+                            <div className="flex flex-col gap-1 min-w-0">
+                              <div className="flex items-center gap-2 text-[10px] dark:text-gray-500 text-gray-600">
+                                <Link
+                                  href={`/u/${domain.user.subdomain}`}
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="dark:hover:text-amber-400 hover:text-amber-600 transition-colors truncate max-w-[100px]"
+                                >
+                                  {domain.user.name || domain.user.subdomain}
+                                </Link>
+                                {isSold && (
+                                  <span className="px-1 py-0.5 text-[9px] font-medium bg-amber-500/20 text-amber-500 dark:text-amber-400 rounded-full">
+                                    SOLD
+                                  </span>
+                                )}
+                                {!isSold && domain.price >= 500 && domain.isVerified && domain.user.escrowEmail && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSelectedEscrowDomain(domain);
+                                      setShowEscrowModal(true);
+                                    }}
+                                    className="px-1.5 py-0.5 text-[9px] font-medium bg-green-500/20 text-green-500 dark:text-green-400 hover:bg-green-500/30 rounded-full border border-green-500/20 transition-colors flex items-center gap-1"
+                                  >
+                                    <ShieldCheck className="w-2.5 h-2.5" />
+                                    Buy with Escrow
+                                  </button>
+                                )}
+                                {domain.expiresAt && (
+                                  <>
+                                    <span className="dark:text-gray-700 text-gray-400">•</span>
+                                    <span>
+                                      Exp: {new Date(domain.expiresAt).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric', year: '2-digit' })}
+                                    </span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+
                             <Link
-                              href={`/u/${domain.user.subdomain}`}
+                              href={`/d/${domain.name}`}
                               onClick={(e) => e.stopPropagation()}
-                              className="hover:text-amber-400 transition-colors truncate max-w-[100px]"
+                              className="group/visit flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-medium dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 rounded-full border dark:border-white/5 border-gray-200 dark:hover:border-white/20 hover:border-gray-300 transition-all shrink-0"
                             >
-                              {domain.user.name || domain.user.subdomain}
+                              <span className="uppercase tracking-wider">Visit</span>
+                              <ExternalLink className="w-2.5 h-2.5 opacity-50 group-hover/visit:opacity-100 transition-opacity" />
                             </Link>
-                            {isSold && (
-                              <span className="px-1 py-0.5 text-[9px] font-medium bg-amber-500/20 text-amber-400 rounded-full">
-                                SOLD
-                              </span>
-                            )}
-                            {!isSold && domain.price >= 500 && domain.isVerified && domain.user.escrowEmail && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedEscrowDomain(domain);
-                                  setShowEscrowModal(true);
-                                }}
-                                className="px-1.5 py-0.5 text-[9px] font-medium bg-green-500/20 text-green-400 hover:bg-green-500/30 rounded-full border border-green-500/20 transition-colors flex items-center gap-1"
-                              >
-                                <ShieldCheck className="w-2.5 h-2.5" />
-                                Buy with Escrow
-                              </button>
-                            )}
-                            {domain.expiresAt && (
-                              <>
-                                <span className="text-gray-700">•</span>
-                                <span>
-                                  Exp: {new Date(domain.expiresAt).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric', year: '2-digit' })}
-                                </span>
-                              </>
-                            )}
                           </div>
                         </div>
                       </div>
@@ -727,10 +741,10 @@ export default function Home() {
 
           {/* Right Column: Top Liquidators (1/3) */}
           <div className="lg:col-span-1 lg:col-start-3">
-            <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6">
+            <div className="dark:bg-[#0A0A0A] bg-white border dark:border-white/10 border-gray-200 rounded-xl p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-6">
                 <Trophy className="h-5 w-5 text-amber-500" />
-                <h2 className="text-xl font-bold text-white">Top Liquidators</h2>
+                <h2 className="text-xl font-bold dark:text-white text-gray-900">Top Liquidators</h2>
               </div>
 
               <div className="space-y-4">
@@ -739,33 +753,33 @@ export default function Home() {
                     <Link
                       key={seller.id}
                       href={`/u/${seller.subdomain}`}
-                      className="flex items-center justify-between p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10 transition-all group"
+                      className="flex items-center justify-between p-3 rounded-lg dark:bg-white/5 bg-gray-50 dark:hover:bg-white/10 hover:bg-gray-100 border border-transparent dark:hover:border-white/10 hover:border-gray-200 transition-all group"
                     >
                       <div className="flex items-center gap-3">
                         <div className={`
                           w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm
                           ${index === 0 ? 'bg-amber-500 text-white' :
-                            index === 1 ? 'bg-gray-300 text-black' :
+                            index === 1 ? 'dark:bg-gray-300 bg-gray-400 text-black' :
                               index === 2 ? 'bg-amber-700 text-white' :
-                                'bg-white/10 text-gray-400'}
+                                'dark:bg-white/10 bg-gray-200 dark:text-gray-400 text-gray-600'}\
                         `}>
                           {index + 1}
                         </div>
                         <div>
-                          <h3 className="font-medium text-white group-hover:text-amber-400 transition-colors">
+                          <h3 className="font-medium dark:text-white text-gray-900 dark:group-hover:text-amber-400 group-hover:text-amber-600 transition-colors">
                             {seller.name}
                           </h3>
-                          <p className="text-xs text-gray-500">@{seller.subdomain}</p>
+                          <p className="text-xs dark:text-gray-500 text-gray-600">@{seller.subdomain}</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 text-gray-400 group-hover:text-white transition-colors">
+                      <div className="flex items-center gap-2 dark:text-gray-400 text-gray-600 dark:group-hover:text-white group-hover:text-gray-900 transition-colors">
                         <span className="text-sm font-medium">{seller.domainCount}</span>
                         <ExternalLink className="h-3 w-3" />
                       </div>
                     </Link>
                   ))
                 ) : (
-                  <div className="text-center py-8 text-gray-600">
+                  <div className="text-center py-8 dark:text-gray-600 text-gray-500">
                     Loading top sellers...
                   </div>
                 )}
@@ -778,18 +792,18 @@ export default function Home() {
 
       {/* Floating Action Bar (Mobile Optimized) */}
       <div className={`
-        fixed bottom-0 left-0 right-0 p-4 bg-[#050505]/90 backdrop-blur-md border-t border-white/10 z-50 transition-transform duration-300
+        fixed bottom-0 left-0 right-0 p-4 dark:bg-[#050505]/90 bg-white/95 backdrop-blur-md border-t dark:border-white/10 border-gray-200 z-50 transition-transform duration-300 shadow-xl
         ${selectedIds.length > 0 ? 'translate-y-0' : 'translate-y-full'}
       `}>
         <div className="max-w-3xl mx-auto flex items-center justify-between gap-4">
-          <div className="text-sm text-gray-400">
-            <span className="text-white font-medium">{selectedIds.length}</span> selected
+          <div className="text-sm dark:text-gray-400 text-gray-600">
+            <span className="dark:text-white text-gray-900 font-medium">{selectedIds.length}</span> selected
           </div>
 
           <div className="flex gap-3">
             <button
               onClick={handleShare}
-              className="p-3 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
+              className="p-3 rounded-lg dark:bg-white/10 bg-gray-100 dark:hover:bg-white/20 hover:bg-gray-200 dark:text-white text-gray-900 transition-colors"
               aria-label="Share"
             >
               <Share2 className="h-5 w-5" />
@@ -797,7 +811,7 @@ export default function Home() {
 
             <button
               onClick={handleContact}
-              className="flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-lg bg-amber-500 hover:bg-amber-400 text-white font-medium transition-colors text-sm md:text-base"
+              className="flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-lg bg-amber-500 hover:bg-amber-600 dark:hover:bg-amber-400 text-white font-medium transition-colors text-sm md:text-base"
             >
               <MessageCircle className="h-4 w-4 md:h-5 md:w-5" />
               <span>Contact Seller</span>

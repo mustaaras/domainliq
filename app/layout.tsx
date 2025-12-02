@@ -6,6 +6,7 @@ import { auth } from "@/auth";
 import Script from "next/script";
 import Footer from "@/components/footer";
 import CookieConsent from "@/components/cookie-consent";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -65,9 +66,11 @@ export default async function RootLayout({
         </Script>
 
         <SessionProvider session={session}>
-          {children}
-          <Footer />
-          <CookieConsent />
+          <ThemeProvider>
+            {children}
+            <Footer />
+            <CookieConsent />
+          </ThemeProvider>
         </SessionProvider>
       </body>
     </html>

@@ -514,33 +514,33 @@ export default function DashboardPage() {
 
     if (status === 'loading' || isLoading) {
         return (
-            <div className="min-h-screen bg-[#050505] flex items-center justify-center">
-                <Loader2 className="h-8 w-8 text-indigo-500 animate-spin" />
+            <div className="min-h-screen dark:bg-[#050505] bg-gray-50 flex items-center justify-center">
+                <Loader2 className="h-8 w-8 dark:text-amber-500 text-amber-600 animate-spin" />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white p-4 md:p-8">
+        <div className="min-h-screen dark:bg-[#050505] bg-gray-50 dark:text-white text-gray-900 p-4 md:p-8">
             <div className="max-w-5xl mx-auto">
                 {/* Header */}
                 <header className="relative mb-8">
                     <div className="flex justify-center mb-6">
                         <Link href="/">
-                            <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto cursor-pointer" />
+                            <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto cursor-pointer dark:bg-transparent bg-black rounded p-1" />
                         </Link>
                     </div>
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                         <div className="text-center md:text-left w-full md:w-auto">
                             <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-                            <p className="text-gray-400 mt-1">Manage your domains and account</p>
+                            <p className="dark:text-gray-400 text-gray-600 mt-1">Manage your domains and account</p>
                         </div>
 
                         {/* Desktop Menu */}
                         <div className="hidden md:flex gap-3 items-center self-end mb-1">
                             <Link
                                 href="/"
-                                className="px-3 py-2 text-sm font-medium text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-2"
+                                className="px-3 py-2 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2"
                             >
                                 <ExternalLink className="h-4 w-4" />
                                 Home
@@ -548,21 +548,21 @@ export default function DashboardPage() {
                             <Link
                                 href={`/u/${userSubdomain}`}
                                 target="_blank"
-                                className="px-3 py-2 text-sm font-medium text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-2"
+                                className="px-3 py-2 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2"
                             >
                                 <ExternalLink className="h-4 w-4" />
                                 My Page
                             </Link>
                             <Link
                                 href="/settings"
-                                className="p-2 text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+                                className="p-2 dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg transition-colors"
                                 title="Settings"
                             >
                                 <Settings className="h-5 w-5" />
                             </Link>
                             <button
                                 onClick={handleLogout}
-                                className="p-2 text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+                                className="p-2 dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg transition-colors"
                                 title="Logout"
                             >
                                 <LogOut className="h-5 w-5" />
@@ -572,7 +572,7 @@ export default function DashboardPage() {
                         {/* Mobile Menu Button */}
                         <div className="absolute top-0 right-0 md:hidden">
                             <button
-                                className="p-2 text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+                                className="p-2 dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg transition-colors"
                                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                             >
                                 {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -582,11 +582,11 @@ export default function DashboardPage() {
 
                     {/* Mobile Dropdown Menu */}
                     {isMobileMenuOpen && (
-                        <div className="absolute top-full right-0 mt-2 w-48 bg-[#111] border border-white/10 rounded-xl shadow-xl z-50 overflow-hidden md:hidden">
+                        <div className="absolute top-full right-0 mt-2 w-48 dark:bg-[#111] bg-white border dark:border-white/10 border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden md:hidden">
                             <div className="flex flex-col p-1">
                                 <Link
                                     href="/"
-                                    className="px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-3"
+                                    className="px-4 py-3 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:hover:bg-white/5 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-3"
                                     onClick={() => setIsMobileMenuOpen(false)}
                                 >
                                     <ExternalLink className="h-4 w-4" />
@@ -595,7 +595,7 @@ export default function DashboardPage() {
                                 <Link
                                     href={`/u/${userSubdomain}`}
                                     target="_blank"
-                                    className="px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-3"
+                                    className="px-4 py-3 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:hover:bg-white/5 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-3"
                                     onClick={() => setIsMobileMenuOpen(false)}
                                 >
                                     <ExternalLink className="h-4 w-4" />
@@ -603,7 +603,7 @@ export default function DashboardPage() {
                                 </Link>
                                 <Link
                                     href="/settings"
-                                    className="px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-3"
+                                    className="px-4 py-3 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:hover:bg-white/5 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-3"
                                     onClick={() => setIsMobileMenuOpen(false)}
                                 >
                                     <Settings className="h-4 w-4" />
@@ -611,7 +611,7 @@ export default function DashboardPage() {
                                 </Link>
                                 <button
                                     onClick={handleLogout}
-                                    className="px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-3 w-full text-left"
+                                    className="px-4 py-3 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:hover:bg-white/5 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-3 w-full text-left"
                                 >
                                     <LogOut className="h-4 w-4" />
                                     Logout
@@ -625,19 +625,19 @@ export default function DashboardPage() {
                     {/* Add Domain Form */}
                     <div className="lg:col-span-1">
                         {/* Contact Info Reminder */}
-                        <div className="mb-6 bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-6">
+                        <div className="mb-6 dark:bg-indigo-500/10 bg-indigo-50 border dark:border-indigo-500/20 border-indigo-200 rounded-xl p-6">
                             <div className="flex items-start gap-4">
-                                <div className="p-2 bg-indigo-500/20 rounded-lg">
-                                    <Settings className="h-5 w-5 text-indigo-400" />
+                                <div className="p-2 dark:bg-indigo-500/20 bg-indigo-200 rounded-lg">
+                                    <Settings className="h-5 w-5 dark:text-indigo-400 text-indigo-600" />
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-medium text-indigo-200 mb-1">Update Contact Info</h3>
-                                    <p className="text-sm text-indigo-200/70 mb-3">
+                                    <h3 className="text-lg font-medium dark:text-indigo-200 text-indigo-900 mb-1">Update Contact Info</h3>
+                                    <p className="text-sm dark:text-indigo-200/70 text-indigo-700 mb-3">
                                         Don't forget to update your contact information in settings so buyers can reach you.
                                     </p>
                                     <Link
                                         href="/settings"
-                                        className="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1"
+                                        className="text-sm font-medium dark:text-indigo-400 text-indigo-600 dark:hover:text-indigo-300 hover:text-indigo-700 transition-colors flex items-center gap-1"
                                     >
                                         Go to Settings <ExternalLink className="h-3 w-3" />
                                     </Link>
@@ -645,35 +645,35 @@ export default function DashboardPage() {
                             </div>
                         </div>
 
-                        <div className="bg-white/5 border border-white/10 rounded-xl p-6 sticky top-8">
+                        <div className="dark:bg-white/5 bg-white border dark:border-white/10 border-gray-200 rounded-xl p-6 sticky top-8 shadow-sm">
                             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                                <Plus className="h-5 w-5 text-amber-400" />
+                                <Plus className="h-5 w-5 text-amber-500" />
                                 Add New Domain
                             </h2>
 
                             <form onSubmit={handleAddDomain} className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">Domain Name</label>
+                                    <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-1">Domain Name</label>
                                     <input
                                         type="text"
                                         value={newDomain.name}
                                         onChange={e => setNewDomain({ ...newDomain, name: e.target.value })}
                                         placeholder="example.com"
-                                        className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                                        className="w-full dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-4 py-2 dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                                         required
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">Price ($)</label>
+                                    <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-1">Price ($)</label>
                                     <div className="relative">
-                                        <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+                                        <DollarSign className="absolute left-3 top-2.5 h-4 w-4 dark:text-gray-500 text-gray-400" />
                                         <input
                                             type="number"
                                             value={newDomain.price}
                                             onChange={e => setNewDomain({ ...newDomain, price: e.target.value })}
                                             placeholder="1000"
-                                            className="w-full bg-black/20 border border-white/10 rounded-lg pl-9 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                                            className="w-full dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg pl-9 pr-4 py-2 dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                                             required
                                             min="0"
                                         />
@@ -681,7 +681,7 @@ export default function DashboardPage() {
                                 </div>
 
                                 {addError && (
-                                    <div className="text-red-400 text-sm bg-red-500/10 p-3 rounded-lg border border-red-500/20">
+                                    <div className="dark:text-red-400 text-red-600 text-sm dark:bg-red-500/10 bg-red-50 p-3 rounded-lg border dark:border-red-500/20 border-red-300">
                                         {addError}
                                     </div>
                                 )}
@@ -689,7 +689,7 @@ export default function DashboardPage() {
                                 <button
                                     type="submit"
                                     disabled={isAdding}
-                                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-white rounded-lg font-medium transition-all disabled:opacity-50"
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 dark:hover:bg-amber-400 text-white rounded-lg font-medium transition-all disabled:opacity-50"
                                 >
                                     {isAdding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
                                     Add Domain
@@ -699,31 +699,31 @@ export default function DashboardPage() {
                             {/* Divider */}
                             <div className="relative my-6">
                                 <div className="absolute inset-0 flex items-center">
-                                    <div className="w-full border-t border-white/10"></div>
+                                    <div className="w-full border-t dark:border-white/10 border-gray-200"></div>
                                 </div>
                                 <div className="relative flex justify-center text-xs uppercase">
-                                    <span className="bg-white/5 px-2 text-gray-500">Or Bulk Upload</span>
+                                    <span className="dark:bg-white/5 bg-white px-2 dark:text-gray-500 text-gray-600">Or Bulk Upload</span>
                                 </div>
                             </div>
 
                             {/* Bulk Upload Form */}
                             <form onSubmit={handleBulkUpload} className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                                    <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-1">
                                         Bulk Upload (max 500 domains)
                                     </label>
                                     <textarea
                                         value={bulkText}
                                         onChange={e => setBulkText(e.target.value)}
                                         placeholder={"example.com 1000\ntest.com 500\ndomain.com 2500"}
-                                        className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500/50 font-mono text-sm min-h-[120px]"
+                                        className="w-full dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-4 py-2 dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 font-mono text-sm min-h-[120px]"
                                         disabled={isAdding}
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">Format: domain.com price (one per line)</p>
+                                    <p className="text-xs dark:text-gray-500 text-gray-600 mt-1">Format: domain.com price (one per line)</p>
                                 </div>
 
                                 {bulkError && (
-                                    <div className="text-red-400 text-sm bg-red-500/10 p-3 rounded-lg border border-red-500/20">
+                                    <div className="dark:text-red-400 text-red-600 text-sm dark:bg-red-500/10 bg-red-50 p-3 rounded-lg border dark:border-red-500/20 border-red-300">
                                         {bulkError}
                                     </div>
                                 )}
@@ -731,7 +731,7 @@ export default function DashboardPage() {
                                 <button
                                     type="submit"
                                     disabled={isAdding || !bulkText.trim()}
-                                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition-all disabled:opacity-50"
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 dark:hover:bg-green-500 text-white rounded-lg font-medium transition-all disabled:opacity-50"
                                 >
                                     {isAdding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
                                     Upload Domains
@@ -742,8 +742,8 @@ export default function DashboardPage() {
 
                     {/* Domain List */}
                     <div className="lg:col-span-2">
-                        <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
-                            <div className="p-6 border-b border-white/10 flex items-center justify-between">
+                        <div className="dark:bg-white/5 bg-white border dark:border-white/10 border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                            <div className="p-6 border-b dark:border-white/10 border-gray-200 flex items-center justify-between">
                                 <h2 className="text-xl font-semibold">Your Domains</h2>
                                 <div className="flex items-center gap-2">
                                     {/* Combined Manage Button */}
@@ -752,13 +752,13 @@ export default function DashboardPage() {
                                             onClick={() => setShowManagePanel(!showManagePanel)}
                                             className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${activeFiltersCount > 0 || isInSelectionMode
                                                 ? 'bg-amber-600 hover:bg-amber-500 text-white'
-                                                : 'bg-white/10 hover:bg-white/20 text-white'
+                                                : 'dark:bg-white/10 bg-gray-100 dark:hover:bg-white/20 hover:bg-gray-200 dark:text-white text-gray-900'
                                                 }`}
                                         >
                                             {isInSelectionMode ? <CheckSquare className="h-4 w-4" /> : <Filter className="h-4 w-4" />}
                                             Manage
                                             {(activeFiltersCount > 0 || selectedDomainIds.size > 0) && (
-                                                <span className="ml-1 px-2 py-0.5 bg-white/20 rounded-full text-xs">
+                                                <span className="ml-1 px-2 py-0.5 dark:bg-white/20 bg-white/30 rounded-full text-xs">
                                                     {activeFiltersCount + (selectedDomainIds.size > 0 ? 1 : 0)}
                                                 </span>
                                             )}
@@ -766,14 +766,14 @@ export default function DashboardPage() {
 
                                         {/* Combined Management Panel */}
                                         {showManagePanel && (
-                                            <div className="absolute right-0 mt-2 w-[85vw] sm:w-96 bg-[#0A0A0A] border border-white/20 rounded-xl shadow-2xl z-50">
+                                            <div className="absolute right-0 mt-2 w-[85vw] sm:w-96 dark:bg-[#0A0A0A] bg-white border dark:border-white/20 border-gray-300 rounded-xl shadow-2xl z-50">
                                                 {/* Tabs */}
-                                                <div className="flex border-b border-white/10">
+                                                <div className="flex border-b dark:border-white/10 border-gray-200">
                                                     <button
                                                         onClick={() => setActiveTab('filter')}
                                                         className={`flex-1 px-4 py-3 font-medium transition-colors ${activeTab === 'filter'
-                                                            ? 'text-amber-400 border-b-2 border-amber-400'
-                                                            : 'text-gray-400 hover:text-white'
+                                                            ? 'text-amber-500 dark:text-amber-400 border-b-2 border-amber-500 dark:border-amber-400'
+                                                            : 'dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900'
                                                             }`}
                                                     >
                                                         <Filter className="h-4 w-4 inline mr-2" />
@@ -787,8 +787,8 @@ export default function DashboardPage() {
                                                     <button
                                                         onClick={() => setActiveTab('select')}
                                                         className={`flex-1 px-4 py-3 font-medium transition-colors ${activeTab === 'select'
-                                                            ? 'text-amber-400 border-b-2 border-amber-400'
-                                                            : 'text-gray-400 hover:text-white'
+                                                            ? 'text-amber-500 dark:text-amber-400 border-b-2 border-amber-500 dark:border-amber-400'
+                                                            : 'dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900'
                                                             }`}
                                                     >
                                                         <CheckSquare className="h-4 w-4 inline mr-2" />
@@ -810,7 +810,7 @@ export default function DashboardPage() {
                                                                 {activeFiltersCount > 0 && (
                                                                     <button
                                                                         onClick={clearFilters}
-                                                                        className="text-xs text-amber-400 hover:text-amber-300"
+                                                                        className="text-xs dark:text-amber-400 text-amber-600 dark:hover:text-amber-300 hover:text-amber-700"
                                                                     >
                                                                         Clear all
                                                                     </button>
@@ -819,7 +819,7 @@ export default function DashboardPage() {
 
                                                             {/* TLD Filter */}
                                                             <div className="mb-4">
-                                                                <label className="text-sm font-medium text-gray-300 mb-2 block">Extension (TLD)</label>
+                                                                <label className="text-sm font-medium dark:text-gray-300 text-gray-700 mb-2 block">Extension (TLD)</label>
                                                                 <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
                                                                     {uniqueTLDs.map(tld => (
                                                                         <button
@@ -827,7 +827,7 @@ export default function DashboardPage() {
                                                                             onClick={() => toggleTLD(tld)}
                                                                             className={`px-3 py-1 rounded-lg text-sm transition-all ${selectedTLDs.has(tld)
                                                                                 ? 'bg-amber-600 text-white'
-                                                                                : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                                                                                : 'dark:bg-white/10 bg-gray-100 dark:text-gray-300 text-gray-700 dark:hover:bg-white/20 hover:bg-gray-200'
                                                                                 }`}
                                                                         >
                                                                             .{tld}
@@ -838,13 +838,13 @@ export default function DashboardPage() {
 
                                                             {/* Verification Status Filter */}
                                                             <div className="mb-4">
-                                                                <label className="text-sm font-medium text-gray-300 mb-2 block">Verification Status</label>
+                                                                <label className="text-sm font-medium dark:text-gray-300 text-gray-700 mb-2 block">Verification Status</label>
                                                                 <div className="flex gap-2">
                                                                     <button
                                                                         onClick={() => setVerificationFilter('all')}
                                                                         className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${verificationFilter === 'all'
                                                                             ? 'bg-amber-600 text-white'
-                                                                            : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                                                                            : 'dark:bg-white/10 bg-gray-100 dark:text-gray-300 text-gray-700 dark:hover:bg-white/20 hover:bg-gray-200'
                                                                             }`}
                                                                     >
                                                                         All
@@ -853,7 +853,7 @@ export default function DashboardPage() {
                                                                         onClick={() => setVerificationFilter('verified')}
                                                                         className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${verificationFilter === 'verified'
                                                                             ? 'bg-green-600 text-white'
-                                                                            : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                                                                            : 'dark:bg-white/10 bg-gray-100 dark:text-gray-300 text-gray-700 dark:hover:bg-white/20 hover:bg-gray-200'
                                                                             }`}
                                                                     >
                                                                         Verified
@@ -862,7 +862,7 @@ export default function DashboardPage() {
                                                                         onClick={() => setVerificationFilter('unverified')}
                                                                         className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${verificationFilter === 'unverified'
                                                                             ? 'bg-gray-600 text-white'
-                                                                            : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                                                                            : 'dark:bg-white/10 bg-gray-100 dark:text-gray-300 text-gray-700 dark:hover:bg-white/20 hover:bg-gray-200'
                                                                             }`}
                                                                     >
                                                                         Unverified
@@ -872,33 +872,33 @@ export default function DashboardPage() {
 
                                                             {/* Price Filter */}
                                                             <div>
-                                                                <label className="text-sm font-medium text-gray-300 mb-2 block">Price Range ($)</label>
+                                                                <label className="text-sm font-medium dark:text-gray-300 text-gray-700 mb-2 block">Price Range ($)</label>
                                                                 <div className="flex gap-2">
                                                                     <input
                                                                         type="number"
                                                                         placeholder="Min"
                                                                         value={priceMin}
                                                                         onChange={(e) => setPriceMin(e.target.value)}
-                                                                        className="flex-1 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-500/50"
+                                                                        className="flex-1 dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-3 py-2 text-sm dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:border-amber-500/50"
                                                                     />
-                                                                    <span className="text-gray-500 self-center">-</span>
+                                                                    <span className="dark:text-gray-500 text-gray-400 self-center">-</span>
                                                                     <input
                                                                         type="number"
                                                                         placeholder="Max"
                                                                         value={priceMax}
                                                                         onChange={(e) => setPriceMax(e.target.value)}
-                                                                        className="flex-1 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-500/50"
+                                                                        className="flex-1 dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-3 py-2 text-sm dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:border-amber-500/50"
                                                                     />
                                                                 </div>
                                                             </div>
 
                                                             {/* Sort Filter */}
                                                             <div className="mt-4">
-                                                                <label className="text-sm font-medium text-gray-300 mb-2 block">Sort By</label>
+                                                                <label className="text-sm font-medium dark:text-gray-300 text-gray-700 mb-2 block">Sort By</label>
                                                                 <select
                                                                     value={sortBy}
                                                                     onChange={(e) => setSortBy(e.target.value)}
-                                                                    className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500/50"
+                                                                    className="w-full dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-3 py-2 text-sm dark:text-white text-gray-900 focus:outline-none focus:border-amber-500/50"
                                                                 >
                                                                     <option value="newest">Newest Listed</option>
                                                                     <option value="price_asc">Price: Low to High</option>
@@ -917,30 +917,30 @@ export default function DashboardPage() {
 
                                                             {!isInSelectionMode ? (
                                                                 <div className="text-center py-8">
-                                                                    <CheckSquare className="h-12 w-12 mx-auto text-gray-600 mb-3" />
-                                                                    <p className="text-gray-400 mb-4">Enable selection mode to perform bulk actions</p>
+                                                                    <CheckSquare className="h-12 w-12 mx-auto dark:text-gray-600 text-gray-400 mb-3" />
+                                                                    <p className="dark:text-gray-400 text-gray-600 mb-4">Enable selection mode to perform bulk actions</p>
                                                                     <button
                                                                         onClick={() => {
                                                                             setIsInSelectionMode(true);
                                                                             setShowManagePanel(false);
                                                                         }}
-                                                                        className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg font-medium transition-all"
+                                                                        className="px-4 py-2 bg-amber-600 hover:bg-amber-700 dark:hover:bg-amber-500 text-white rounded-lg font-medium transition-all"
                                                                     >
                                                                         Enable Selection Mode
                                                                     </button>
                                                                 </div>
                                                             ) : (
                                                                 <div className="space-y-3">
-                                                                    <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+                                                                    <div className="dark:bg-white/5 bg-gray-100 rounded-lg p-3 border dark:border-white/10 border-gray-300">
                                                                         <div className="flex items-center justify-between mb-2">
-                                                                            <span className="text-sm text-gray-400">Selected</span>
-                                                                            <span className="text-lg font-semibold text-amber-400">{selectedDomainIds.size}</span>
+                                                                            <span className="text-sm dark:text-gray-400 text-gray-600">Selected</span>
+                                                                            <span className="text-lg font-semibold dark:text-amber-400 text-amber-600">{selectedDomainIds.size}</span>
                                                                         </div>
                                                                         <button
                                                                             onClick={() => {
                                                                                 toggleSelectAll();
                                                                             }}
-                                                                            className="w-full px-3 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm transition-all"
+                                                                            className="w-full px-3 py-2 dark:bg-white/10 bg-gray-50 dark:hover:bg-white/20 hover:bg-gray-200 dark:text-white text-gray-900 rounded-lg text-sm transition-all border dark:border-transparent border-gray-300"
                                                                         >
                                                                             {selectedDomainIds.size === filteredDomains.slice((currentPage - 1) * domainsPerPage, currentPage * domainsPerPage).length
                                                                                 ? 'Deselect All on Page'
@@ -956,7 +956,7 @@ export default function DashboardPage() {
                                                                                     setShowManagePanel(false);
                                                                                 }}
                                                                                 disabled={isBulkVerifying}
-                                                                                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition-all disabled:opacity-50"
+                                                                                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 dark:hover:bg-green-500 text-white rounded-lg font-medium transition-all disabled:opacity-50"
                                                                             >
                                                                                 {isBulkVerifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
                                                                                 Verify Selected ({selectedDomainIds.size})
@@ -968,7 +968,7 @@ export default function DashboardPage() {
                                                                                     setShowManagePanel(false);
                                                                                 }}
                                                                                 disabled={selectedDomainIds.size === 0}
-                                                                                className="w-full py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                                                                className="w-full py-2 bg-amber-600 hover:bg-amber-700 dark:hover:bg-amber-500 text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                                                             >
                                                                                 <DollarSign className="h-4 w-4" />
                                                                                 Set Price ({selectedDomainIds.size})
@@ -979,7 +979,7 @@ export default function DashboardPage() {
                                                                                     setShowManagePanel(false);
                                                                                 }}
                                                                                 disabled={isDeleting}
-                                                                                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-medium transition-all disabled:opacity-50"
+                                                                                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 dark:hover:bg-red-500 text-white rounded-lg font-medium transition-all disabled:opacity-50"
                                                                             >
                                                                                 {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
                                                                                 Delete Selected ({selectedDomainIds.size})
@@ -993,7 +993,7 @@ export default function DashboardPage() {
                                                                             setSelectedDomainIds(new Set());
                                                                             setShowManagePanel(false);
                                                                         }}
-                                                                        className="w-full px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg font-medium transition-all"
+                                                                        className="w-full px-4 py-2 dark:bg-white/10 bg-gray-100 dark:hover:bg-white/20 hover:bg-gray-200 dark:text-white text-gray-900 rounded-lg font-medium transition-all border dark:border-transparent border-gray-300"
                                                                     >
                                                                         Exit Selection Mode
                                                                     </button>
@@ -1009,46 +1009,46 @@ export default function DashboardPage() {
                             </div>
 
                             {filteredDomains.length === 0 ? (
-                                <div className="p-12 text-center text-gray-500">
+                                <div className="p-12 text-center dark:text-gray-500 text-gray-600">
                                     You haven't added any domains yet.
                                 </div>
                             ) : (
-                                <div className="divide-y divide-white/5">
+                                <div className="divide-y dark:divide-white/5 divide-gray-200">
                                     {/* Select All Row - Only show in selection mode */}
                                     {isInSelectionMode && filteredDomains.length > 0 && (
-                                        <div className="p-4 bg-white/5 flex items-center gap-3">
+                                        <div className="p-4 dark:bg-white/5 bg-gray-50 flex items-center gap-3">
                                             <input
                                                 type="checkbox"
                                                 checked={selectedDomainIds.size > 0 && selectedDomainIds.size === filteredDomains.slice((currentPage - 1) * domainsPerPage, currentPage * domainsPerPage).length}
                                                 onChange={toggleSelectAll}
-                                                className="h-4 w-4 rounded border-white/20 bg-black/20 text-amber-500 focus:ring-amber-500/50"
+                                                className="h-4 w-4 rounded dark:border-white/20 border-gray-300 dark:bg-black/20 bg-gray-50 text-amber-500 focus:ring-amber-500/50"
                                             />
-                                            <span className="text-sm text-gray-400">
+                                            <span className="text-sm dark:text-gray-400 text-gray-600">
                                                 Select all on this page
                                             </span>
                                         </div>
                                     )}
 
                                     {filteredDomains.slice((currentPage - 1) * domainsPerPage, currentPage * domainsPerPage).map(domain => (
-                                        <div key={domain.id} className="p-4 flex items-center gap-3 hover:bg-white/5 transition-colors">
+                                        <div key={domain.id} className="p-4 flex items-center gap-3 dark:hover:bg-white/5 hover:bg-gray-50 transition-colors">
                                             {isInSelectionMode && (
                                                 <input
                                                     type="checkbox"
                                                     checked={selectedDomainIds.has(domain.id)}
                                                     onChange={() => toggleSelectDomain(domain.id)}
-                                                    className="h-4 w-4 rounded border-white/20 bg-black/20 text-amber-500 focus:ring-amber-500/50"
+                                                    className="h-4 w-4 rounded dark:border-white/20 border-gray-300 dark:bg-black/20 bg-gray-50 text-amber-500 focus:ring-amber-500/50"
                                                 />
                                             )}
                                             <div className="flex-1 flex items-center justify-between">
                                                 <div>
                                                     <div className="flex items-center gap-2">
-                                                        <h3 className={`font-medium ${domain.status === 'sold' ? 'line-through text-gray-500' : 'text-white'}`}>
+                                                        <h3 className={`font-medium ${domain.status === 'sold' ? 'line-through dark:text-gray-500 text-gray-400' : 'dark:text-white text-gray-900'}`}>
                                                             {domain.name}
                                                         </h3>
                                                         {domain.isVerified ? (
                                                             <div className="group relative">
-                                                                <ShieldCheck className="h-4 w-4 text-green-400" />
-                                                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                                                                <ShieldCheck className="h-4 w-4 text-green-500 dark:text-green-400" />
+                                                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 dark:bg-gray-800 bg-gray-900 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                                                                     Ownership Verified
                                                                 </div>
                                                             </div>
@@ -1056,7 +1056,7 @@ export default function DashboardPage() {
                                                             domain.status !== 'sold' && (
                                                                 <button
                                                                     onClick={() => openVerifyModal(domain)}
-                                                                    className="text-xs text-amber-500 hover:text-amber-400 flex items-center gap-1 bg-amber-500/10 hover:bg-amber-500/20 px-2 py-0.5 rounded transition-colors"
+                                                                    className="text-xs dark:text-amber-500 text-amber-600 dark:hover:text-amber-400 hover:text-amber-700 flex items-center gap-1 dark:bg-amber-500/10 bg-amber-50 dark:hover:bg-amber-500/20 hover:bg-amber-100 px-2 py-0.5 rounded transition-colors"
                                                                 >
                                                                     <Shield className="h-3 w-3" />
                                                                     Verify
@@ -1064,13 +1064,13 @@ export default function DashboardPage() {
                                                             )
                                                         )}
                                                     </div>
-                                                    <p className="text-sm text-gray-500 flex items-center gap-2">
+                                                    <p className="text-sm dark:text-gray-500 text-gray-600 flex items-center gap-2">
                                                         {domain.expiresAt ? (
                                                             <>
-                                                                <span className="text-amber-500/80">
+                                                                <span className="dark:text-amber-500/80 text-amber-600">
                                                                     Expires {new Date(domain.expiresAt).toLocaleDateString()}
                                                                 </span>
-                                                                <span className="text-gray-700">•</span>
+                                                                <span className="dark:text-gray-700 text-gray-400">•</span>
                                                                 <span>
                                                                     {(() => {
                                                                         const daysRemaining = Math.ceil((new Date(domain.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
@@ -1083,7 +1083,7 @@ export default function DashboardPage() {
                                                                 </span>
                                                             </>
                                                         ) : (
-                                                            <span className="text-gray-600">No expiration data</span>
+                                                            <span className="dark:text-gray-600 text-gray-500">No expiration data</span>
                                                         )}
                                                     </p>
                                                 </div>
@@ -1091,7 +1091,7 @@ export default function DashboardPage() {
                                                 <div className="flex items-center gap-4">
                                                     <div className="text-right">
                                                         <div className="flex items-center justify-end gap-2">
-                                                            <div className="font-mono text-white">
+                                                            <div className="font-mono dark:text-white text-gray-900 font-medium">
                                                                 ${domain.price.toLocaleString()}
                                                             </div>
                                                             <button
@@ -1099,7 +1099,7 @@ export default function DashboardPage() {
                                                                     setEditingDomainId(domain.id);
                                                                     setEditPriceValue(domain.price.toString());
                                                                 }}
-                                                                className="p-1 text-gray-500 hover:text-amber-400 transition-colors"
+                                                                className="p-1 dark:text-gray-500 text-gray-400 dark:hover:text-amber-400 hover:text-amber-600 transition-colors"
                                                                 title="Edit Price"
                                                             >
                                                                 <Pencil className="h-3 w-3" />
@@ -1108,8 +1108,8 @@ export default function DashboardPage() {
                                                         <button
                                                             onClick={() => handleToggleSold(domain.id, domain.status)}
                                                             className={`text-xs font-medium mt-1 ${domain.status === 'sold'
-                                                                ? 'text-green-400 hover:text-green-300'
-                                                                : 'text-amber-500 hover:text-amber-400'
+                                                                ? 'dark:text-green-400 text-green-600 dark:hover:text-green-300 hover:text-green-700'
+                                                                : 'dark:text-amber-500 text-amber-600 dark:hover:text-amber-400 hover:text-amber-700'
                                                                 }`}
                                                         >
                                                             {domain.status === 'sold' ? 'Mark Available' : 'Mark Sold'}
@@ -1118,7 +1118,7 @@ export default function DashboardPage() {
 
                                                     <button
                                                         onClick={() => handleDeleteDomain(domain.id)}
-                                                        className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                                                        className="p-2 dark:text-gray-500 text-gray-400 dark:hover:text-red-400 hover:text-red-600 dark:hover:bg-red-500/10 hover:bg-red-50 rounded-lg transition-colors"
                                                         title="Delete Domain"
                                                     >
                                                         <Trash2 className="h-4 w-4" />
@@ -1132,16 +1132,16 @@ export default function DashboardPage() {
 
                             {/* Pagination */}
                             {filteredDomains.length > 0 && (
-                                <div className="p-4 border-t border-white/10 flex items-center justify-between">
+                                <div className="p-4 border-t dark:border-white/10 border-gray-200 flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                                        <span className="text-sm text-gray-500">Show:</span>
+                                        <span className="text-sm dark:text-gray-500 text-gray-600">Show:</span>
                                         <select
                                             value={domainsPerPage}
                                             onChange={(e) => {
                                                 setDomainsPerPage(Number(e.target.value));
                                                 setCurrentPage(1);
                                             }}
-                                            className="bg-black/20 border border-white/10 rounded px-2 py-1 text-sm text-gray-300 focus:outline-none focus:border-amber-500/50"
+                                            className="dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded px-2 py-1 text-sm dark:text-gray-300 text-gray-900 focus:outline-none focus:border-amber-500/50"
                                         >
                                             <option value="10">10 per page</option>
                                             <option value="50">50 per page</option>
@@ -1152,19 +1152,19 @@ export default function DashboardPage() {
 
                                     <div className="flex items-center gap-2">
                                         <button
-                                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                                             disabled={currentPage === 1}
-                                            className="px-3 py-1 text-sm text-gray-400 hover:text-white disabled:opacity-50 disabled:hover:text-gray-400 transition-colors"
+                                            className="px-3 py-1 text-sm dark:bg-white/10 bg-gray-100 dark:hover:bg-white/20 hover:bg-gray-200 border dark:border-white/10 border-gray-300 rounded dark:text-white text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                         >
                                             Previous
                                         </button>
-                                        <span className="text-sm text-gray-500">
+                                        <span className="text-sm dark:text-gray-400 text-gray-600">
                                             Page {currentPage} of {Math.ceil(filteredDomains.length / domainsPerPage)}
                                         </span>
                                         <button
-                                            onClick={() => setCurrentPage(p => Math.min(Math.ceil(filteredDomains.length / domainsPerPage), p + 1))}
+                                            onClick={() => setCurrentPage(Math.min(Math.ceil(filteredDomains.length / domainsPerPage), currentPage + 1))}
                                             disabled={currentPage >= Math.ceil(filteredDomains.length / domainsPerPage)}
-                                            className="px-3 py-1 text-sm text-gray-400 hover:text-white disabled:opacity-50 disabled:hover:text-gray-400 transition-colors"
+                                            className="px-3 py-1 text-sm dark:bg-white/10 bg-gray-100 dark:hover:bg-white/20 hover:bg-gray-200 border dark:border-white/10 border-gray-300 rounded dark:text-white text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                         >
                                             Next
                                         </button>

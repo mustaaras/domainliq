@@ -54,44 +54,44 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#050505] flex items-center justify-center p-4">
-            <div className="w-full max-w-md bg-white/5 p-8 rounded-2xl border border-white/10">
+        <div className="min-h-screen dark:bg-[#050505] bg-gray-50 flex items-center justify-center p-4">
+            <div className="w-full max-w-md dark:bg-white/5 bg-white p-8 rounded-2xl border dark:border-white/10 border-gray-200 shadow-lg">
                 <div className="flex justify-center mb-6">
                     <Link href="/">
-                        <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto cursor-pointer" />
+                        <img src="/logo.svg" alt="DomainLiq" className="h-8 w-auto cursor-pointer dark:bg-transparent bg-black rounded p-1" />
                     </Link>
                 </div>
-                <h1 className="text-2xl font-bold text-white mb-6 text-center">Login to DomainLiq</h1>
+                <h1 className="text-2xl font-bold dark:text-white text-gray-900 mb-6 text-center">Login to DomainLiq</h1>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-1">Email</label>
+                        <label className="block text-sm font-medium dark:text-gray-400 text-gray-700 mb-1">Email</label>
                         <input
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-amber-500"
+                            className="w-full dark:bg-black/50 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg p-3 dark:text-white text-gray-900 dark:placeholder-gray-600 placeholder-gray-400 focus:outline-none focus:border-amber-500"
                             required
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-1">Password</label>
+                        <label className="block text-sm font-medium dark:text-gray-400 text-gray-700 mb-1">Password</label>
                         <input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-amber-500"
+                            className="w-full dark:bg-black/50 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg p-3 dark:text-white text-gray-900 dark:placeholder-gray-600 placeholder-gray-400 focus:outline-none focus:border-amber-500"
                             required
                         />
                     </div>
                     {error && (
-                        <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-sm">
+                        <div className="dark:bg-red-500/10 bg-red-50 border dark:border-red-500/20 border-red-300 dark:text-red-400 text-red-700 p-3 rounded-lg text-sm">
                             {error}
                         </div>
                     )}
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full bg-amber-500 hover:bg-amber-400 text-white font-bold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-amber-500 dark:hover:bg-amber-400 hover:bg-amber-600 text-white font-bold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isLoading ? 'Signing in...' : 'Sign In'}
                     </button>

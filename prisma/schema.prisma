@@ -48,6 +48,10 @@ model Domain {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  // Content
+  content     String?  @db.Text
+  aiGenerated Boolean  @default(false)
+
   // Verification
   isVerified        Boolean   @default(false)
   verificationToken String?   @unique
