@@ -34,7 +34,7 @@ export default function DashboardPage() {
     const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null);
     const [verificationStatus, setVerificationStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
     const [verificationMessage, setVerificationMessage] = useState('');
-    const [activeMethod, setActiveMethod] = useState<'txt' | 'ns' | null>(null);
+    const [activeMethod, setActiveMethod] = useState<'txt' | 'a' | 'ns' | null>(null);
     const [copiedToken, setCopiedToken] = useState(false);
 
     // Pagination state
