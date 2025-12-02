@@ -17,9 +17,9 @@ services:
       - "traefik.http.routers.domainliq.tls=true"
       - "traefik.http.routers.domainliq.tls.certresolver=letsencrypt"
       # Explicitly link router to service
-      - "traefik.http.routers.domainliq.service=domainliq"
+      - "traefik.http.routers.domainliq.service=app"
       # Port configuration
-      - "traefik.http.services.domainliq.loadbalancer.server.port=3000"
+      - "traefik.http.services.app.loadbalancer.server.port=3000"
     networks:
       - coolify
 
