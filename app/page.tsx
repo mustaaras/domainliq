@@ -246,12 +246,17 @@ export default function Home() {
         <header className="mb-8">
           <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-6 mb-8">
             <div className="text-center md:text-left w-full md:w-auto">
-              <div className="flex items-center gap-3 justify-center md:justify-start">
-                <Link href="/" className="flex-shrink-0">
-                  <Logo className="h-8 w-auto" />
-                </Link>
+              <Link href="/" className="inline-block group">
+                <div className="flex items-center gap-3 justify-center md:justify-start">
+                  <Logo className="h-11 w-auto transition-transform group-hover:scale-105 duration-300" />
+                </div>
+              </Link>
+              <div className="flex items-center gap-3 justify-center md:justify-start mt-3">
+                <span className="h-px w-8 bg-gradient-to-r from-amber-500/50 to-transparent hidden md:block"></span>
+                <p className="text-xs font-semibold tracking-[0.2em] text-gray-500 dark:text-gray-400 uppercase">
+                  Domain Liquidation Platform
+                </p>
               </div>
-              <p className="dark:text-gray-500 text-gray-600 mt-1">Domain Liquidation Platform</p>
             </div>
 
             <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto items-center">
@@ -456,7 +461,7 @@ export default function Home() {
                   onClick={() => setShowFilterPanel(!showFilterPanel)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${showFilterPanel || filterTLD.length > 0 || filterPrice.min || filterPrice.max || filterVerified
                     ? 'bg-amber-500 text-white'
-                    : 'bg-white/10 hover:bg-white/20 text-white'
+                    : 'dark:bg-white/10 bg-gray-100 dark:hover:bg-white/20 hover:bg-gray-200 dark:text-white text-gray-700'
                     }`}
                 >
                   <Filter className="h-4 w-4" />
@@ -474,7 +479,7 @@ export default function Home() {
                 <div className="absolute top-full right-0 mt-2 w-full md:w-80 dark:bg-[#0A0A0A] bg-gray-100 border dark:border-white/20 border-gray-200 rounded-xl shadow-2xl z-40 p-4">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="font-semibold dark:text-white text-gray-900">Filters</h3>
-                    <button onClick={() => setShowFilterPanel(false)} className="dark:text-gray-400 text-gray-600 hover:text-white dark:hover:text-gray-900">
+                    <button onClick={() => setShowFilterPanel(false)} className="dark:text-gray-400 text-gray-500 dark:hover:text-white hover:text-gray-900 transition-colors">
                       <X className="h-4 w-4" />
                     </button>
                   </div>
@@ -572,7 +577,7 @@ export default function Home() {
                       setSortBy('newest');
                       setPage(1);
                     }}
-                    className="w-full py-2 text-xs text-gray-400 hover:text-white transition-colors border-t border-white/10"
+                    className="w-full py-2 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors border-t border-gray-200 dark:border-white/10"
                   >
                     Clear Filters
                   </button>

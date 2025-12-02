@@ -93,13 +93,20 @@ export default function DomainLanderClient({ domain, isOwner }: DomainLanderClie
                     <div className="absolute top-[10%] right-[-10%] w-[600px] h-[600px] bg-orange-50/50 dark:bg-cyan-500/10 rounded-full blur-[100px] dark:mix-blend-screen animate-pulse duration-[5000ms]" />
                 </div>
 
-                <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
+                <div className="max-w-7xl mx-auto px-4 text-center relative z-10">
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-white/5 border border-amber-200 dark:border-amber-500/20 shadow-sm mb-8 backdrop-blur-sm">
                         <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
                         <span className="text-sm font-semibold text-amber-700 dark:text-amber-400 tracking-wide uppercase text-[11px]">Liquidation Listing</span>
                     </div>
 
-                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-6 break-words text-gray-900 dark:text-white drop-shadow-sm">
+                    <h1 className={`
+                        font-black tracking-tight mb-6 break-words text-gray-900 dark:text-white drop-shadow-sm px-2
+                        ${domain.name.length > 20
+                            ? 'text-xl sm:text-5xl md:text-6xl lg:text-6xl'
+                            : domain.name.length > 14
+                                ? 'text-2xl sm:text-6xl md:text-7xl lg:text-7xl'
+                                : 'text-4xl sm:text-7xl md:text-8xl lg:text-8xl'}
+                    `}>
                         {domain.name}
                     </h1>
 
