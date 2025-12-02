@@ -97,7 +97,26 @@ export async function verifyDomain(domainId: string) {
                 return { success: true };
             }
 
-            // 3. Fallback: Check Authoritative Nameservers directly
+            // 3. A Record Check
+            const SERVER_IP = process.env.SERVER_IP || '46.224.108.38';
+            try {
+                const { resolve4 } = await import('dns/promises');
+                const aRecords = await resolve4(domain.name);
+                console.log(`[DNS] A records for ${domain.name}:`, aRecords);
+                console.log(`[DNS] Looking for server IP: ${SERVER_IP}`);
+
+                if (aRecords.includes(SERVER_IP)) {
+                    console.log(`[DNS] ✅ A record matches!`);
+                    await markAsVerified(domainId, domain.name);
+                    return { success: true };
+                } else {
+                    console.log(`[DNS] ❌ A record found but doesn't match server IP`);
+                }
+            } catch (aError) {
+                console.log(`[DNS] ❌ A record lookup failed:`, aError);
+            }
+
+            // 4. Fallback: Check Authoritative Nameservers directly
             // This bypasses propagation delays by querying the TLD's nameservers (e.g., a0.nic.bet)
             try {
                 console.log('🌐 Trying authoritative NS check for', domain.name);
