@@ -79,6 +79,7 @@ export default function PrivacyPage() {
                 <ul className="list-disc pl-6 text-gray-300 mb-4">
                     <li><strong>Public Profile:</strong> Your username, display name, and domain listings are publicly visible</li>
                     <li><strong>Contact Information:</strong> Your chosen contact method is shown to interested buyers</li>
+                    <li><strong>Escrow Transactions:</strong> When you initiate a "Buy with Escrow" transaction, your email is shared with Escrow.com and the other party to facilitate the sale</li>
                     <li><strong>Legal Requirements:</strong> We may disclose information if required by law</li>
                 </ul>
 

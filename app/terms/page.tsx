@@ -31,11 +31,10 @@ export default function TermsPage() {
                 <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-6 my-6">
                     <p className="font-bold text-amber-400 mb-2">IMPORTANT: DomainLiq does NOT:</p>
                     <ul className="list-disc pl-6 text-gray-300">
-                        <li>Process payments</li>
-                        <li>Act as an escrow service</li>
+                        <li>Process payments directly</li>
+                        <li>Hold funds (we use Escrow.com for this)</li>
                         <li>Guarantee legal ownership title (Verification via TXT record or ns3verify.domainliq.com proves DNS control only)</li>
-                        <li>Guarantee transactions</li>
-                        <li>Mediate disputes</li>
+                        <li>Mediate disputes (handled by Escrow.com for secured transactions)</li>
                     </ul>
                 </div>
 
@@ -46,7 +45,7 @@ export default function TermsPage() {
                     <li>You must have legitimate ownership or authorization to sell listed domains</li>
                     <li>You are responsible for all domain listings and pricing</li>
                     <li>You must respond to legitimate buyer inquiries</li>
-                    <li>You must complete transactions independently</li>
+                    <li>You must complete transactions independently or via our Escrow.com integration</li>
                     <li>You are solely responsible for domain transfers</li>
                     <li><strong>Homepage Listing:</strong> Only domains priced under $1,000 are eligible for homepage featuring. All domains remain visible on your profile page.</li>
                 </ul>
@@ -56,19 +55,20 @@ export default function TermsPage() {
                     <li className="font-bold text-amber-400">ONLY PURCHASE FROM TRUSTED SELLERS</li>
                     <li>Verify domain ownership before making any payment</li>
                     <li>Conduct all due diligence independently</li>
-                    <li>Use secure escrow services for transactions (we recommend Escrow.com)</li>
-                    <li>Never share payment information through our platform</li>
+                    <li><strong>Use our "Buy with Escrow" feature</strong> for secure transactions via Escrow.com</li>
+                    <li>Never share payment information outside of the secure Escrow.com environment</li>
                 </ul>
 
-                <h2 className="text-2xl font-bold mt-8 mb-4">3. No Payment Processing</h2>
-                <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-6 my-6">
-                    <p className="font-bold text-red-400 mb-2">CRITICAL NOTICE:</p>
+                <h2 className="text-2xl font-bold mt-8 mb-4">3. Payment & Escrow</h2>
+                <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-6 my-6">
+                    <p className="font-bold text-green-400 mb-2">SECURE TRANSACTIONS:</p>
                     <p className="text-gray-300">
-                        DomainLiq does NOT handle payments. All financial transactions must be completed through trusted
-                        third-party escrow services or directly between buyer and seller (at your own risk).
+                        DomainLiq integrates with <strong>Escrow.com</strong> to facilitate secure domain purchases.
+                        When you use "Buy with Escrow", a transaction is created on Escrow.com, and you are redirected
+                        to their secure platform to complete payment.
                     </p>
                     <p className="text-gray-300 mt-4">
-                        We are not responsible for any financial losses, fraud, or disputes arising from transactions.
+                        DomainLiq does not touch your funds. All payments are held by Escrow.com until the domain transfer is verified.
                     </p>
                 </div>
 

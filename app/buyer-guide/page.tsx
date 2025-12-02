@@ -52,14 +52,18 @@ export default function UserGuidePage() {
                     <li>Get details about the domain's history and traffic (if relevant)</li>
                 </ul>
 
-                <h2 className="text-2xl font-bold mt-8 mb-4">Step 5: Use Escrow</h2>
+                <h2 className="text-2xl font-bold mt-8 mb-4">Step 5: Use "Buy with Escrow"</h2>
                 <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-6 my-6">
-                    <p className="font-bold text-green-400 mb-2">Recommended Escrow Services:</p>
-                    <ul className="list-disc pl-6 text-gray-300">
-                        <li><strong>Escrow.com</strong> - Most trusted for domain transactions</li>
-                        <li><strong>Afternic.com</strong> - Popular domain marketplace with built-in escrow</li>
-                        <li><strong>Sedo.com</strong> - Another trusted option</li>
-                    </ul>
+                    <p className="font-bold text-green-400 mb-2">Secure Integrated Payments:</p>
+                    <p className="text-gray-300 mb-4">
+                        We have integrated directly with <strong>Escrow.com</strong> for seamless security.
+                    </p>
+                    <ol className="list-decimal pl-6 text-gray-300 space-y-2">
+                        <li>Click the <strong>"Buy with Escrow"</strong> button on any domain listing</li>
+                        <li>Enter your email address in the secure pop-up</li>
+                        <li>You will be automatically redirected to Escrow.com</li>
+                        <li>Complete your payment securely on their platform</li>
+                    </ol>
                 </div>
 
                 <h2 className="text-2xl font-bold mt-8 mb-4">Step 6: Complete Transfer</h2>

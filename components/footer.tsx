@@ -31,6 +31,11 @@ export default function Footer() {
                                     Seller's Guide
                                 </Link>
                             </li>
+                            <li>
+                                <Link href="/resources/faq" className="text-gray-400 hover:text-white text-xs transition-colors">
+                                    FAQ
+                                </Link>
+                            </li>
                         </ul>
                     </div>
 
