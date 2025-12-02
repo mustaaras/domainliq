@@ -21,6 +21,8 @@ export async function GET() {
                 linkedinProfile: true,
                 telegramUsername: true,
                 preferredContact: true,
+                escrowEmail: true,
+                escrowTermsAccepted: true,
             },
         });
 
@@ -52,7 +54,9 @@ export async function PUT(req: NextRequest) {
             whatsappNumber,
             linkedinProfile,
             telegramUsername,
-            preferredContact
+            preferredContact,
+            escrowEmail,
+            escrowTermsAccepted
         } = data;
 
         const updatedUser = await db.user.update({
@@ -65,6 +69,8 @@ export async function PUT(req: NextRequest) {
                 linkedinProfile,
                 telegramUsername,
                 preferredContact,
+                escrowEmail,
+                escrowTermsAccepted,
             },
         });
 

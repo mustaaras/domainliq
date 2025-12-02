@@ -23,6 +23,7 @@ interface Domain {
     linkedinProfile: string | null;
     telegramUsername: string | null;
     preferredContact: string;
+    escrowEmail: string | null;
   };
   isVerified?: boolean;
   expiresAt?: string | null;
@@ -48,6 +49,8 @@ export default function Home() {
   const [itemsPerPage, setItemsPerPage] = useState(20);
   const [totalDomains, setTotalDomains] = useState(0);
   const [showContactModal, setShowContactModal] = useState(false);
+  const [showEscrowModal, setShowEscrowModal] = useState(false);
+  const [selectedEscrowDomain, setSelectedEscrowDomain] = useState<Domain | null>(null);
 
   // Filter State
   const [showFilterPanel, setShowFilterPanel] = useState(false);
@@ -318,6 +321,103 @@ export default function Home() {
               </div>
             );
           })()}
+
+          {/* Escrow Modal */}
+          {showEscrowModal && selectedEscrowDomain && (
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowEscrowModal(false)}>
+              <div className="bg-[#0A0A0A] border border-white/10 rounded-xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center border border-green-500/20">
+                    <ShieldCheck className="h-5 w-5 text-green-500" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white">Buy with Escrow.com</h3>
+                    <p className="text-xs text-gray-400">Secure transaction for {selectedEscrowDomain.name}</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4 mb-6">
+                  <div className="bg-white/5 rounded-lg p-4 border border-white/5">
+                    <p className="text-sm text-gray-300 mb-2">
+                      This domain is listed for <span className="text-white font-bold">${selectedEscrowDomain.price.toLocaleString()}</span>.
+                    </p>
+                    <p className="text-sm text-gray-400">
+                      Enter your email address to start a secure transaction on Escrow.com. You will be redirected to complete the purchase.
+                    </p>
+                  </div>
+
+                  <form
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      const form = e.target as HTMLFormElement;
+                      const email = (form.elements.namedItem('buyerEmail') as HTMLInputElement).value;
+                      const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+                      const originalText = btn.innerHTML;
+
+                      try {
+                        btn.disabled = true;
+                        btn.innerHTML = '<span class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></span> Processing...';
+
+                        const res = await fetch('/api/escrow/create-transaction', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            domain: selectedEscrowDomain.name,
+                            price: selectedEscrowDomain.price,
+                            buyerEmail: email,
+                            sellerEmail: selectedEscrowDomain.user.escrowEmail
+                          })
+                        });
+
+                        const data = await res.json();
+
+                        if (!res.ok) throw new Error(data.error || 'Failed to start transaction');
+
+                        if (data.landing_page) {
+                          window.location.href = data.landing_page;
+                        } else {
+                          throw new Error('No redirect URL received');
+                        }
+
+                      } catch (error: any) {
+                        alert(error.message);
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                      }
+                    }}
+                  >
+                    <div className="mb-4">
+                      <label className="block text-xs font-medium text-gray-500 mb-1">Your Email Address</label>
+                      <input
+                        type="email"
+                        name="buyerEmail"
+                        required
+                        placeholder="you@example.com"
+                        className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-green-500/50"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-3">
+                      <button
+                        type="submit"
+                        className="w-full py-2.5 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                      >
+                        Start Secure Transaction
+                        <ExternalLink className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowEscrowModal(false)}
+                        className="w-full py-2 text-gray-400 hover:text-white transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          )}
         </header>
 
         {/* Main Content Layout */}
@@ -527,7 +627,7 @@ export default function Home() {
                                 <div className="group/tooltip relative">
                                   <ShieldCheck className="h-3.5 w-3.5 text-green-500 shrink-0 cursor-help" />
                                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-medium text-white bg-black/90 rounded whitespace-nowrap opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none z-20 border border-white/10">
-                                    It is a verified domain
+                                    Ownership verified
                                     <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-black/90"></div>
                                   </div>
                                 </div>
@@ -550,6 +650,19 @@ export default function Home() {
                               <span className="px-1 py-0.5 text-[9px] font-medium bg-amber-500/20 text-amber-400 rounded-full">
                                 SOLD
                               </span>
+                            )}
+                            {!isSold && domain.price >= 500 && domain.isVerified && domain.user.escrowEmail && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedEscrowDomain(domain);
+                                  setShowEscrowModal(true);
+                                }}
+                                className="px-1.5 py-0.5 text-[9px] font-medium bg-green-500/20 text-green-400 hover:bg-green-500/30 rounded-full border border-green-500/20 transition-colors flex items-center gap-1"
+                              >
+                                <ShieldCheck className="w-2.5 h-2.5" />
+                                Buy with Escrow
+                              </button>
                             )}
                             {domain.expiresAt && (
                               <>

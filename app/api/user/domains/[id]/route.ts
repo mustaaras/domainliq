@@ -13,7 +13,7 @@ export async function PATCH(
         }
 
         const { id } = await params;
-        const { status } = await req.json();
+        const { status, price } = await req.json();
 
         // Verify ownership
         const domain = await db.domain.findUnique({
@@ -29,10 +29,14 @@ export async function PATCH(
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
         }
 
-        // Update status
+        // Update domain
+        const updateData: any = {};
+        if (status) updateData.status = status;
+        if (price !== undefined) updateData.price = price;
+
         const updatedDomain = await db.domain.update({
             where: { id },
-            data: { status },
+            data: updateData,
         });
 
         return NextResponse.json(updatedDomain);

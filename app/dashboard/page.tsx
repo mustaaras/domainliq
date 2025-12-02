@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Loader2, Plus, Trash2, Settings, ExternalLink, DollarSign, LogOut, Shield, ShieldCheck, Copy, Check, CheckSquare, Filter, X, Menu } from 'lucide-react';
+import { Loader2, Plus, Trash2, Settings, ExternalLink, DollarSign, LogOut, Shield, ShieldCheck, Copy, Check, CheckSquare, Filter, X, Menu, Pencil } from 'lucide-react';
 import { useSession, signOut } from 'next-auth/react';
 import { verifyDomain } from '../actions/verify-domain';
 
@@ -43,6 +43,12 @@ export default function DashboardPage() {
     // New domain form state
     const [newDomain, setNewDomain] = useState({ name: '', price: '' });
     const [addError, setAddError] = useState('');
+
+    // Edit Price State
+    const [editingDomainId, setEditingDomainId] = useState<string | null>(null);
+    const [editPriceValue, setEditPriceValue] = useState('');
+    const [isEditingPrice, setIsEditingPrice] = useState(false);
+    const [showBulkEditPriceModal, setShowBulkEditPriceModal] = useState(false);
 
     // Bulk upload state
     const [bulkText, setBulkText] = useState('');
@@ -212,6 +218,71 @@ export default function DashboardPage() {
         } catch (error) {
             console.error(error);
             alert('Failed to update domain status');
+        }
+    };
+
+    const handleBulkUpdatePrice = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (selectedDomainIds.size === 0 || !editPriceValue) return;
+
+        setIsEditingPrice(true);
+        try {
+            const updatePromises = Array.from(selectedDomainIds).map(id =>
+                fetch(`/api/user/domains/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ price: parseFloat(editPriceValue) })
+                })
+            );
+
+            await Promise.all(updatePromises);
+
+            // Update local state
+            setDomains(domains.map(d =>
+                selectedDomainIds.has(d.id) ? { ...d, price: parseFloat(editPriceValue) } : d
+            ));
+
+            setShowBulkEditPriceModal(false);
+            setEditPriceValue('');
+            setSelectedDomainIds(new Set());
+            setIsInSelectionMode(false);
+            alert('Prices updated successfully!');
+        } catch (error) {
+            console.error(error);
+            alert('Failed to update prices');
+        } finally {
+            setIsEditingPrice(false);
+        }
+    };
+
+    const handleUpdatePrice = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editingDomainId || !editPriceValue) return;
+
+        setIsEditingPrice(true);
+        try {
+            const res = await fetch(`/api/user/domains/${editingDomainId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ price: parseFloat(editPriceValue) })
+            });
+
+            if (!res.ok) throw new Error('Failed to update price');
+
+            const updatedDomain = await res.json();
+
+            // Update local state
+            setDomains(domains.map(d =>
+                d.id === editingDomainId ? { ...d, price: updatedDomain.price } : d
+            ));
+
+            setEditingDomainId(null);
+            setEditPriceValue('');
+        } catch (error) {
+            console.error(error);
+            alert('Failed to update price');
+        } finally {
+            setIsEditingPrice(false);
         }
     };
 
@@ -892,6 +963,18 @@ export default function DashboardPage() {
                                                                             </button>
                                                                             <button
                                                                                 onClick={() => {
+                                                                                    setEditPriceValue('');
+                                                                                    setShowBulkEditPriceModal(true);
+                                                                                    setShowManagePanel(false);
+                                                                                }}
+                                                                                disabled={selectedDomainIds.size === 0}
+                                                                                className="w-full py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                                                            >
+                                                                                <DollarSign className="h-4 w-4" />
+                                                                                Set Price ({selectedDomainIds.size})
+                                                                            </button>
+                                                                            <button
+                                                                                onClick={() => {
                                                                                     handleBulkDelete();
                                                                                     setShowManagePanel(false);
                                                                                 }}
@@ -1007,8 +1090,20 @@ export default function DashboardPage() {
 
                                                 <div className="flex items-center gap-4">
                                                     <div className="text-right">
-                                                        <div className="font-mono text-white">
-                                                            ${domain.price.toLocaleString()}
+                                                        <div className="flex items-center justify-end gap-2">
+                                                            <div className="font-mono text-white">
+                                                                ${domain.price.toLocaleString()}
+                                                            </div>
+                                                            <button
+                                                                onClick={() => {
+                                                                    setEditingDomainId(domain.id);
+                                                                    setEditPriceValue(domain.price.toString());
+                                                                }}
+                                                                className="p-1 text-gray-500 hover:text-amber-400 transition-colors"
+                                                                title="Edit Price"
+                                                            >
+                                                                <Pencil className="h-3 w-3" />
+                                                            </button>
                                                         </div>
                                                         <button
                                                             onClick={() => handleToggleSold(domain.id, domain.status)}
@@ -1209,6 +1304,95 @@ export default function DashboardPage() {
                                 )}
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+            {/* Edit Price Modal */}
+            {editingDomainId && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setEditingDomainId(null)}>
+                    <div className="bg-[#0A0A0A] border border-white/10 rounded-xl max-w-sm w-full p-6" onClick={e => e.stopPropagation()}>
+                        <h3 className="text-xl font-bold text-white mb-4">Edit Price</h3>
+                        <form onSubmit={handleUpdatePrice}>
+                            <div className="mb-6">
+                                <label className="block text-sm font-medium text-gray-300 mb-2">New Price ($)</label>
+                                <div className="relative">
+                                    <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+                                    <input
+                                        type="number"
+                                        value={editPriceValue}
+                                        onChange={e => setEditPriceValue(e.target.value)}
+                                        className="w-full bg-white/5 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                                        placeholder="1000"
+                                        required
+                                        min="0"
+                                        autoFocus
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex justify-end gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setEditingDomainId(null)}
+                                    className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isEditingPrice}
+                                    className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-white rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+                                >
+                                    {isEditingPrice && <Loader2 className="h-4 w-4 animate-spin" />}
+                                    Save Price
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+            {/* Bulk Edit Price Modal */}
+            {showBulkEditPriceModal && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowBulkEditPriceModal(false)}>
+                    <div className="bg-[#0A0A0A] border border-white/10 rounded-xl max-w-sm w-full p-6" onClick={e => e.stopPropagation()}>
+                        <h3 className="text-xl font-bold text-white mb-4">Set Price for {selectedDomainIds.size} Domains</h3>
+                        <form onSubmit={handleBulkUpdatePrice}>
+                            <div className="mb-6">
+                                <label className="block text-sm font-medium text-gray-300 mb-2">New Price ($)</label>
+                                <div className="relative">
+                                    <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+                                    <input
+                                        type="number"
+                                        value={editPriceValue}
+                                        onChange={e => setEditPriceValue(e.target.value)}
+                                        className="w-full bg-white/5 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                                        placeholder="1000"
+                                        required
+                                        min="0"
+                                        autoFocus
+                                    />
+                                </div>
+                                <p className="text-xs text-gray-500 mt-2">
+                                    This will update the price for all {selectedDomainIds.size} selected domains.
+                                </p>
+                            </div>
+                            <div className="flex justify-end gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowBulkEditPriceModal(false)}
+                                    className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isEditingPrice}
+                                    className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-white rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+                                >
+                                    {isEditingPrice && <Loader2 className="h-4 w-4 animate-spin" />}
+                                    Update All
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}

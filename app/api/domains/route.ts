@@ -99,6 +99,7 @@ export async function GET(request: NextRequest) {
               linkedinProfile: true,
               telegramUsername: true,
               preferredContact: true,
+              escrowEmail: true,
             },
           },
         },

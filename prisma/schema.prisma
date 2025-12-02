@@ -31,6 +31,10 @@ model User {
   
   // Verification
   verificationToken String? @unique
+
+  // Integrations
+  escrowEmail       String?
+  escrowTermsAccepted Boolean @default(false)
 }
 
 model Domain {
