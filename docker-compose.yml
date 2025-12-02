@@ -7,22 +7,14 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=postgresql://postgres:password@db:5432/domainliq
+      - DATABASE_URL=${DATABASE_URL}
       - AUTH_SECRET=${AUTH_SECRET}
-    depends_on:
-      - db
-
-  db:
-    image: postgres:15-alpine
-    restart: always
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=domainliq
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-
-volumes:
-  db_data:
+    labels:
+      - "traefik.enable=true"
+      # Catch-all rule for any domain pointing to this IP
+      - "traefik.http.routers.domainliq.rule=HostRegexp(`{host:.+}`)"
+      - "traefik.http.routers.domainliq.entrypoints=web,websecure"
+      - "traefik.http.routers.domainliq.tls=true"
+      - "traefik.http.routers.domainliq.tls.certresolver=letsencrypt"
+      # Port configuration
+      - "traefik.http.services.domainliq.loadbalancer.server.port=3000"
