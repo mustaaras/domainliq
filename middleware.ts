@@ -18,10 +18,12 @@ export default async function middleware(req: NextRequest) {
 
     // If it's a custom domain (e.g., "example.com" pointing to our server)
     if (!isMainDomain) {
+        // Normalize hostname: remove 'www.' and port number if present
+        const currentHost = hostname.replace(/^www\./, '').split(':')[0];
+
         // Rewrite the request to the domain landing page route
         // e.g., example.com/ -> /d/example.com/
-        // e.g., example.com/about -> /d/example.com/about
-        url.pathname = `/d/${hostname}${url.pathname}`;
+        url.pathname = `/d/${currentHost}${url.pathname}`;
         return NextResponse.rewrite(url);
     }
 
