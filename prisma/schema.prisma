@@ -55,6 +55,7 @@ model Domain {
   // Verification
   isVerified        Boolean   @default(false)
   verificationToken String?   @unique
+  verificationMethod String?  // 'txt', 'a', 'ns', null
   verifiedAt        DateTime?
   expiresAt         DateTime?
 

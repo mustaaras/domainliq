@@ -196,26 +196,13 @@ export async function POST(req: NextRequest) {
                 price: parsedPrice,
                 userId: user.id,
                 status: 'available',
+                verificationToken: crypto.randomUUID(),
+                isVerified: false,
             },
         });
 
-        // Register domain with Coolify for automatic SSL
-        try {
-            const coolifyResponse = await fetch(`${req.nextUrl.origin}/api/coolify/add-domain`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ domain: validation.normalized }),
-            });
-
-            if (!coolifyResponse.ok) {
-                console.error(`[Coolify] Failed to register domain ${validation.normalized}`);
-            } else {
-                console.log(`[Coolify] Successfully registered domain ${validation.normalized}`);
-            }
-        } catch (coolifyError) {
-            console.error('[Coolify] Error registering domain:', coolifyError);
-            // Don't fail the request if Coolify registration fails
-        }
+        // DO NOT register with Coolify yet - user must verify domain ownership first
+        console.log(`[Domain] Created domain ${domain.name} - pending verification`);
 
         return NextResponse.json(domain);
     } catch (error) {
