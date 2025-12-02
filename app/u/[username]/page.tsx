@@ -68,6 +68,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function UserProfilePage({ params }: PageProps) {
     const { username } = await params;
 
+    console.log(`[UserProfilePage] Loading profile for username: "${username}"`);
+
     const user = await db.user.findUnique({
         where: { subdomain: username },
         include: {
@@ -78,8 +80,11 @@ export default async function UserProfilePage({ params }: PageProps) {
     });
 
     if (!user) {
+        console.log(`[UserProfilePage] User NOT FOUND: "${username}"`);
         notFound();
     }
+
+    console.log(`[UserProfilePage] User FOUND: ${user.email}`);
 
     const userData = {
         name: user.name,
