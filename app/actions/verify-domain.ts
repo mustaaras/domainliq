@@ -366,7 +366,7 @@ async function markAsVerified(domainId: string, domainName: string, method: 'txt
     // Only register with Coolify if verified via A record (pointing to our server)
     if (method === 'a') {
         try {
-            const COOLIFY_URL = process.env.COOLIFY_URL || 'http://localhost';
+            const COOLIFY_URL = process.env.COOLIFY_API_URL || 'http://localhost';
             const COOLIFY_TOKEN = process.env.COOLIFY_API_TOKEN;
             const APPLICATION_ID = process.env.COOLIFY_APPLICATION_ID;
 
