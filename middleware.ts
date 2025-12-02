@@ -21,6 +21,10 @@ export default async function middleware(req: NextRequest) {
         // Normalize hostname: remove 'www.' and port number if present
         const currentHost = hostname.replace(/^www\./, '').split(':')[0];
 
+        console.log(`[Middleware] Incoming Custom Domain: ${hostname}`);
+        console.log(`[Middleware] Normalized Host: ${currentHost}`);
+        console.log(`[Middleware] Rewriting to: /d/${currentHost}${url.pathname}`);
+
         // Rewrite the request to the domain landing page route
         // e.g., example.com/ -> /d/example.com/
         url.pathname = `/d/${currentHost}${url.pathname}`;
