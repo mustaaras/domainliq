@@ -3,6 +3,9 @@ import { db } from '@/lib/db';
 import { auth } from '@/auth';
 import DomainLanderClient from './domain-lander-client';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 interface DomainLanderPageProps {
     params: Promise<{ domain: string }>;
 }

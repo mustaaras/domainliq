@@ -23,10 +23,19 @@ export default async function middleware(req: NextRequest) {
 
         console.log(`[Middleware] Incoming Custom Domain: ${hostname}`);
         console.log(`[Middleware] Normalized Host: ${currentHost}`);
-        console.log(`[Middleware] Rewriting to: /d/${currentHost}${url.pathname}`);
 
-        // Rewrite the request to the domain landing page route
-        // e.g., example.com/ -> /d/example.com/
+        // CHECK: Is this a subdomain of domainliq.com? (e.g. aras.domainliq.com)
+        // ALSO ALLOW .localhost for local testing
+        if (currentHost.endsWith('.domainliq.com') || currentHost.endsWith('.localhost')) {
+            // Extract subdomain (e.g. "aras")
+            const subdomain = currentHost.replace('.domainliq.com', '').replace('.localhost', '');
+            console.log(`[Middleware] Subdomain detected: ${subdomain} -> Rewriting to /u/${subdomain}`);
+            url.pathname = `/u/${subdomain}${url.pathname}`;
+            return NextResponse.rewrite(url);
+        }
+
+        // Otherwise, it's a fully custom domain (e.g. possible.bet) -> Domain Lander
+        console.log(`[Middleware] Custom Domain detected -> Rewriting to: /d/${currentHost}${url.pathname}`);
         url.pathname = `/d/${currentHost}${url.pathname}`;
         return NextResponse.rewrite(url);
     }
