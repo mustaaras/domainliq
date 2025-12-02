@@ -16,6 +16,8 @@ services:
       - "traefik.http.routers.domainliq.entrypoints=http,https"
       - "traefik.http.routers.domainliq.tls=true"
       - "traefik.http.routers.domainliq.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.domainliq.tls.domains[0].main=domainliq.com"
+      - "traefik.http.routers.domainliq.tls.domains[0].sans=*.domainliq.com"
       # Explicitly link router to service
       - "traefik.http.routers.domainliq.service=domainliq"
       # Port configuration
