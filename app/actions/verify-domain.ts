@@ -370,29 +370,41 @@ async function markAsVerified(domainId: string, domainName: string, method: 'txt
             const COOLIFY_TOKEN = process.env.COOLIFY_API_TOKEN;
             const APPLICATION_ID = process.env.COOLIFY_APPLICATION_ID;
 
+            console.log(`[Coolify] Attempting registration:`, {
+                url: COOLIFY_URL,
+                appId: APPLICATION_ID,
+                domain: domainName,
+                hasToken: !!COOLIFY_TOKEN
+            });
+
             if (COOLIFY_TOKEN && APPLICATION_ID) {
-                const response = await fetch(
-                    `${COOLIFY_URL}/api/v1/applications/${APPLICATION_ID}/domains`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            Authorization: `Bearer ${COOLIFY_TOKEN}`,
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            domain: `https://${domainName}`,
-                        }),
-                    }
-                );
+                const apiUrl = `${COOLIFY_URL}/api/v1/applications/${APPLICATION_ID}/domains`;
+                const payload = { domain: `https://${domainName}` };
+
+                console.log(`[Coolify] Full API URL:`, apiUrl);
+                console.log(`[Coolify] Payload:`, payload);
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${COOLIFY_TOKEN}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                });
 
                 if (response.ok) {
                     console.log(`✅ [Coolify] Registered ${domainName} for SSL (A record verified)`);
                 } else {
-                    console.error(`❌ [Coolify] Failed to register ${domainName}`);
+                    const errorText = await response.text();
+                    console.error(`❌ [Coolify] Failed to register ${domainName}:`, response.status, errorText);
                 }
+            } else {
+                console.error(`[Coolify] Missing credentials - Token: ${!!COOLIFY_TOKEN}, AppID: ${!!APPLICATION_ID}`);
             }
-        } catch (coolifyError) {
-            console.error('[Coolify] Registration error:', coolifyError);
+        } catch (coolifyError: any) {
+            console.error('[Coolify] Registration error:', coolifyError.message);
+            console.error('[Coolify] Error details:', coolifyError);
             // Don't fail verification if Coolify fails
         }
     } else {
