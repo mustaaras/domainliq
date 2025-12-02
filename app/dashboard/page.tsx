@@ -1179,33 +1179,34 @@ export default function DashboardPage() {
 
             {/* Verification Modal */}
             {showVerifyModal && selectedDomain && (
-                <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50" onClick={() => setShowVerifyModal(false)}>
-                    <div className="bg-[#0A0A0A] border border-white/20 rounded-xl p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
-                        <h3 className="text-xl font-bold mb-4 text-white flex items-center gap-2">
-                            <ShieldCheck className="h-6 w-6 text-amber-400" />
+                <div className="fixed inset-0 bg-black/70 dark:bg-black/70 flex items-center justify-center p-4 z-50" onClick={() => setShowVerifyModal(false)}>
+                    <div className="bg-white dark:bg-[#0A0A0A] border border-gray-200 dark:border-white/20 rounded-xl p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+                        <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
+                            <ShieldCheck className="h-6 w-6 text-amber-500" />
                             Verify Domain Ownership
                         </h3>
 
-                        <p className="text-gray-300 text-sm mb-6">
-                            To verify ownership of <span className="font-bold text-white">{selectedDomain.name}</span>, choose one of the verification methods below. <span className="text-amber-400 font-medium">NS verification is recommended</span> for instant results.
+                        <p className="text-gray-600 dark:text-gray-300 text-sm mb-6">
+                            To verify ownership of <span className="font-bold text-gray-900 dark:text-white">{selectedDomain.name}</span>, choose one of the verification methods below.
                         </p>
 
+                        {/* TXT Record */}
                         <div
-                            className={`bg-white/5 border rounded-lg p-4 mb-6 cursor-pointer transition-colors ${activeMethod === 'txt' ? 'border-amber-500/50 bg-amber-500/5' : 'border-white/10 hover:border-white/20'}`}
+                            className={`bg-gray-50 dark:bg-white/5 border rounded-lg p-4 mb-4 cursor-pointer transition-colors ${activeMethod === 'txt' ? 'border-amber-500 bg-amber-50 dark:bg-amber-500/5' : 'border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20'}`}
                             onClick={() => setActiveMethod(activeMethod === 'txt' ? null : 'txt')}
                         >
-                            <div className="flex justify-between text-xs text-gray-500 mb-1">
+                            <div className="flex justify-between text-xs text-gray-500 dark:text-gray-500 mb-1">
                                 <span>Record Type</span>
                                 <span>Host / Name</span>
                             </div>
-                            <div className="flex justify-between text-sm text-white font-mono mb-4">
+                            <div className="flex justify-between text-sm text-gray-900 dark:text-white font-mono mb-4">
                                 <span>TXT</span>
                                 <span>@</span>
                             </div>
 
-                            <div className="text-xs text-gray-500 mb-1">Value / Content</div>
-                            <div className="flex items-center gap-2 bg-black/40 rounded p-2 border border-white/10">
-                                <code className="text-sm text-amber-400 font-mono flex-1 truncate">
+                            <div className="text-xs text-gray-500 dark:text-gray-500 mb-1">Value / Content</div>
+                            <div className="flex items-center gap-2 bg-gray-100 dark:bg-black/40 rounded p-2 border border-gray-200 dark:border-white/10">
+                                <code className="text-sm text-amber-600 dark:text-amber-400 font-mono flex-1 truncate">
                                     domainliq-verification={selectedDomain.verificationToken || 'Loading...'}
                                 </code>
                                 <button
@@ -1213,43 +1214,94 @@ export default function DashboardPage() {
                                         e.stopPropagation();
                                         selectedDomain.verificationToken && copyToClipboard(`domainliq-verification=${selectedDomain.verificationToken}`);
                                     }}
-                                    className="text-gray-400 hover:text-white transition-colors"
+                                    className="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
                                 >
-                                    {copiedToken ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
+                                    {copiedToken ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
                                 </button>
                             </div>
 
                             {activeMethod === 'txt' && (
-                                <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded text-xs text-amber-200 animate-in fade-in slide-in-from-top-2">
+                                <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded text-xs text-amber-900 dark:text-amber-200 animate-in fade-in slide-in-from-top-2">
                                     <p className="font-medium mb-1">How to verify with TXT:</p>
                                     <p className="mb-1">Go to your domain registrar's DNS settings and add a new TXT record with the value above.</p>
-                                    <p className="text-amber-400/80">⏱️ Verification typically takes 5-15 minutes after DNS propagation.</p>
+                                    <p className="text-amber-700 dark:text-amber-400/80">⏱️ Verification typically takes 5-15 minutes after DNS propagation.</p>
                                 </div>
                             )}
                         </div>
 
                         <div className="flex items-center gap-4 my-4">
-                            <div className="h-px bg-white/10 flex-1" />
-                            <span className="text-gray-500 text-sm">OR</span>
-                            <div className="h-px bg-white/10 flex-1" />
+                            <div className="h-px bg-gray-200 dark:bg-white/10 flex-1" />
+                            <span className="text-gray-500 dark:text-gray-500 text-sm">OR</span>
+                            <div className="h-px bg-gray-200 dark:bg-white/10 flex-1" />
                         </div>
 
+                        {/* A Record - RECOMMENDED */}
                         <div
-                            className={`bg-white/5 border rounded-lg p-4 mb-6 cursor-pointer transition-colors ${activeMethod === 'ns' ? 'border-amber-500/50 bg-amber-500/5' : 'border-white/10 hover:border-white/20'}`}
+                            className={`bg-gray-50 dark:bg-white/5 border rounded-lg p-4 mb-4 cursor-pointer transition-colors ${activeMethod === 'a' ? 'border-green-500 bg-green-50 dark:bg-green-500/5' : 'border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20'}`}
+                            onClick={() => setActiveMethod(activeMethod === 'a' ? null : 'a')}
+                        >
+                            <div className="flex justify-between items-start text-xs mb-1">
+                                <span className="text-gray-500 dark:text-gray-500">Record Type</span>
+                                <span className="text-green-600 dark:text-green-400 font-semibold text-[10px]">✨ EASIEST</span>
+                            </div>
+                            <div className="flex justify-between text-sm text-gray-900 dark:text-white font-mono mb-4">
+                                <span>A</span>
+                                <span className="text-gray-500 dark:text-gray-400">@ or {selectedDomain.name}</span>
+                            </div>
+
+                            <div className="text-xs text-gray-500 dark:text-gray-500 mb-1">Value / Content</div>
+                            <div className="flex items-center gap-2 bg-gray-100 dark:bg-black/40 rounded p-2 border border-gray-200 dark:border-white/10">
+                                <code className="text-sm text-green-600 dark:text-green-400 font-mono flex-1">
+                                    46.224.108.38
+                                </code>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        copyToClipboard('46.224.108.38');
+                                    }}
+                                    className="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                                >
+                                    {copiedToken ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                                </button>
+                            </div>
+
+                            {activeMethod === 'a' && (
+                                <div className="mt-4 p-3 bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 rounded text-xs text-green-900 dark:text-green-200 animate-in fade-in slide-in-from-top-2">
+                                    <p className="font-medium mb-1">🎯 Recommended: Point & Verify!</p>
+                                    <p className="mb-2">Point your domain's A record to the IP above. This will:</p>
+                                    <ul className="list-disc list-inside space-y-1 mb-2 ml-2">
+                                        <li>✅ Verify your ownership instantly</li>
+                                        <li>🌐 Enable your domain lander page</li>
+                                        <li>🔒 Get automatic SSL certificate</li>
+                                    </ul>
+                                    <p className="text-green-700 dark:text-green-400 font-medium">⚡️ Your lander will be live at https://{selectedDomain.name}</p>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex items-center gap-4 my-4">
+                            <div className="h-px bg-gray-200 dark:bg-white/10 flex-1" />
+                            <span className="text-gray-500 dark:text-gray-500 text-sm">OR</span>
+                            <div className="h-px bg-gray-200 dark:bg-white/10 flex-1" />
+                        </div>
+
+                        {/* NS Record */}
+                        <div
+                            className={`bg-gray-50 dark:bg-white/5 border rounded-lg p-4 mb-6 cursor-pointer transition-colors ${activeMethod === 'ns' ? 'border-amber-500 bg-amber-50 dark:bg-amber-500/5' : 'border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20'}`}
                             onClick={() => setActiveMethod(activeMethod === 'ns' ? null : 'ns')}
                         >
-                            <div className="flex justify-between text-xs text-gray-500 mb-1">
+                            <div className="flex justify-between text-xs text-gray-500 dark:text-gray-500 mb-1">
                                 <span>Record Type</span>
                                 <span>Host / Name</span>
                             </div>
-                            <div className="flex justify-between text-sm text-white font-mono mb-4">
+                            <div className="flex justify-between text-sm text-gray-900 dark:text-white font-mono mb-4">
                                 <span>NS</span>
                                 <span>@</span>
                             </div>
 
-                            <div className="text-xs text-gray-500 mb-1">Value / Content</div>
-                            <div className="flex items-center gap-2 bg-black/40 rounded p-2 border border-white/10">
-                                <code className="text-sm text-amber-400 font-mono flex-1 truncate">
+                            <div className="text-xs text-gray-500 dark:text-gray-500 mb-1">Value / Content</div>
+                            <div className="flex items-center gap-2 bg-gray-100 dark:bg-black/40 rounded p-2 border border-gray-200 dark:border-white/10">
+                                <code className="text-sm text-amber-600 dark:text-amber-400 font-mono flex-1 truncate">
                                     ns3verify.domainliq.com
                                 </code>
                                 <button
@@ -1257,23 +1309,23 @@ export default function DashboardPage() {
                                         e.stopPropagation();
                                         copyToClipboard('ns3verify.domainliq.com');
                                     }}
-                                    className="text-gray-400 hover:text-white transition-colors"
+                                    className="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
                                 >
-                                    {copiedToken ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
+                                    {copiedToken ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
                                 </button>
                             </div>
 
                             {activeMethod === 'ns' && (
-                                <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded text-xs text-amber-200 animate-in fade-in slide-in-from-top-2">
-                                    <p className="font-medium mb-1">✨ Recommended: Fastest Verification!</p>
+                                <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded text-xs text-amber-900 dark:text-amber-200 animate-in fade-in slide-in-from-top-2">
+                                    <p className="font-medium mb-1">How to verify with NS:</p>
                                     <p className="mb-2">Add this as an <strong>additional nameserver (e.g., NS3)</strong> to your existing list. <br />Do <strong>NOT</strong> remove your current nameservers (NS1, NS2) to keep your landing page working.</p>
-                                    <p className="text-green-400 font-medium">⚡️ Verifies within minutes once your registrar updates the registry!</p>
+                                    <p className="text-amber-700 dark:text-amber-400 font-medium">⚡️ Verifies within minutes once your registrar updates the registry!</p>
                                 </div>
                             )}
                         </div>
 
                         {verificationMessage && (
-                            <div className={`mb-4 p-3 rounded-lg text-sm ${verificationStatus === 'success' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                            <div className={`mb-4 p-3 rounded-lg text-sm ${verificationStatus === 'success' ? 'bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-500/20' : 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-500/20'}`}>
                                 {verificationMessage}
                             </div>
                         )}
@@ -1281,7 +1333,7 @@ export default function DashboardPage() {
                         <div className="flex gap-3">
                             <button
                                 onClick={() => setShowVerifyModal(false)}
-                                className="flex-1 px-4 py-2 text-gray-400 hover:text-white transition-colors"
+                                className="flex-1 px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
                             >
                                 Cancel
                             </button>
