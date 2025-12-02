@@ -117,7 +117,7 @@ export function getVerificationInstructions(domain: string, token: string) {
             {
                 name: 'A Record',
                 type: 'A',
-                host: '@' || domain,
+                host: '@',
                 value: SERVER_IP,
                 description: 'Point your domain to our server (also enables lander)',
             },
