@@ -16,6 +16,8 @@ services:
       - "traefik.http.routers.domainliq.entrypoints=web,websecure"
       - "traefik.http.routers.domainliq.tls=true"
       - "traefik.http.routers.domainliq.tls.certresolver=letsencrypt"
+      # Explicitly link router to service
+      - "traefik.http.routers.domainliq.service=domainliq"
       # Port configuration
       - "traefik.http.services.domainliq.loadbalancer.server.port=3000"
     networks:
