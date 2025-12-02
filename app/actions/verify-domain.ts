@@ -366,7 +366,9 @@ async function markAsVerified(domainId: string, domainName: string, method: 'txt
     // Only register with Coolify if verified via A record (pointing to our server)
     if (method === 'a') {
         try {
-            const COOLIFY_URL = process.env.COOLIFY_API_URL || 'http://localhost';
+            // Use host.docker.internal to access host machine from Docker container
+            // Fallback to localhost for local development
+            const COOLIFY_URL = process.env.COOLIFY_API_URL || 'http://host.docker.internal:8000';
             const COOLIFY_TOKEN = process.env.COOLIFY_API_TOKEN;
             const APPLICATION_ID = process.env.COOLIFY_APPLICATION_ID;
 
@@ -408,6 +410,6 @@ async function markAsVerified(domainId: string, domainName: string, method: 'txt
             // Don't fail verification if Coolify fails
         }
     } else {
-        console.log(`ℹ️  [Coolify] Skipping registration for ${domainName} (verified via ${method.toUpperCase()}, not pointing to server)`);
+        console.log(`ℹ️  [Verification] Domain ${domainName} verified via ${method.toUpperCase()} (not pointing to server, no SSL needed)`);
     }
 }
