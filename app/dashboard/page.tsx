@@ -1174,10 +1174,10 @@ export default function DashboardPage() {
                                                         {domain.expiresAt ? (
                                                             <>
                                                                 <span className="dark:text-amber-500/80 text-amber-600">
-                                                                    Expires {new Date(domain.expiresAt).toLocaleDateString()}
+                                                                    Expires {new Date(domain.expiresAt).toLocaleDateString('en-US')}
                                                                 </span>
                                                                 <span className="dark:text-gray-700 text-gray-400">•</span>
-                                                                <span>
+                                                                <span suppressHydrationWarning>
                                                                     {(() => {
                                                                         const daysRemaining = Math.ceil((new Date(domain.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
                                                                         return daysRemaining > 0
