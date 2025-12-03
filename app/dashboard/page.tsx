@@ -148,6 +148,7 @@ export default function DashboardPage() {
 
     // User subdomain for profile link
     const [userSubdomain, setUserSubdomain] = useState('');
+    const [hasContactInfo, setHasContactInfo] = useState(false);
 
     // Bulk delete state
     const [selectedDomainIds, setSelectedDomainIds] = useState<Set<string>>(new Set());
@@ -175,16 +176,26 @@ export default function DashboardPage() {
 
         if (status === 'authenticated') {
             fetchUserDomains();
-            fetchUserSubdomain();
+            fetchUserSettings();
         }
     }, [status, router]);
 
-    const fetchUserSubdomain = async () => {
+    const fetchUserSettings = async () => {
         try {
             const res = await fetch('/api/user/settings');
             if (!res.ok) throw new Error('Failed to fetch user data');
             const data = await res.json();
             setUserSubdomain(data.subdomain || '');
+
+            // Check if any contact info is set
+            const hasContact = !!(
+                data.contactEmail ||
+                data.twitterHandle ||
+                data.whatsappNumber ||
+                data.linkedinProfile ||
+                data.telegramUsername
+            );
+            setHasContactInfo(hasContact);
         } catch (error) {
             console.error(error);
         }
@@ -656,25 +667,27 @@ export default function DashboardPage() {
                     {/* Add Domain Form */}
                     <div className="lg:col-span-1">
                         {/* Contact Info Reminder */}
-                        <div className="mb-6 dark:bg-indigo-500/10 bg-indigo-50 border dark:border-indigo-500/20 border-indigo-200 rounded-xl p-6">
-                            <div className="flex items-start gap-4">
-                                <div className="p-2 dark:bg-indigo-500/20 bg-indigo-200 rounded-lg">
-                                    <Settings className="h-5 w-5 dark:text-indigo-400 text-indigo-600" />
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-medium dark:text-indigo-200 text-indigo-900 mb-1">Update Contact Info</h3>
-                                    <p className="text-sm dark:text-indigo-200/70 text-indigo-700 mb-3">
-                                        Don't forget to update your contact information in settings so buyers can reach you.
-                                    </p>
-                                    <Link
-                                        href="/settings"
-                                        className="text-sm font-medium dark:text-indigo-400 text-indigo-600 dark:hover:text-indigo-300 hover:text-indigo-700 transition-colors flex items-center gap-1"
-                                    >
-                                        Go to Settings <ExternalLink className="h-3 w-3" />
-                                    </Link>
+                        {!hasContactInfo && (
+                            <div className="mb-6 dark:bg-indigo-500/10 bg-indigo-50 border dark:border-indigo-500/20 border-indigo-200 rounded-xl p-6">
+                                <div className="flex items-start gap-4">
+                                    <div className="p-2 dark:bg-indigo-500/20 bg-indigo-200 rounded-lg">
+                                        <Settings className="h-5 w-5 dark:text-indigo-400 text-indigo-600" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-medium dark:text-indigo-200 text-indigo-900 mb-1">Update Contact Info</h3>
+                                        <p className="text-sm dark:text-indigo-200/70 text-indigo-700 mb-3">
+                                            Don't forget to update your contact information in settings so buyers can reach you.
+                                        </p>
+                                        <Link
+                                            href="/settings"
+                                            className="text-sm font-medium dark:text-indigo-400 text-indigo-600 dark:hover:text-indigo-300 hover:text-indigo-700 transition-colors flex items-center gap-1"
+                                        >
+                                            Go to Settings <ExternalLink className="h-3 w-3" />
+                                        </Link>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        )}
 
                         <div className="dark:bg-white/5 bg-white border dark:border-white/10 border-gray-200 rounded-xl p-6 sticky top-8 shadow-sm">
                             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
