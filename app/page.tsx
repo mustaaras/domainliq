@@ -29,6 +29,7 @@ interface Domain {
   };
   isVerified?: boolean;
   expiresAt?: string | null;
+  checkoutLink?: string | null;
 }
 
 interface TopSeller {
@@ -678,25 +679,30 @@ export default function Home() {
                                     Buy with Escrow
                                   </button>
                                 )}
-                                {domain.expiresAt && (
-                                  <>
-                                    <span className="dark:text-gray-700 text-gray-400">•</span>
-                                    <span>
-                                      Exp: {new Date(domain.expiresAt).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric', year: '2-digit' })}
-                                    </span>
-                                  </>
-                                )}
                               </div>
                             </div>
 
-                            <Link
-                              href={`/d/${domain.name}`}
-                              onClick={(e) => e.stopPropagation()}
-                              className="group/visit flex items-center gap-1 px-2 py-0.5 text-[9px] font-medium dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 rounded-full border dark:border-white/5 border-gray-200 dark:hover:border-white/20 hover:border-gray-300 transition-all shrink-0"
-                            >
-                              <span className="uppercase tracking-wider">Visit</span>
-                              <ExternalLink className="w-2 h-2 opacity-50 group-hover/visit:opacity-100 transition-opacity" />
-                            </Link>
+                            <div className="flex items-center gap-2">
+                              {domain.checkoutLink && (
+                                <a
+                                  href={domain.checkoutLink}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="px-2 py-0.5 text-[9px] font-medium bg-green-600 hover:bg-green-500 text-white rounded-full transition-colors shadow-sm hover:shadow-md"
+                                >
+                                  Buy Now
+                                </a>
+                              )}
+                              <Link
+                                href={`/d/${domain.name}`}
+                                onClick={(e) => e.stopPropagation()}
+                                className="group/visit flex items-center gap-1 px-2 py-0.5 text-[9px] font-medium dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 rounded-full border dark:border-white/5 border-gray-200 dark:hover:border-white/20 hover:border-gray-300 transition-all shrink-0"
+                              >
+                                <span className="uppercase tracking-wider">Visit</span>
+                                <ExternalLink className="w-2 h-2 opacity-50 group-hover/visit:opacity-100 transition-opacity" />
+                              </Link>
+                            </div>
                           </div>
                         </div>
                       </div>

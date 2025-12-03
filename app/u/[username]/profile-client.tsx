@@ -453,11 +453,6 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
                                                                 <span className="sm:hidden">Verified</span>
                                                             </div>
                                                         )}
-                                                        {domain.expiresAt && (
-                                                            <span className="text-[9px] sm:text-[10px] uppercase tracking-wider font-medium dark:text-gray-500 text-gray-500/80">
-                                                                Exp: {new Date(domain.expiresAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: '2-digit' })}
-                                                            </span>
-                                                        )}
                                                     </div>
 
                                                     <div className="flex gap-2 w-full sm:w-auto">
