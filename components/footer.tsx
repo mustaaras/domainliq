@@ -14,9 +14,9 @@ export default function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                     {/* About */}
                     <div>
-                        <Link href="/">
+                        <a href="https://domainliq.com">
                             <Logo className="h-8 w-auto mb-4 cursor-pointer" />
-                        </Link>
+                        </a>
                         <p className="text-xs dark:text-gray-400 text-gray-600">
                             Free and open domain liquidation platform. Connect sellers with buyers directly.
                         </p>
@@ -48,19 +48,19 @@ export default function Footer() {
                         <h3 className="font-semibold mb-4 dark:text-white text-gray-900">Resources</h3>
                         <ul className="space-y-2">
                             <li>
-                                <Link href="/buyer-guide" className="dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 text-xs transition-colors">
+                                <a href="https://domainliq.com/buyer-guide" className="dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 text-xs transition-colors">
                                     Buyer's Guide
-                                </Link>
+                                </a>
                             </li>
                             <li>
-                                <Link href="/seller-guide" className="dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 text-xs transition-colors">
+                                <a href="https://domainliq.com/seller-guide" className="dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 text-xs transition-colors">
                                     Seller's Guide
-                                </Link>
+                                </a>
                             </li>
                             <li>
-                                <Link href="/resources/faq" className="dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 text-xs transition-colors">
+                                <a href="https://domainliq.com/resources/faq" className="dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 text-xs transition-colors">
                                     FAQ
-                                </Link>
+                                </a>
                             </li>
                         </ul>
                     </div>
@@ -70,19 +70,19 @@ export default function Footer() {
                         <h3 className="font-semibold mb-4 dark:text-white text-gray-900">Legal</h3>
                         <ul className="space-y-2">
                             <li>
-                                <Link href="/terms" className="dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 text-xs transition-colors">
+                                <a href="https://domainliq.com/terms" className="dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 text-xs transition-colors">
                                     Terms of Service
-                                </Link>
+                                </a>
                             </li>
                             <li>
-                                <Link href="/privacy" className="dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 text-xs transition-colors">
+                                <a href="https://domainliq.com/privacy" className="dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 text-xs transition-colors">
                                     Privacy Policy
-                                </Link>
+                                </a>
                             </li>
                             <li>
-                                <Link href="/contact" className="dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 text-xs transition-colors">
+                                <a href="https://domainliq.com/contact" className="dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 text-xs transition-colors">
                                     Contact Us
-                                </Link>
+                                </a>
                             </li>
                         </ul>
                     </div>
