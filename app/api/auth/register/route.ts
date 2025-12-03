@@ -38,6 +38,18 @@ export async function POST(req: NextRequest) {
             }
         }
 
+        // Check if subdomain is reserved
+        const isReserved = await db.reservedSubdomain.findUnique({
+            where: { name: subdomain.toLowerCase() },
+        });
+
+        if (isReserved) {
+            return NextResponse.json(
+                { error: 'This subdomain is reserved and cannot be used.' },
+                { status: 400 }
+            );
+        }
+
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 

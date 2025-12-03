@@ -70,3 +70,9 @@ model ContactMessage {
   createdAt DateTime @default(now())
   read      Boolean  @default(false)
 }
+
+model ReservedSubdomain {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+}
