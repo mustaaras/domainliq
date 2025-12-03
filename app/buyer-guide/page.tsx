@@ -24,6 +24,7 @@ export default function UserGuidePage() {
                 <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
                     <li>Visit the homepage to see all recently added domains (priced under $1,000 for quick liquidation)</li>
                     <li>Use the search bar to find specific domains</li>
+                    <li><strong>Direct Access:</strong> Type the domain name in your browser - if it's verified via A record, you'll see a "For Sale" landing page!</li>
                     <li><strong>Look for the Green Shield:</strong> Domains with a green shield badge have verified ownership!</li>
                     <li>Check domain prices and seller information</li>
                     <li>Look at seller profiles (click on username) to see all their listings</li>

@@ -51,7 +51,7 @@ export default function PrivacyPage() {
                     <li>Prices you set</li>
                     <li>Domain descriptions (optional)</li>
                     <li>Domain status (available/sold)</li>
-                    <li>DNS verification records (TXT records or ns3verify.domainliq.com pointers accessed publicly to verify ownership)</li>
+                    <li>DNS verification records (TXT, A, or NS records accessed publicly to verify ownership)</li>
                 </ul>
 
                 <h2 className="text-2xl font-bold mt-8 mb-4">2. How We Use Your Information</h2>

@@ -83,8 +83,28 @@ export default function FAQPage() {
                         <div className="mb-6">
                             <h3 className="text-xl font-semibold mb-2">How do I verify ownership?</h3>
                             <p className="dark:text-gray-300 text-gray-700">
-                                To get the "Verified" badge, you need to add a specific TXT record to your domain's DNS settings.
-                                Instructions are provided in your dashboard.
+                                You can verify ownership in three ways:
+                                <ul className="list-disc pl-6 mt-2">
+                                    <li>Add a TXT record to your DNS</li>
+                                    <li>Point your A record to our server (enables free Lander Page!)</li>
+                                    <li>Point your NS records to our verification nameserver</li>
+                                </ul>
+                            </p>
+                        </div>
+
+                        <div className="mb-6">
+                            <h3 className="text-xl font-semibold mb-2">What is a Domain Lander?</h3>
+                            <p className="dark:text-gray-300 text-gray-700">
+                                If you verify your domain by pointing its A record to us, we automatically generate a beautiful "For Sale" landing page.
+                                Visitors to your domain will see this page and can click to buy it immediately!
+                            </p>
+                        </div>
+
+                        <div className="mb-6">
+                            <h3 className="text-xl font-semibold mb-2">How do I get my subdomain?</h3>
+                            <p className="dark:text-gray-300 text-gray-700">
+                                Every user automatically gets a free subdomain (e.g., <strong>yourname.domainliq.com</strong>) upon signup.
+                                This serves as your public storefront where all your domains are listed.
                             </p>
                         </div>
 

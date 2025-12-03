@@ -34,7 +34,7 @@ export default function TermsPage() {
                     <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700">
                         <li>Process payments directly</li>
                         <li>Hold funds (we use Escrow.com for this)</li>
-                        <li>Guarantee legal ownership title (Verification via TXT record or ns3verify.domainliq.com proves DNS control only)</li>
+                        <li>Guarantee legal ownership title (Verification via TXT/A record proves DNS control only)</li>
                         <li>Mediate disputes (handled by Escrow.com for secured transactions)</li>
                     </ul>
                 </div>

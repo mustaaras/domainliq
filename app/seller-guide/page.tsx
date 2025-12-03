@@ -65,12 +65,20 @@ export default function SellerGuidePage() {
                 <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
                     <li>Go to your Dashboard</li>
                     <li>Click the "Verify" button next to your domain</li>
-                    <li>Copy the unique verification token (e.g., domainliq-xyz123)</li>
-                    <li>Add a <strong>TXT record</strong> to your domain's DNS settings with this token</li>
-                    <li>Alternatively, point your NS records to <strong>ns3verify.domainliq.com</strong></li>
+                    <li><strong>Option 1 (TXT Record):</strong> Add a TXT record with the provided token to your DNS.</li>
+                    <li><strong>Option 2 (A Record):</strong> Point your domain's A record to our server IP (46.224.108.38).</li>
+                    <li><strong>Option 3 (NS Record):</strong> Point your NS records to ns3verify.domainliq.com.</li>
                     <li>Click "Check Now" to verify</li>
                     <li><strong>Benefit:</strong> Verified domains get a green shield badge, increasing buyer trust!</li>
                 </ul>
+
+                <div className="dark:bg-blue-500/10 bg-blue-50 border dark:border-blue-500/30 border-blue-300 rounded-lg p-6 my-6">
+                    <p className="font-bold dark:text-blue-400 text-blue-700 mb-2">🚀 Free Domain Landers!</p>
+                    <p className="dark:text-gray-300 text-gray-700">
+                        If you verify via <strong>Option 2 (A Record)</strong>, your domain will automatically display a beautiful "For Sale" landing page hosted by us for free!
+                        This page directs buyers straight to your listing.
+                    </p>
+                </div>
 
                 <h2 className="text-2xl font-bold mt-8 mb-4">Step 5: Manage Your Listings</h2>
                 <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
