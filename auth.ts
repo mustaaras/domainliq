@@ -26,11 +26,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                 if (parsedCredentials.success) {
                     const { email, password } = parsedCredentials.data;
-                    console.log(`[AUTH] Attempting login for: ${email}`);
 
                     const user = await getUser(email);
                     if (!user) {
-                        console.log(`[AUTH] User not found: ${email}`);
                         return null;
                     }
 

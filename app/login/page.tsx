@@ -109,45 +109,6 @@ export default function LoginPage() {
                     </button>
                 </form>
             </div>
-
-            <div className="mt-8 text-center space-y-2">
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                    App Version: v1.3 (Debug Mode)
-                </p>
-                <div className="flex flex-col gap-1 items-center">
-                    <button
-                        type="button"
-                        onClick={async () => {
-                            const statusEl = document.getElementById('conn-status');
-                            if (statusEl) statusEl.textContent = 'Testing...';
-
-                            try {
-                                const start = Date.now();
-                                await fetch('/favicon.ico', { cache: 'no-store' });
-                                const duration = Date.now() - start;
-                                if (statusEl) {
-                                    statusEl.textContent = `✅ Online (${duration}ms)`;
-                                    statusEl.className = 'text-xs text-green-500 font-medium';
-                                }
-                            } catch (e) {
-                                if (statusEl) {
-                                    statusEl.textContent = '❌ Connection Failed (Blocked/Offline)';
-                                    statusEl.className = 'text-xs text-red-500 font-medium';
-                                }
-                            }
-                        }}
-                        className="text-xs text-amber-500 hover:underline"
-                    >
-                        Test Connection
-                    </button>
-                    <p id="conn-status" className="text-xs text-gray-400 h-4"></p>
-
-                    <p className="text-[10px] text-gray-400">
-                        Cookies: {typeof navigator !== 'undefined' && navigator.cookieEnabled ? '✅' : '❌'} |
-                        Net: {typeof navigator !== 'undefined' && navigator.onLine ? '✅' : '❌'}
-                    </p>
-                </div>
-            </div>
         </div >
     );
 }
