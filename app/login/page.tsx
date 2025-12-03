@@ -40,7 +40,17 @@ export default function LoginPage() {
 
             if (result?.error) {
                 console.error('Login error:', result.error);
-                setError('Invalid email or password');
+                // Show specific error if it's not a generic credentials error
+                if (result.error === 'Configuration') {
+                    setError('System configuration error. Please contact support.');
+                } else if (result.error === 'AccessDenied') {
+                    setError('Access denied. Please contact support.');
+                } else if (result.error.includes('timeout') || result.error.includes('fetch')) {
+                    setError('Connection timed out. Please check your internet or try again.');
+                } else {
+                    // For security, we usually hide details, but for debugging this specific issue:
+                    setError(result.error === 'CredentialsSignin' ? 'Invalid email or password' : `Login failed: ${result.error}`);
+                }
                 setIsLoading(false);
             } else {
                 console.log('Login successful, redirecting...');
