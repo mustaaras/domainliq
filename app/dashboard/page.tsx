@@ -1170,7 +1170,7 @@ export default function DashboardPage() {
                                                             )
                                                         )}
                                                     </div>
-                                                    <p className="text-sm dark:text-gray-500 text-gray-600 flex items-center gap-2">
+                                                    <p className="text-[10px] dark:text-gray-500 text-gray-600 flex items-center gap-2 mt-0.5">
                                                         {domain.expiresAt ? (
                                                             <>
                                                                 <span className="dark:text-amber-500/80 text-amber-600">
