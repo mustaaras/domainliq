@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ShieldCheck, ExternalLink, Edit2, Wand2, Save, X, Check, Globe, Zap, Lock, ChevronDown, ChevronUp, ArrowRight, Star, MessageCircle } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { Logo } from '@/components/logo';
+import { ChatWidget } from '@/components/chat-widget';
 
 interface DomainLanderClientProps {
     domain: any;
@@ -121,7 +122,7 @@ export default function DomainLanderClient({ domain, isOwner }: DomainLanderClie
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-[#050505] dark:text-white text-gray-900 font-sans selection:bg-amber-500/30">
+        <div className="min-h-screen bg-white dark:bg-[#0A0A0A] text-gray-900 dark:text-white font-sans selection:bg-amber-500/30">
             {/* Navigation */}
             <nav className="absolute top-0 left-0 right-0 z-50 px-6 py-6">
                 <div className="max-w-7xl mx-auto flex justify-between items-center">
@@ -418,6 +419,14 @@ export default function DomainLanderClient({ domain, isOwner }: DomainLanderClie
                         </button>
                     </div>
                 </div>
+            )}
+
+            {/* Chat Widget */}
+            {!isOwner && (
+                <ChatWidget
+                    domainId={domain.id}
+                    sellerName={domain.user.name || domain.user.subdomain}
+                />
             )}
         </div>
     );

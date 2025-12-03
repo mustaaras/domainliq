@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Loader2, Plus, Trash2, Settings, ExternalLink, DollarSign, LogOut, Shield, ShieldCheck, Copy, Check, CheckSquare, Filter, X, Menu, Pencil, Link as LinkIcon } from 'lucide-react';
+import { Loader2, Plus, Trash2, Settings, ExternalLink, DollarSign, LogOut, Shield, ShieldCheck, Copy, Check, CheckSquare, Filter, X, Menu, Pencil, Link as LinkIcon, MessageCircle } from 'lucide-react';
 import { useSession, signOut } from 'next-auth/react';
 import { verifyDomain } from '../actions/verify-domain';
 import { Logo } from '@/components/logo';
@@ -51,6 +51,43 @@ export default function DashboardPage() {
     const [isEditingDomain, setIsEditingDomain] = useState(false);
     const [showBulkEditPriceModal, setShowBulkEditPriceModal] = useState(false);
     const [bulkEditPriceValue, setBulkEditPriceValue] = useState('');
+
+    // Chat notifications
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    useEffect(() => {
+        // Request notification permission on mount
+        if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+
+        const fetchUnread = async () => {
+            try {
+                const res = await fetch('/api/user/chat/unread');
+                const data = await res.json();
+                if (typeof data.count === 'number') {
+                    setUnreadCount(prev => {
+                        // Trigger notification if count increased
+                        if (data.count > prev && typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+                            new Notification('New Message', {
+                                body: `You have ${data.count} unread messages`,
+                                icon: '/favicon.ico'
+                            });
+                        }
+                        return data.count;
+                    });
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        if (status === 'authenticated') {
+            fetchUnread();
+            const interval = setInterval(fetchUnread, 5000);
+            return () => clearInterval(interval);
+        }
+    }, [status]);
 
     // ... (bulk upload state) ...
 
@@ -596,6 +633,18 @@ export default function DashboardPage() {
                                 My Page
                             </Link>
                             <Link
+                                href="/dashboard/chat"
+                                className="relative px-3 py-2 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2"
+                            >
+                                <MessageCircle className="h-4 w-4" />
+                                Messages
+                                {unreadCount > 0 && (
+                                    <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full animate-pulse">
+                                        {unreadCount}
+                                    </span>
+                                )}
+                            </Link>
+                            <Link
                                 href="/settings"
                                 className="p-2 dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg transition-colors"
                                 title="Settings"
@@ -642,6 +691,19 @@ export default function DashboardPage() {
                                 >
                                     <ExternalLink className="h-4 w-4" />
                                     My Page
+                                </Link>
+                                <Link
+                                    href="/dashboard/chat"
+                                    className="px-4 py-3 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:hover:bg-white/5 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-3 relative"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                >
+                                    <MessageCircle className="h-4 w-4" />
+                                    Messages
+                                    {unreadCount > 0 && (
+                                        <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">
+                                            {unreadCount}
+                                        </span>
+                                    )}
                                 </Link>
                                 <Link
                                     href="/settings"

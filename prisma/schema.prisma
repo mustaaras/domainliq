@@ -35,6 +35,9 @@ model User {
   // Integrations
   escrowEmail       String?
   escrowTermsAccepted Boolean @default(false)
+
+  // Status
+  lastSeen          DateTime  @default(now())
 }
 
 model Domain {
@@ -62,6 +65,9 @@ model Domain {
   // Sales
   checkoutLink      String?
 
+  // Chat
+  chatSessions      ChatSession[]
+
   @@index([userId])
 }
 
@@ -78,4 +84,31 @@ model ReservedSubdomain {
   id        String   @id @default(cuid())
   name      String   @unique
   createdAt DateTime @default(now())
+}
+
+model ChatSession {
+  id        String   @id @default(cuid())
+  domainId  String
+  domain    Domain   @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  visitorId String   // Fingerprint or cookie ID
+  visitorName String?
+  visitorEmail String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  messages  ChatMessage[]
+  
+  @@index([domainId])
+  @@index([visitorId])
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  sessionId String
+  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sender    String   // 'visitor' | 'seller'
+  content   String   @db.Text
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+  @@index([sessionId])
 }

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { MessageCircle, Check, ShieldCheck, Search, Filter, X, Loader2 } from 'lucide-react';
 import { useDebounce } from '@/hooks/use-debounce';
 import { Logo } from '@/components/logo';
+import { ChatWidget } from '@/components/chat-widget';
 
 interface Domain {
     id: string;
@@ -578,6 +579,14 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
                         </button>
                     </div>
                 </div>
+            )}
+
+            {/* Chat Widget */}
+            {domains.length > 0 && (
+                <ChatWidget
+                    domainId={domains[0].id}
+                    sellerName={user.name || user.subdomain}
+                />
             )}
         </div>
     );
