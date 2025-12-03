@@ -210,7 +210,7 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
             <div className="max-w-7xl mx-auto px-4 py-8 pb-32 md:pb-12">
                 {/* Header */}
                 <header className="mb-8 text-center">
-                    <Link href="/" className="inline-block mb-6">
+                    <Link href="https://domainliq.com" className="inline-block mb-6">
                         <Logo className="h-8 w-auto" />
                     </Link>
                     <h1 className="text-3xl font-bold tracking-tight dark:text-white text-gray-900">
@@ -220,157 +220,18 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
                 </header>
 
                 <div className="flex flex-col lg:flex-row gap-8">
-                    {/* Filters Sidebar - Desktop */}
-                    <div className="hidden lg:block w-64 flex-shrink-0 space-y-6">
-                        <div className="dark:bg-[#0A0A0A] bg-white border dark:border-white/10 border-gray-200 rounded-xl p-4 sticky top-4 shadow-sm">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="font-semibold flex items-center gap-2">
-                                    <Filter className="h-4 w-4" /> Filters
-                                </h3>
-                                {activeFiltersCount > 0 && (
-                                    <button onClick={clearFilters} className="text-xs dark:text-amber-400 text-amber-600 dark:hover:text-amber-300 hover:text-amber-700">
-                                        Clear all
-                                    </button>
-                                )}
-                            </div>
-
-                            {/* Search */}
-                            <div className="mb-4">
-                                <div className="relative">
-                                    <Search className="absolute left-3 top-2.5 h-4 w-4 dark:text-gray-500 text-gray-400" />
-                                    <input
-                                        type="text"
-                                        placeholder="Search domains..."
-                                        value={search}
-                                        onChange={(e) => setSearch(e.target.value)}
-                                        className="w-full dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg pl-9 pr-3 py-2 text-sm dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:border-amber-500/50"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* TLDs */}
-                            <div className="mb-4">
-                                <label className="text-sm font-medium dark:text-gray-400 text-gray-700 mb-2 block">Extensions</label>
-                                <div className="flex flex-wrap gap-2">
-                                    {uniqueTLDs.map(tld => (
-                                        <button
-                                            key={tld}
-                                            onClick={() => toggleTLD(tld)}
-                                            className={`px-2 py-1 rounded text-xs transition-colors ${selectedTLDs.has(tld)
-                                                ? 'bg-amber-600 text-white'
-                                                : 'dark:bg-white/5 bg-gray-100 dark:text-gray-400 text-gray-700 dark:hover:bg-white/10 hover:bg-gray-200'
-                                                }`}
-                                        >
-                                            .{tld}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Price */}
-                            <div className="mb-4">
-                                <label className="text-sm font-medium dark:text-gray-400 text-gray-700 mb-2 block">Price Range</label>
-                                <div className="flex gap-2">
-                                    <input
-                                        type="number"
-                                        placeholder="Min"
-                                        value={priceMin}
-                                        onChange={(e) => setPriceMin(e.target.value)}
-                                        className="w-full dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-3 py-2 text-sm dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:border-amber-500/50"
-                                    />
-                                    <input
-                                        type="number"
-                                        placeholder="Max"
-                                        value={priceMax}
-                                        onChange={(e) => setPriceMax(e.target.value)}
-                                        className="w-full dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-3 py-2 text-sm dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:border-amber-500/50"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Verification */}
-                            <div className="mb-4">
-                                <label className="text-sm font-medium dark:text-gray-400 text-gray-700 mb-2 block">Status</label>
-                                <div className="space-y-2">
-                                    <label className="flex items-center gap-2 text-sm dark:text-gray-300 text-gray-700 cursor-pointer">
-                                        <input
-                                            type="radio"
-                                            name="verification"
-                                            checked={verificationFilter === 'all'}
-                                            onChange={() => setVerificationFilter('all')}
-                                            className="text-amber-500 focus:ring-amber-500 bg-transparent dark:border-white/20 border-gray-300"
-                                        />
-                                        All
-                                    </label>
-                                    <label className="flex items-center gap-2 text-sm dark:text-gray-300 text-gray-700 cursor-pointer">
-                                        <input
-                                            type="radio"
-                                            name="verification"
-                                            checked={verificationFilter === 'verified'}
-                                            onChange={() => setVerificationFilter('verified')}
-                                            className="text-amber-500 focus:ring-amber-500 bg-transparent dark:border-white/20 border-gray-300"
-                                        />
-                                        Verified Only
-                                    </label>
-                                    <label className="flex items-center gap-2 text-sm dark:text-gray-300 text-gray-700 cursor-pointer">
-                                        <input
-                                            type="radio"
-                                            name="verification"
-                                            checked={verificationFilter === 'unverified'}
-                                            onChange={() => setVerificationFilter('unverified')}
-                                            className="text-amber-500 focus:ring-amber-500 bg-transparent dark:border-white/20 border-gray-300"
-                                        />
-                                        Unverified Only
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Mobile Filter Toggle */}
-                    <div className="lg:hidden mb-4">
-                        <button
-                            onClick={() => setShowMobileFilters(!showMobileFilters)}
-                            className="w-full flex items-center justify-center gap-2 px-4 py-2 dark:bg-[#0A0A0A] bg-white border dark:border-white/10 border-gray-300 rounded-lg dark:text-white text-gray-900 shadow-sm"
-                        >
-                            <Filter className="h-4 w-4" />
-                            Filters {activeFiltersCount > 0 && `(${activeFiltersCount})`}
-                        </button>
-                    </div>
-
-                    {/* Mobile Filters Panel */}
-                    {showMobileFilters && (
-                        <div className="lg:hidden mb-6 dark:bg-[#0A0A0A] bg-white border dark:border-white/10 border-gray-300 rounded-xl p-4 shadow-sm">
-                            {/* Same filters as desktop, simplified for brevity in this view */}
-                            <div className="space-y-4">
-                                <input
-                                    type="text"
-                                    placeholder="Search..."
-                                    value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
-                                    className="w-full dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-3 py-2 text-sm dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400"
-                                />
-                                {/* Add other mobile filters here if needed, keeping it simple for now */}
-                                <div className="flex gap-2">
-                                    <button onClick={clearFilters} className="flex-1 py-2 text-sm dark:text-gray-400 text-gray-600 border dark:border-white/10 border-gray-300 rounded-lg">Reset</button>
-                                    <button onClick={() => setShowMobileFilters(false)} className="flex-1 py-2 text-sm bg-amber-600 dark:hover:bg-amber-500 hover:bg-amber-700 text-white rounded-lg">Apply</button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
                     {/* Main Content */}
                     <div className="flex-1">
-                        {/* Sort and Limit Controls */}
-                        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                        {/* Controls Bar */}
+                        <div className="flex flex-wrap items-center justify-center gap-4 mb-6 relative z-30">
                             <div className="text-sm dark:text-gray-400 text-gray-600">
                                 Found <span className="dark:text-white text-gray-900 font-medium">{totalDomains}</span> domains
                             </div>
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2 sm:gap-4">
                                 <select
                                     value={sortBy}
                                     onChange={(e) => setSortBy(e.target.value)}
-                                    className="dark:bg-[#0A0A0A] bg-white border dark:border-white/10 border-gray-300 rounded-lg px-3 py-1.5 text-sm dark:text-white text-gray-900 focus:outline-none focus:border-amber-500/50"
+                                    className="dark:bg-[#0A0A0A] bg-white border dark:border-white/10 border-gray-300 rounded-lg px-3 py-2 text-sm dark:text-white text-gray-900 focus:outline-none focus:border-amber-500/50 transition-colors"
                                 >
                                     <option value="newest">Newest Listed</option>
                                     <option value="price_asc">Price: Low to High</option>
@@ -378,94 +239,241 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
                                     <option value="expires_asc">Expiring Soon</option>
                                     <option value="expires_desc">Expiring Later</option>
                                 </select>
-                                <select
-                                    value={limit}
-                                    onChange={(e) => {
-                                        setLimit(Number(e.target.value));
-                                        setPage(1);
-                                    }}
-                                    className="dark:bg-[#0A0A0A] bg-white border dark:border-white/10 border-gray-300 rounded-lg px-3 py-1.5 text-sm dark:text-white text-gray-900 focus:outline-none focus:border-amber-500/50"
-                                >
-                                    <option value={20}>20 per page</option>
-                                    <option value={50}>50 per page</option>
-                                    <option value={100}>100 per page</option>
-                                </select>
+
+                                <div className="relative">
+                                    <button
+                                        onClick={() => setShowMobileFilters(!showMobileFilters)}
+                                        className={`
+                                            flex items-center justify-center px-3 py-2 border rounded-lg transition-all focus:outline-none focus:border-amber-500/50 relative
+                                            ${showMobileFilters
+                                                ? 'bg-amber-500/10 border-amber-500/50 text-amber-500'
+                                                : 'dark:bg-[#0A0A0A] bg-white dark:border-white/10 border-gray-300 dark:text-gray-400 text-gray-600 hover:text-gray-900 dark:hover:text-white hover:border-gray-400 dark:hover:border-white/20'
+                                            }
+                                        `}
+                                        aria-label="Filters"
+                                    >
+                                        <Filter className="h-4 w-4" />
+                                        {activeFiltersCount > 0 && !showMobileFilters && (
+                                            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-amber-500 rounded-full border-2 dark:border-[#050505] border-white" />
+                                        )}
+                                    </button>
+
+                                    {/* Filter Popover */}
+                                    {showMobileFilters && (
+                                        <>
+                                            {/* Mobile Backdrop */}
+                                            <div
+                                                className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 sm:hidden"
+                                                onClick={() => setShowMobileFilters(false)}
+                                            />
+
+                                            <div className={`
+                                                fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85vw] max-w-[260px] z-50
+                                                sm:absolute sm:top-full sm:left-auto sm:right-0 sm:translate-x-0 sm:translate-y-0 sm:mt-2 sm:w-64
+                                                dark:bg-[#0A0A0A] bg-white border dark:border-white/10 border-gray-200 rounded-xl shadow-xl p-4
+                                            `}>
+                                                <div className="flex items-center justify-between mb-4">
+                                                    <h3 className="font-semibold flex items-center gap-2 dark:text-white text-gray-900 text-sm">
+                                                        Filters
+                                                    </h3>
+                                                    {activeFiltersCount > 0 && (
+                                                        <button onClick={clearFilters} className="text-xs dark:text-amber-400 text-amber-600 hover:underline">
+                                                            Clear all
+                                                        </button>
+                                                    )}
+                                                </div>
+
+                                                <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                                                    {/* Search */}
+                                                    <div>
+                                                        <div className="relative">
+                                                            <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 dark:text-gray-500 text-gray-400" />
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Search..."
+                                                                value={search}
+                                                                onChange={(e) => setSearch(e.target.value)}
+                                                                className="w-full dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg pl-8 pr-3 py-1.5 text-xs dark:text-white text-gray-900 focus:outline-none focus:border-amber-500/50"
+                                                            />
+                                                        </div>
+                                                    </div>
+
+                                                    {/* TLDs */}
+                                                    <div>
+                                                        <label className="text-[10px] font-medium dark:text-gray-400 text-gray-500 mb-2 block uppercase tracking-wider">Extensions</label>
+                                                        <div className="flex flex-wrap gap-1.5">
+                                                            {uniqueTLDs.map(tld => (
+                                                                <button
+                                                                    key={tld}
+                                                                    onClick={() => toggleTLD(tld)}
+                                                                    className={`px-2 py-1 rounded text-[10px] transition-colors border ${selectedTLDs.has(tld)
+                                                                        ? 'bg-amber-500 border-amber-500 text-white'
+                                                                        : 'dark:bg-white/5 bg-gray-50 border-transparent dark:text-gray-300 text-gray-700 hover:bg-gray-100 dark:hover:bg-white/10'
+                                                                        }`}
+                                                                >
+                                                                    .{tld}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Price */}
+                                                    <div>
+                                                        <label className="text-[10px] font-medium dark:text-gray-400 text-gray-500 mb-2 block uppercase tracking-wider">Price Range</label>
+                                                        <div className="flex gap-2">
+                                                            <input
+                                                                type="number"
+                                                                placeholder="Min"
+                                                                value={priceMin}
+                                                                onChange={(e) => setPriceMin(e.target.value)}
+                                                                className="w-full dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-2 py-1.5 text-xs dark:text-white text-gray-900 focus:outline-none focus:border-amber-500/50"
+                                                            />
+                                                            <input
+                                                                type="number"
+                                                                placeholder="Max"
+                                                                value={priceMax}
+                                                                onChange={(e) => setPriceMax(e.target.value)}
+                                                                className="w-full dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-2 py-1.5 text-xs dark:text-white text-gray-900 focus:outline-none focus:border-amber-500/50"
+                                                            />
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Status */}
+                                                    <div>
+                                                        <label className="text-[10px] font-medium dark:text-gray-400 text-gray-500 mb-2 block uppercase tracking-wider">Status</label>
+                                                        <div className="space-y-1.5">
+                                                            {['all', 'verified', 'unverified'].map((status) => (
+                                                                <label key={status} className="flex items-center gap-2 text-xs dark:text-gray-300 text-gray-700 cursor-pointer hover:text-amber-500 transition-colors">
+                                                                    <input
+                                                                        type="radio"
+                                                                        name="verification"
+                                                                        checked={verificationFilter === status}
+                                                                        onChange={() => setVerificationFilter(status as any)}
+                                                                        className="text-amber-500 focus:ring-amber-500 bg-transparent dark:border-white/20 border-gray-300 scale-90"
+                                                                    />
+                                                                    <span className="capitalize">{status === 'all' ? 'All Domains' : status}</span>
+                                                                </label>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
-                        {/* Domain List */}
-                        <div className="space-y-2">
+                        {/* Domain Grid */}
+                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                             {isLoading ? (
-                                <div className="py-20 flex justify-center">
-                                    <Loader2 className="h-8 w-8 text-amber-500 animate-spin" />
-                                </div>
+                                // Skeleton loading
+                                [...Array(6)].map((_, i) => (
+                                    <div key={i} className="h-48 sm:h-64 rounded-xl bg-white/5 animate-pulse" />
+                                ))
                             ) : domains.length > 0 ? (
-                                domains.map((domain) => (
-                                    <div
-                                        key={domain.id}
-                                        onClick={() => domain.status === 'available' && toggleSelection(domain.id)}
-                                        className={`
-                                            group flex items-center justify-between p-4 rounded-xl border transition-all duration-200
-                                            ${domain.status === 'sold'
-                                                ? 'dark:bg-transparent bg-gray-50/50 border-transparent opacity-40 cursor-not-allowed'
-                                                : selectedIds.includes(domain.id)
-                                                    ? 'dark:bg-amber-500/10 bg-amber-50 dark:border-amber-500/30 border-amber-400'
-                                                    : 'dark:bg-white/5 bg-white border-transparent dark:hover:bg-white/10 hover:bg-gray-50 cursor-pointer shadow-sm dark:shadow-none'
-                                            }
-                                        `}
-                                    >
-                                        <div className="flex items-center gap-4">
-                                            <div className={`
-                                                w-5 h-5 rounded-full border flex items-center justify-center transition-all duration-200 flex-shrink-0
-                                                ${domain.status === 'sold'
-                                                    ? 'dark:border-gray-700 border-gray-300 dark:bg-gray-800 bg-gray-100'
-                                                    : selectedIds.includes(domain.id)
-                                                        ? 'border-amber-500 bg-amber-500'
-                                                        : 'dark:border-gray-600 border-gray-300 dark:group-hover:border-gray-500 group-hover:border-gray-400'
-                                                }
-                                            `}>
-                                                {domain.status === 'sold' ? (
-                                                    <div className="w-2 h-2 rounded-full dark:bg-gray-600 bg-gray-400" />
-                                                ) : selectedIds.includes(domain.id) ? (
-                                                    <Check className="h-3 w-3 text-white" />
-                                                ) : null}
-                                            </div>
+                                domains.map((domain) => {
+                                    const isSelected = selectedIds.includes(domain.id);
+                                    const isSold = domain.status === 'sold';
 
-                                            <div className="flex flex-col">
-                                                <div className="flex items-center gap-2">
-                                                    <span className={`text-lg font-medium ${domain.status === 'sold' ? 'line-through dark:text-gray-500 text-gray-400' : 'dark:text-gray-200 text-gray-900'}`}>
-                                                        {domain.name}
-                                                    </span>
-                                                    {domain.isVerified && (
-                                                        <div className="group relative">
-                                                            <ShieldCheck className="h-4 w-4 text-green-500 dark:text-green-400" />
-                                                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 dark:bg-gray-800 bg-gray-900 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                                                                Ownership Verified
-                                                            </div>
-                                                        </div>
+                                    // Deterministic gradient based on domain ID - Lively Colors
+                                    // Deterministic gradient based on domain ID - Yellow/Black Theme
+                                    const gradients = [
+                                        'from-amber-500/10 to-yellow-500/10 dark:from-amber-500/20 dark:to-yellow-500/20 hover:from-amber-500/20 hover:to-yellow-500/20',
+                                        'from-yellow-500/10 to-orange-500/10 dark:from-yellow-500/20 dark:to-orange-500/20 hover:from-yellow-500/20 hover:to-orange-500/20',
+                                        'from-orange-500/10 to-amber-500/10 dark:from-orange-500/20 dark:to-amber-500/20 hover:from-orange-500/20 hover:to-amber-500/20',
+                                        'from-gray-500/10 to-slate-500/10 dark:from-gray-500/20 dark:to-slate-500/20 hover:from-gray-500/20 hover:to-slate-500/20',
+                                        'from-neutral-500/10 to-stone-500/10 dark:from-neutral-500/20 dark:to-stone-500/20 hover:from-neutral-500/20 hover:to-stone-500/20',
+                                        'from-amber-400/10 to-yellow-400/10 dark:from-amber-400/20 dark:to-yellow-400/20 hover:from-amber-400/20 hover:to-yellow-400/20',
+                                        'from-yellow-600/10 to-amber-600/10 dark:from-yellow-600/20 dark:to-amber-600/20 hover:from-yellow-600/20 hover:to-amber-600/20',
+                                        'from-zinc-500/10 to-neutral-500/10 dark:from-zinc-500/20 dark:to-neutral-500/20 hover:from-zinc-500/20 hover:to-neutral-500/20',
+                                    ];
+                                    const gradientIndex = domain.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % gradients.length;
+                                    const gradientClass = gradients[gradientIndex];
+
+                                    return (
+                                        <div
+                                            key={domain.id}
+                                            onClick={() => !isSold && toggleSelection(domain.id)}
+                                            className={`
+                                                group flex flex-col justify-between p-3 sm:p-5 rounded-xl sm:rounded-2xl border transition-all duration-300 cursor-pointer relative h-full overflow-hidden
+                                                ${isSold
+                                                    ? 'dark:bg-transparent bg-gray-100 border-transparent opacity-40 cursor-not-allowed'
+                                                    : isSelected
+                                                        ? 'dark:bg-amber-500/10 bg-amber-50 dark:border-amber-500/50 border-amber-400 ring-1 ring-amber-500/50'
+                                                        : `bg-gradient-to-br ${gradientClass} border-transparent dark:hover:border-white/10 hover:border-gray-200 dark:hover:shadow-2xl dark:hover:shadow-black/40 shadow-sm hover:shadow-lg hover:-translate-y-1`
+                                                }
+                                            `}
+                                        >
+                                            {/* Selection Indicator */}
+                                            {!isSold && (
+                                                <div className={`
+                                                    absolute top-3 right-3 sm:top-4 sm:right-4 w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center transition-all z-20
+                                                    ${isSelected
+                                                        ? 'bg-amber-500 border-amber-500 scale-100 opacity-100 shadow-sm'
+                                                        : 'dark:border-white/20 border-gray-400/50 dark:bg-black/20 bg-white/40 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 backdrop-blur-md'
+                                                    }
+                                                `}>
+                                                    {isSelected && (
+                                                        <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" strokeWidth={3} />
                                                     )}
                                                 </div>
-                                                {domain.expiresAt && (
-                                                    <span className="text-xs dark:text-gray-500 text-gray-600">
-                                                        Exp: {new Date(domain.expiresAt).toLocaleDateString()}
-                                                    </span>
-                                                )}
+                                            )}
+
+                                            <div className="flex flex-col gap-2 sm:gap-4 h-full relative z-10">
+                                                {/* Top: Name and Price */}
+                                                <div>
+                                                    <div className="flex items-start justify-between gap-2 mb-2 sm:mb-3 pr-6 sm:pr-8 overflow-hidden">
+                                                        <h3 className="text-sm sm:text-xl font-bold dark:text-white text-gray-900 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors leading-tight tracking-tight truncate w-full" title={domain.name}>
+                                                            {domain.name}
+                                                        </h3>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-2 mb-2 sm:mb-4">
+                                                        {isSold ? (
+                                                            <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs font-bold bg-red-500/10 text-red-600 dark:text-red-400 rounded-lg uppercase tracking-wider border border-red-500/20">
+                                                                SOLD
+                                                            </span>
+                                                        ) : (
+                                                            <span className="font-mono text-lg sm:text-xl font-semibold dark:text-gray-200 text-gray-800 tracking-tight">
+                                                                ${domain.price.toLocaleString()}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                {/* Bottom: Status/Meta and Actions */}
+                                                <div className="mt-auto pt-3 sm:pt-4 border-t dark:border-white/5 border-black/5 flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-2">
+                                                    <div className="flex flex-col gap-1">
+                                                        {domain.isVerified && (
+                                                            <div className="flex items-center gap-1 text-[10px] sm:text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
+                                                                <ShieldCheck className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                                                                <span className="hidden sm:inline">Verified Ownership</span>
+                                                                <span className="sm:hidden">Verified</span>
+                                                            </div>
+                                                        )}
+                                                        {domain.expiresAt && (
+                                                            <span className="text-[9px] sm:text-[10px] uppercase tracking-wider font-medium dark:text-gray-500 text-gray-500/80">
+                                                                Exp: {new Date(domain.expiresAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: '2-digit' })}
+                                                            </span>
+                                                        )}
+                                                    </div>
+
+                                                    <Link
+                                                        href={`/d/${domain.name}`}
+                                                        onClick={(e) => e.stopPropagation()}
+                                                        className="flex items-center justify-center gap-1 px-2 py-1.5 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-bold dark:bg-white/10 bg-white/60 dark:hover:bg-white/20 hover:bg-white dark:text-gray-200 text-gray-800 dark:hover:text-white hover:text-black rounded-lg transition-all shadow-sm hover:shadow-md backdrop-blur-sm w-full sm:w-auto"
+                                                    >
+                                                        Details
+                                                        <span className="text-base sm:text-lg leading-none mb-0.5 ml-0.5">→</span>
+                                                    </Link>
+                                                </div>
                                             </div>
                                         </div>
-
-                                        <div className="flex items-center gap-4">
-                                            {domain.status === 'sold' ? (
-                                                <span className="text-xs font-medium dark:text-red-400 text-red-600 uppercase tracking-wider">Sold</span>
-                                            ) : (
-                                                <span className="font-mono dark:text-gray-400 text-gray-700 font-medium">
-                                                    ${domain.price.toLocaleString()}
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))
+                                    );
+                                })
                             ) : (
-                                <div className="text-center py-12 dark:text-gray-600 text-gray-500">
+                                <div className="col-span-full text-center py-12 dark:text-gray-600 text-gray-500">
                                     No domains found matching your filters.
                                 </div>
                             )}
@@ -473,24 +481,42 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
 
                         {/* Pagination */}
                         {totalDomains > 0 && (
-                            <div className="mt-8 flex items-center justify-between border-t dark:border-white/10 border-gray-200 pt-4">
-                                <button
-                                    onClick={() => setPage(p => Math.max(1, p - 1))}
-                                    disabled={page === 1}
-                                    className="px-4 py-2 text-sm dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 disabled:opacity-50"
-                                >
-                                    Previous
-                                </button>
-                                <span className="text-sm dark:text-gray-500 text-gray-600">
-                                    Page {page} of {Math.ceil(totalDomains / limit)}
-                                </span>
-                                <button
-                                    onClick={() => setPage(p => Math.min(Math.ceil(totalDomains / limit), p + 1))}
-                                    disabled={page >= Math.ceil(totalDomains / limit)}
-                                    className="px-4 py-2 text-sm dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 disabled:opacity-50"
-                                >
-                                    Next
-                                </button>
+                            <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-t dark:border-white/10 border-gray-200 pt-6">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm font-medium dark:text-gray-500 text-gray-600">Show:</span>
+                                    <select
+                                        value={limit}
+                                        onChange={(e) => {
+                                            setLimit(Number(e.target.value));
+                                            setPage(1);
+                                        }}
+                                        className="dark:bg-[#0A0A0A] bg-white border dark:border-white/10 border-gray-300 rounded-lg px-2 py-1 text-sm dark:text-white text-gray-900 focus:outline-none focus:border-amber-500/50"
+                                    >
+                                        <option value={20}>20</option>
+                                        <option value={50}>50</option>
+                                        <option value={100}>100</option>
+                                    </select>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => setPage(p => Math.max(1, p - 1))}
+                                        disabled={page === 1}
+                                        className="px-4 py-2 text-sm font-medium rounded-lg border dark:border-white/10 border-gray-200 dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 dark:hover:bg-white/5 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                    >
+                                        Previous
+                                    </button>
+                                    <span className="text-sm font-medium dark:text-gray-500 text-gray-600 px-2">
+                                        Page {page} of {Math.ceil(totalDomains / limit)}
+                                    </span>
+                                    <button
+                                        onClick={() => setPage(p => Math.min(Math.ceil(totalDomains / limit), p + 1))}
+                                        disabled={page >= Math.ceil(totalDomains / limit)}
+                                        className="px-4 py-2 text-sm font-medium rounded-lg border dark:border-white/10 border-gray-200 dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 dark:hover:bg-white/5 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                    >
+                                        Next
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>
