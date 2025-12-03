@@ -178,12 +178,35 @@ export default function ChatPage() {
         }
     };
 
+    const handleDeleteSession = async (e: React.MouseEvent, sessionId: string) => {
+        e.stopPropagation();
+        if (!confirm('Are you sure you want to delete this entire conversation? This cannot be undone.')) return;
+
+        try {
+            const res = await fetch(`/api/user/chat/sessions/${sessionId}`, {
+                method: 'DELETE',
+            });
+
+            if (res.ok) {
+                setSessions(prev => prev.filter(s => s.id !== sessionId));
+                if (selectedSessionId === sessionId) {
+                    setSelectedSessionId(null);
+                    setMessages([]);
+                }
+            } else {
+                console.error('Failed to delete session');
+            }
+        } catch (error) {
+            console.error('Error deleting session:', error);
+        }
+    };
+
     const selectedSession = sessions.find(s => s.id === selectedSessionId);
 
     return (
-        <div className="h-[calc(100vh-80px)] flex bg-white dark:bg-[#0A0A0A] border-t dark:border-white/5 border-gray-200">
+        <div className="fixed inset-0 z-50 flex bg-white dark:bg-[#0A0A0A]">
             {/* Sidebar */}
-            <div className="w-80 border-r dark:border-white/5 border-gray-200 flex flex-col">
+            <div className={`w-full md:w-80 border-r dark:border-white/5 border-gray-200 flex flex-col ${selectedSessionId ? 'hidden md:flex' : 'flex'}`}>
                 <div className="p-4 border-b dark:border-white/5 border-gray-200">
                     <div className="flex items-center gap-2 mb-4">
                         <Link href="/dashboard" className="p-2 -ml-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors">
@@ -213,11 +236,11 @@ export default function ChatPage() {
                         </div>
                     ) : (
                         sessions.map(session => (
-                            <button
+                            <div
                                 key={session.id}
-                                onClick={() => setSelectedSessionId(session.id)}
-                                className={`w-full p-4 text-left border-b dark:border-white/5 border-gray-100 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors ${selectedSessionId === session.id ? 'bg-amber-50 dark:bg-amber-500/10 border-l-4 border-l-amber-500' : ''
+                                className={`w-full p-4 text-left border-b dark:border-white/5 border-gray-100 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors cursor-pointer group relative ${selectedSessionId === session.id ? 'bg-amber-50 dark:bg-amber-500/10 border-l-4 border-l-amber-500' : ''
                                     }`}
+                                onClick={() => setSelectedSessionId(session.id)}
                             >
                                 <div className="flex justify-between items-start mb-1">
                                     <h3 className="font-medium truncate pr-2">{session.visitorName || 'Visitor'}</h3>
@@ -226,33 +249,50 @@ export default function ChatPage() {
                                     </span>
                                 </div>
                                 <p className="text-xs text-amber-600 dark:text-amber-400 mb-1 font-medium">{session.domainName}</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                                    {session.lastMessage}
-                                </p>
-                            </button>
+                                <div className="flex justify-between items-center">
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate flex-1 pr-2">
+                                        {session.lastMessage}
+                                    </p>
+                                    <button
+                                        onClick={(e) => handleDeleteSession(e, session.id)}
+                                        className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                                        title="Delete conversation"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            </div>
                         ))
                     )}
                 </div>
             </div>
 
             {/* Chat Area */}
-            <div className="flex-1 flex flex-col bg-gray-50 dark:bg-black/20">
+            <div className={`flex-1 flex flex-col bg-gray-50 dark:bg-black/20 ${!selectedSessionId ? 'hidden md:flex' : 'flex'}`}>
                 {selectedSessionId ? (
                     <>
                         {/* Chat Header */}
                         <div className="p-4 bg-white dark:bg-[#0A0A0A] border-b dark:border-white/5 border-gray-200 flex justify-between items-center">
-                            <div>
-                                <h3 className="font-bold">{selectedSession?.visitorName || 'Visitor'}</h3>
-                                <div className="flex items-center gap-2 text-sm text-gray-500">
-                                    <span className="font-medium text-amber-600 dark:text-amber-400">
-                                        {selectedSession?.domainName}
-                                    </span>
-                                    {selectedSession?.visitorEmail && (
-                                        <>
-                                            <span>•</span>
-                                            <span>{selectedSession.visitorEmail}</span>
-                                        </>
-                                    )}
+                            <div className="flex items-center gap-3">
+                                <button
+                                    onClick={() => setSelectedSessionId(null)}
+                                    className="md:hidden p-2 -ml-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
+                                >
+                                    <ArrowLeft className="h-5 w-5" />
+                                </button>
+                                <div>
+                                    <h3 className="font-bold">{selectedSession?.visitorName || 'Visitor'}</h3>
+                                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                                        <span className="font-medium text-amber-600 dark:text-amber-400">
+                                            {selectedSession?.domainName}
+                                        </span>
+                                        {selectedSession?.visitorEmail && (
+                                            <>
+                                                <span>•</span>
+                                                <span>{selectedSession.visitorEmail}</span>
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -269,16 +309,7 @@ export default function ChatPage() {
                                         key={msg.id}
                                         className={`flex ${msg.sender === 'seller' ? 'justify-end' : 'justify-start'} group`}
                                     >
-                                        <div className={`max-w-[70%] ${msg.sender === 'seller' ? 'order-1' : 'order-2'} flex items-end gap-2`}>
-                                            {msg.sender === 'seller' && (
-                                                <button
-                                                    onClick={() => handleDeleteMessage(msg.id)}
-                                                    className="p-2 text-gray-300 hover:text-red-500 transition-colors"
-                                                    title="Delete message"
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </button>
-                                            )}
+                                        <div className={`max-w-[85%] md:max-w-[70%] ${msg.sender === 'seller' ? 'order-1' : 'order-2'} flex items-end gap-2`}>
                                             <div>
                                                 <div
                                                     className={`p-4 rounded-2xl text-sm shadow-sm ${msg.sender === 'seller'
@@ -318,7 +349,7 @@ export default function ChatPage() {
                                     className="px-6 py-3 bg-amber-500 text-white rounded-xl hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
                                 >
                                     {isSending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
-                                    Send
+                                    <span className="hidden md:inline">Send</span>
                                 </button>
                             </form>
                         </div>
