@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function DELETE(
     req: NextRequest,
-    { params }: { params: { messageId: string } }
+    { params }: { params: Promise<{ messageId: string }> }
 ) {
     try {
         const session = await auth();
@@ -12,7 +12,7 @@ export async function DELETE(
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { messageId } = params;
+        const { messageId } = await params;
 
         if (!messageId) {
             return NextResponse.json({ error: 'Missing messageId' }, { status: 400 });
