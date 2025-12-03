@@ -59,6 +59,9 @@ model Domain {
   verifiedAt        DateTime?
   expiresAt         DateTime?
 
+  // Sales
+  checkoutLink      String?
+
   @@index([userId])
 }
 

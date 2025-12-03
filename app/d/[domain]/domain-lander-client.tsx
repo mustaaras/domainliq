@@ -121,7 +121,19 @@ export default function DomainLanderClient({ domain, isOwner }: DomainLanderClie
                         </div>
 
                         <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-                            {domain.price >= 500 && domain.isVerified && domain.user.escrowEmail && (
+                            {domain.checkoutLink && (
+                                <a
+                                    href={domain.checkoutLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-full sm:w-auto px-8 py-4 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold text-lg transition-all shadow-lg shadow-green-600/20 hover:shadow-green-600/30 hover:-translate-y-0.5 flex items-center justify-center gap-2 group"
+                                >
+                                    <Zap className="w-5 h-5" />
+                                    Buy Now
+                                    <ArrowRight className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />
+                                </a>
+                            )}
+                            {domain.price >= 500 && domain.isVerified && domain.user.escrowEmail && !domain.checkoutLink && (
                                 <button
                                     onClick={() => setShowEscrowModal(true)}
                                     className="w-full sm:w-auto px-8 py-4 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold text-lg transition-all shadow-lg shadow-green-600/20 hover:shadow-green-600/30 hover:-translate-y-0.5 flex items-center justify-center gap-2 group"

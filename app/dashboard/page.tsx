@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Loader2, Plus, Trash2, Settings, ExternalLink, DollarSign, LogOut, Shield, ShieldCheck, Copy, Check, CheckSquare, Filter, X, Menu, Pencil } from 'lucide-react';
+import { Loader2, Plus, Trash2, Settings, ExternalLink, DollarSign, LogOut, Shield, ShieldCheck, Copy, Check, CheckSquare, Filter, X, Menu, Pencil, Link as LinkIcon } from 'lucide-react';
 import { useSession, signOut } from 'next-auth/react';
 import { verifyDomain } from '../actions/verify-domain';
 import { Logo } from '@/components/logo';
@@ -17,6 +17,7 @@ interface Domain {
     isVerified: boolean;
     verificationToken: string | null;
     expiresAt: string | null;
+    checkoutLink: string | null;
 }
 
 export default function DashboardPage() {
@@ -45,11 +46,101 @@ export default function DashboardPage() {
     const [newDomain, setNewDomain] = useState({ name: '', price: '' });
     const [addError, setAddError] = useState('');
 
-    // Edit Price State
     const [editingDomainId, setEditingDomainId] = useState<string | null>(null);
-    const [editPriceValue, setEditPriceValue] = useState('');
-    const [isEditingPrice, setIsEditingPrice] = useState(false);
+    const [editDomainData, setEditDomainData] = useState({ price: '', checkoutLink: '' });
+    const [isEditingDomain, setIsEditingDomain] = useState(false);
     const [showBulkEditPriceModal, setShowBulkEditPriceModal] = useState(false);
+    const [bulkEditPriceValue, setBulkEditPriceValue] = useState('');
+
+    // ... (bulk upload state) ...
+
+    // ... (other state) ...
+
+    const handleBulkUpdatePrice = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (selectedDomainIds.size === 0 || !bulkEditPriceValue) return;
+
+        setIsEditingDomain(true);
+        try {
+            const updatePromises = Array.from(selectedDomainIds).map(id =>
+                fetch(`/api/user/domains/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ price: parseFloat(bulkEditPriceValue) })
+                })
+            );
+
+            await Promise.all(updatePromises);
+
+            // Update local state
+            setDomains(domains.map(d =>
+                selectedDomainIds.has(d.id) ? { ...d, price: parseFloat(bulkEditPriceValue) } : d
+            ));
+
+            setShowBulkEditPriceModal(false);
+            setBulkEditPriceValue('');
+            setSelectedDomainIds(new Set());
+            setIsInSelectionMode(false);
+            alert('Prices updated successfully!');
+        } catch (error) {
+            console.error(error);
+            alert('Failed to update prices');
+        } finally {
+            setIsEditingDomain(false);
+        }
+    };
+
+    const handleUpdateDomain = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editingDomainId) return;
+
+        setIsEditingDomain(true);
+        try {
+            const body: any = {};
+            if (editDomainData.price) body.price = parseFloat(editDomainData.price);
+            if (editDomainData.checkoutLink !== undefined) body.checkoutLink = editDomainData.checkoutLink;
+
+            const res = await fetch(`/api/user/domains/${editingDomainId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.error || 'Failed to update domain');
+            }
+
+            const updatedDomain = await res.json();
+
+            // Update local state
+            setDomains(domains.map(d =>
+                d.id === editingDomainId ? { ...d, price: updatedDomain.price, checkoutLink: updatedDomain.checkoutLink } : d
+            ));
+
+            setEditingDomainId(null);
+            setEditDomainData({ price: '', checkoutLink: '' });
+        } catch (error: any) {
+            console.error(error);
+            alert(error.message || 'Failed to update domain');
+        } finally {
+            setIsEditingDomain(false);
+        }
+    };
+
+    const openEditModal = (domain: Domain) => {
+        setEditingDomainId(domain.id);
+        setEditDomainData({
+            price: domain.price.toString(),
+            checkoutLink: domain.checkoutLink || ''
+        });
+    };
+
+    // ... (rest of functions) ...
+
+    // ... (render) ...
+
+
 
     // Bulk upload state
     const [bulkText, setBulkText] = useState('');
@@ -222,70 +313,9 @@ export default function DashboardPage() {
         }
     };
 
-    const handleBulkUpdatePrice = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (selectedDomainIds.size === 0 || !editPriceValue) return;
 
-        setIsEditingPrice(true);
-        try {
-            const updatePromises = Array.from(selectedDomainIds).map(id =>
-                fetch(`/api/user/domains/${id}`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ price: parseFloat(editPriceValue) })
-                })
-            );
 
-            await Promise.all(updatePromises);
 
-            // Update local state
-            setDomains(domains.map(d =>
-                selectedDomainIds.has(d.id) ? { ...d, price: parseFloat(editPriceValue) } : d
-            ));
-
-            setShowBulkEditPriceModal(false);
-            setEditPriceValue('');
-            setSelectedDomainIds(new Set());
-            setIsInSelectionMode(false);
-            alert('Prices updated successfully!');
-        } catch (error) {
-            console.error(error);
-            alert('Failed to update prices');
-        } finally {
-            setIsEditingPrice(false);
-        }
-    };
-
-    const handleUpdatePrice = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!editingDomainId || !editPriceValue) return;
-
-        setIsEditingPrice(true);
-        try {
-            const res = await fetch(`/api/user/domains/${editingDomainId}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ price: parseFloat(editPriceValue) })
-            });
-
-            if (!res.ok) throw new Error('Failed to update price');
-
-            const updatedDomain = await res.json();
-
-            // Update local state
-            setDomains(domains.map(d =>
-                d.id === editingDomainId ? { ...d, price: updatedDomain.price } : d
-            ));
-
-            setEditingDomainId(null);
-            setEditPriceValue('');
-        } catch (error) {
-            console.error(error);
-            alert('Failed to update price');
-        } finally {
-            setIsEditingPrice(false);
-        }
-    };
 
     const handleDeleteDomain = async (domainId: string) => {
         if (!confirm('Are you sure you want to delete this domain?')) return;
@@ -964,7 +994,7 @@ export default function DashboardPage() {
                                                                             </button>
                                                                             <button
                                                                                 onClick={() => {
-                                                                                    setEditPriceValue('');
+                                                                                    setBulkEditPriceValue('');
                                                                                     setShowBulkEditPriceModal(true);
                                                                                     setShowManagePanel(false);
                                                                                 }}
@@ -1096,10 +1126,7 @@ export default function DashboardPage() {
                                                                 ${domain.price.toLocaleString()}
                                                             </div>
                                                             <button
-                                                                onClick={() => {
-                                                                    setEditingDomainId(domain.id);
-                                                                    setEditPriceValue(domain.price.toString());
-                                                                }}
+                                                                onClick={() => openEditModal(domain)}
                                                                 className="p-1 dark:text-gray-500 text-gray-400 dark:hover:text-amber-400 hover:text-amber-600 transition-colors"
                                                                 title="Edit Price"
                                                             >
@@ -1359,49 +1386,82 @@ export default function DashboardPage() {
                     </div>
                 </div>
             )}
-            {/* Edit Price Modal */}
+            {/* Edit Domain Modal */}
             {editingDomainId && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setEditingDomainId(null)}>
-                    <div className="bg-[#0A0A0A] border border-white/10 rounded-xl max-w-sm w-full p-6" onClick={e => e.stopPropagation()}>
-                        <h3 className="text-xl font-bold text-white mb-4">Edit Price</h3>
-                        <form onSubmit={handleUpdatePrice}>
-                            <div className="mb-6">
-                                <label className="block text-sm font-medium text-gray-300 mb-2">New Price ($)</label>
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50" onClick={() => setEditingDomainId(null)}>
+                    <div className="dark:bg-[#0A0A0A] bg-white border dark:border-white/10 border-gray-300 rounded-xl p-6 max-w-md w-full shadow-xl" onClick={(e) => e.stopPropagation()}>
+                        <h3 className="text-xl font-bold mb-4 dark:text-white text-gray-900">Edit Domain</h3>
+                        <form onSubmit={handleUpdateDomain} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-1">Price ($)</label>
                                 <div className="relative">
-                                    <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+                                    <DollarSign className="absolute left-3 top-2.5 h-4 w-4 dark:text-gray-500 text-gray-400" />
                                     <input
                                         type="number"
-                                        value={editPriceValue}
-                                        onChange={e => setEditPriceValue(e.target.value)}
-                                        className="w-full bg-white/5 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-amber-500/50"
-                                        placeholder="1000"
+                                        value={editDomainData.price}
+                                        onChange={(e) => setEditDomainData({ ...editDomainData, price: e.target.value })}
+                                        className="w-full dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg pl-9 pr-4 py-2 dark:text-white text-gray-900 focus:outline-none focus:border-amber-500/50"
                                         required
                                         min="0"
-                                        autoFocus
                                     />
                                 </div>
                             </div>
-                            <div className="flex justify-end gap-3">
+
+                            {/* Checkout Link - Only if price >= 99 */}
+                            {(parseFloat(editDomainData.price) >= 99) && (
+                                <div>
+                                    <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-1">
+                                        Checkout Link (Optional)
+                                    </label>
+                                    <div className="relative">
+                                        <ExternalLink className="absolute left-3 top-2.5 h-4 w-4 dark:text-gray-500 text-gray-400" />
+                                        <input
+                                            type="url"
+                                            value={editDomainData.checkoutLink}
+                                            onChange={(e) => setEditDomainData({ ...editDomainData, checkoutLink: e.target.value })}
+                                            placeholder="https://checkoutlink.godaddy.com/..."
+                                            className="w-full dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg pl-9 pr-4 py-2 dark:text-white text-gray-900 focus:outline-none focus:border-amber-500/50"
+                                        />
+                                    </div>
+                                    <p className="text-xs dark:text-gray-500 text-gray-600 mt-1">
+                                        Must be a valid <strong>checkoutlink.godaddy.com</strong> link.
+                                    </p>
+                                    {editDomainData.checkoutLink && !editDomainData.checkoutLink.startsWith('https://checkoutlink.godaddy.com/') && (
+                                        <p className="text-xs text-red-500 mt-1">
+                                            Invalid link. Must start with https://checkoutlink.godaddy.com/
+                                        </p>
+                                    )}
+                                </div>
+                            )}
+
+                            {(parseFloat(editDomainData.price) < 99) && (
+                                <div className="text-xs dark:text-amber-500/80 text-amber-700 bg-amber-500/10 p-3 rounded-lg border border-amber-500/20">
+                                    Checkout links are only available for domains priced $99 or more.
+                                </div>
+                            )}
+
+                            <div className="flex gap-3 mt-6">
                                 <button
                                     type="button"
                                     onClick={() => setEditingDomainId(null)}
-                                    className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+                                    className="flex-1 px-4 py-2 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg font-medium transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    disabled={isEditingPrice}
-                                    className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-white rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+                                    disabled={isEditingDomain}
+                                    className="flex-1 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                                 >
-                                    {isEditingPrice && <Loader2 className="h-4 w-4 animate-spin" />}
-                                    Save Price
+                                    {isEditingDomain && <Loader2 className="h-4 w-4 animate-spin" />}
+                                    Save Changes
                                 </button>
                             </div>
                         </form>
                     </div>
                 </div>
             )}
+
             {/* Bulk Edit Price Modal */}
             {showBulkEditPriceModal && (
                 <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowBulkEditPriceModal(false)}>
@@ -1414,8 +1474,8 @@ export default function DashboardPage() {
                                     <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
                                     <input
                                         type="number"
-                                        value={editPriceValue}
-                                        onChange={e => setEditPriceValue(e.target.value)}
+                                        value={bulkEditPriceValue}
+                                        onChange={e => setBulkEditPriceValue(e.target.value)}
                                         className="w-full bg-white/5 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                                         placeholder="1000"
                                         required
@@ -1437,10 +1497,10 @@ export default function DashboardPage() {
                                 </button>
                                 <button
                                     type="submit"
-                                    disabled={isEditingPrice}
+                                    disabled={isEditingDomain}
                                     className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-white rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
                                 >
-                                    {isEditingPrice && <Loader2 className="h-4 w-4 animate-spin" />}
+                                    {isEditingDomain && <Loader2 className="h-4 w-4 animate-spin" />}
                                     Update All
                                 </button>
                             </div>

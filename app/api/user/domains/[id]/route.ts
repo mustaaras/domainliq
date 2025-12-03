@@ -13,7 +13,7 @@ export async function PATCH(
         }
 
         const { id } = await params;
-        const { status, price } = await req.json();
+        const { status, price, checkoutLink } = await req.json();
 
         // Verify ownership
         const domain = await db.domain.findUnique({
@@ -33,6 +33,28 @@ export async function PATCH(
         const updateData: any = {};
         if (status) updateData.status = status;
         if (price !== undefined) updateData.price = price;
+
+        // Handle checkout link update
+        if (checkoutLink !== undefined) {
+            // Check price requirement (either new price or existing price)
+            const currentPrice = price !== undefined ? price : domain.price;
+            if (currentPrice < 99 && checkoutLink !== null && checkoutLink !== '') {
+                return NextResponse.json(
+                    { error: 'Checkout links are only available for domains priced $99 or more' },
+                    { status: 400 }
+                );
+            }
+
+            // Validate checkout link domain
+            if (checkoutLink && !checkoutLink.startsWith('https://checkoutlink.godaddy.com/')) {
+                return NextResponse.json(
+                    { error: 'Invalid checkout link. Must be a https://checkoutlink.godaddy.com/ link' },
+                    { status: 400 }
+                );
+            }
+
+            updateData.checkoutLink = checkoutLink;
+        }
 
         const updatedDomain = await db.domain.update({
             where: { id },

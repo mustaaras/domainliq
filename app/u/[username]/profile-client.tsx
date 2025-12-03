@@ -13,6 +13,7 @@ interface Domain {
     status: string;
     isVerified?: boolean;
     expiresAt?: string | null;
+    checkoutLink?: string | null;
 }
 
 interface User {
@@ -459,14 +460,27 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
                                                         )}
                                                     </div>
 
-                                                    <Link
-                                                        href={`/d/${domain.name}`}
-                                                        onClick={(e) => e.stopPropagation()}
-                                                        className="flex items-center justify-center gap-1 px-2 py-1.5 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-bold dark:bg-white/10 bg-white/60 dark:hover:bg-white/20 hover:bg-white dark:text-gray-200 text-gray-800 dark:hover:text-white hover:text-black rounded-lg transition-all shadow-sm hover:shadow-md backdrop-blur-sm w-full sm:w-auto"
-                                                    >
-                                                        Details
-                                                        <span className="text-base sm:text-lg leading-none mb-0.5 ml-0.5">→</span>
-                                                    </Link>
+                                                    <div className="flex gap-2 w-full sm:w-auto">
+                                                        {domain.checkoutLink && (
+                                                            <a
+                                                                href={domain.checkoutLink}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                onClick={(e) => e.stopPropagation()}
+                                                                className="flex items-center justify-center gap-1 px-2 py-1.5 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-bold bg-green-500 hover:bg-green-600 text-white rounded-lg transition-all shadow-sm hover:shadow-md backdrop-blur-sm flex-1 sm:flex-none"
+                                                            >
+                                                                Buy Now
+                                                            </a>
+                                                        )}
+                                                        <Link
+                                                            href={`/d/${domain.name}`}
+                                                            onClick={(e) => e.stopPropagation()}
+                                                            className="flex items-center justify-center gap-1 px-2 py-1.5 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-bold dark:bg-white/10 bg-white/60 dark:hover:bg-white/20 hover:bg-white dark:text-gray-200 text-gray-800 dark:hover:text-white hover:text-black rounded-lg transition-all shadow-sm hover:shadow-md backdrop-blur-sm flex-1 sm:flex-none"
+                                                        >
+                                                            Details
+                                                            <span className="text-base sm:text-lg leading-none mb-0.5 ml-0.5">→</span>
+                                                        </Link>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
