@@ -109,6 +109,27 @@ export default function LoginPage() {
                     </button>
                 </form>
             </div>
+            <div className="mt-8 text-center">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                    App Version: v1.2 (Timeout 60s)
+                </p>
+                <button
+                    type="button"
+                    onClick={async () => {
+                        try {
+                            const start = Date.now();
+                            await fetch('/favicon.ico', { cache: 'no-store' });
+                            const duration = Date.now() - start;
+                            alert(`Connection OK! Ping: ${duration}ms`);
+                        } catch (e) {
+                            alert('Connection Failed! Check your internet/VPN.');
+                        }
+                    }}
+                    className="mt-2 text-xs text-amber-500 hover:underline"
+                >
+                    Test Connection
+                </button>
+            </div>
         </div>
     );
 }
