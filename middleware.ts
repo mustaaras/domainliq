@@ -27,6 +27,12 @@ export default async function middleware(req: NextRequest) {
         // CHECK: Is this a subdomain of domainliq.com? (e.g. aras.domainliq.com)
         // ALSO ALLOW .localhost for local testing
         if (currentHost.endsWith('.domainliq.com') || currentHost.endsWith('.localhost')) {
+            // Redirect /d/* to main domain (Domain Detail/Lander pages)
+            if (url.pathname.startsWith('/d/')) {
+                const mainDomain = hostname.includes('localhost') ? 'localhost:3000' : 'domainliq.com';
+                return NextResponse.redirect(`${url.protocol}//${mainDomain}${url.pathname}`);
+            }
+
             // Extract subdomain (e.g. "aras")
             const subdomain = currentHost.replace('.domainliq.com', '').replace('.localhost', '');
             console.log(`[Middleware] Subdomain detected: ${subdomain} -> Rewriting to /u/${subdomain}`);
