@@ -69,10 +69,14 @@ export default function DashboardPage() {
                     setUnreadCount(prev => {
                         // Trigger notification if count increased
                         if (data.count > prev && typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
-                            new Notification('New Message', {
-                                body: `You have ${data.count} unread messages`,
-                                icon: '/favicon.ico'
-                            });
+                            try {
+                                new Notification('New Message', {
+                                    body: `You have ${data.count} unread messages`,
+                                    icon: '/favicon.ico'
+                                });
+                            } catch (e) {
+                                console.error('Notification failed:', e);
+                            }
                         }
                         return data.count;
                     });
