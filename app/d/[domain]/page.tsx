@@ -31,6 +31,8 @@ export default async function DomainLanderPage({ params }: DomainLanderPageProps
     }
 
     console.log(`[DomainLanderPage] Domain FOUND: ${domainName} (User: ${domain.user.email})`);
+    console.log(`[DomainLanderPage] Session User: ${session?.user?.email}`);
+    console.log(`[DomainLanderPage] Is Owner: ${session?.user?.email === domain.user.email}`);
 
     const isOwner = session?.user?.email === domain.user.email;
 
