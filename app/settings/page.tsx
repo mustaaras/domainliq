@@ -322,6 +322,62 @@ export default function SettingsPage() {
                 </div>
             </form>
 
+            {/* Change Password */}
+            <div className="dark:bg-white/5 bg-white border dark:border-white/10 border-gray-200 rounded-xl p-6 space-y-6 shadow-sm">
+                <h2 className="text-xl font-semibold flex items-center gap-2 dark:text-white text-gray-900">
+                    <div className="h-5 w-5 flex items-center justify-center">🔒</div>
+                    Change Password
+                </h2>
+
+                <form onSubmit={handlePasswordChange} className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-1">Current Password</label>
+                        <input
+                            type="password"
+                            value={passwordData.currentPassword}
+                            onChange={e => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                            className="w-full dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-4 py-2 dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                        />
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-1">New Password</label>
+                            <input
+                                type="password"
+                                value={passwordData.newPassword}
+                                onChange={e => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                                className="w-full dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-4 py-2 dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-1">Confirm New Password</label>
+                            <input
+                                type="password"
+                                value={passwordData.confirmPassword}
+                                onChange={e => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                                className="w-full dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-4 py-2 dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                            />
+                        </div>
+                    </div>
+
+                    {passwordMessage.text && (
+                        <div className={`p-4 rounded-lg text-sm ${passwordMessage.type === 'error' ? 'dark:bg-red-500/10 bg-red-50 dark:text-red-400 text-red-700' : 'dark:bg-green-500/10 bg-green-50 dark:text-green-400 text-green-700'}`}>
+                            {passwordMessage.text}
+                        </div>
+                    )}
+
+                    <div className="flex justify-end">
+                        <button
+                            type="submit"
+                            disabled={isChangingPassword}
+                            className="px-6 py-3 bg-gray-900 dark:bg-white dark:text-black text-white hover:bg-gray-800 dark:hover:bg-gray-200 rounded-lg font-medium transition-all disabled:opacity-50"
+                        >
+                            {isChangingPassword ? 'Updating...' : 'Update Password'}
+                        </button>
+                    </div>
+                </form>
+            </div>
+
             {/* Danger Zone */}
             <div className="mt-8 dark:bg-red-500/10 bg-red-50 border dark:border-red-500/30 border-red-300 rounded-xl p-6">
                 <h2 className="text-xl font-semibold dark:text-red-500 text-red-700 mb-4">Danger Zone</h2>
