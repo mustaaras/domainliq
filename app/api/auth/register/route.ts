@@ -38,7 +38,16 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        // Check if subdomain is reserved
+        // Check if subdomain is reserved (Hardcoded list)
+        const reservedSubdomains = ['market', 'marketplace', 'store', 'shop', 'buy', 'sell', 'checkout', 'pay', 'admin', 'api', 'www', 'mail', 'support', 'help', 'status'];
+        if (reservedSubdomains.includes(subdomain.toLowerCase())) {
+            return NextResponse.json(
+                { error: 'This subdomain is reserved and cannot be used.' },
+                { status: 400 }
+            );
+        }
+
+        // Check if subdomain is reserved (DB check)
         const isReserved = await db.reservedSubdomain.findUnique({
             where: { name: subdomain.toLowerCase() },
         });

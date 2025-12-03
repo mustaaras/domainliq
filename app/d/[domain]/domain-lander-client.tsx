@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ShieldCheck, ExternalLink, Edit2, Wand2, Save, X, Check, Globe, Zap, Lock, ChevronDown, ChevronUp, ArrowRight, Star } from 'lucide-react';
+import { ShieldCheck, ExternalLink, Edit2, Wand2, Save, X, Check, Globe, Zap, Lock, ChevronDown, ChevronUp, ArrowRight, Star, MessageCircle } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { Logo } from '@/components/logo';
 
@@ -17,6 +17,66 @@ export default function DomainLanderClient({ domain, isOwner }: DomainLanderClie
     const [isGenerating, setIsGenerating] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [showEscrowModal, setShowEscrowModal] = useState(false);
+    const [showContactModal, setShowContactModal] = useState(false);
+
+    // Get available contact methods
+    const availableMethods = [
+        domain.user.contactEmail && { type: 'email', label: 'Email', value: domain.user.contactEmail },
+        domain.user.twitterHandle && { type: 'twitter', label: 'X / Twitter', value: domain.user.twitterHandle },
+        domain.user.whatsappNumber && { type: 'whatsapp', label: 'WhatsApp', value: domain.user.whatsappNumber },
+        domain.user.linkedinProfile && { type: 'linkedin', label: 'LinkedIn', value: domain.user.linkedinProfile },
+        domain.user.telegramUsername && { type: 'telegram', label: 'Telegram', value: domain.user.telegramUsername },
+    ].filter(Boolean) as Array<{ type: string; label: string; value: string }>;
+
+    const handleContact = () => {
+        if (availableMethods.length > 1) {
+            setShowContactModal(true);
+        } else if (availableMethods.length === 1) {
+            contactViaMethod(availableMethods[0].type);
+        } else {
+            // Fallback to default email if nothing else (shouldn't happen if logic is correct, but good for safety)
+            window.location.href = `mailto:${domain.user.contactEmail || domain.user.email}?subject=Inquiry about ${domain.name}`;
+        }
+    };
+
+    const contactViaMethod = async (method: string) => {
+        const message = `Hi, I'm interested in the domain: ${domain.name}`;
+
+        switch (method) {
+            case 'twitter':
+                if (domain.user.twitterHandle) {
+                    await navigator.clipboard.writeText(message);
+                    window.open(`https://x.com/messages/compose?recipient=${domain.user.twitterHandle}`, '_blank');
+                }
+                break;
+            case 'whatsapp':
+                if (domain.user.whatsappNumber) {
+                    const encodedMessage = encodeURIComponent(message);
+                    window.open(`https://wa.me/${domain.user.whatsappNumber.replace(/[^0-9]/g, '')}?text=${encodedMessage}`, '_blank');
+                }
+                break;
+            case 'linkedin':
+                if (domain.user.linkedinProfile) {
+                    await navigator.clipboard.writeText(message);
+                    window.open(domain.user.linkedinProfile, '_blank');
+                }
+                break;
+            case 'telegram':
+                if (domain.user.telegramUsername) {
+                    const encodedMessage = encodeURIComponent(message);
+                    window.open(`https://t.me/${domain.user.telegramUsername}?text=${encodedMessage}`, '_blank');
+                }
+                break;
+            default: // email
+                const email = domain.user.contactEmail || domain.user.email;
+                if (email) {
+                    const subject = encodeURIComponent(`Inquiry about ${domain.name}`);
+                    const body = encodeURIComponent(message);
+                    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+                }
+                break;
+        }
+    };
 
     // AI Generation Logic
     const handleGenerateAI = async () => {
@@ -144,7 +204,7 @@ export default function DomainLanderClient({ domain, isOwner }: DomainLanderClie
                                 </button>
                             )}
                             <button
-                                onClick={() => window.location.href = `mailto:${domain.user.contactEmail || domain.user.email}?subject=Inquiry about ${domain.name}`}
+                                onClick={handleContact}
                                 className="w-full sm:w-auto px-8 py-4 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/10 text-gray-900 dark:text-white rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2"
                             >
                                 Contact Seller
@@ -325,6 +385,39 @@ export default function DomainLanderClient({ domain, isOwner }: DomainLanderClie
                     domain={domain}
                     onClose={() => setShowEscrowModal(false)}
                 />
+            )}
+
+            {/* Contact Method Selection Modal */}
+            {showContactModal && (
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50" onClick={() => setShowContactModal(false)}>
+                    <div className="dark:bg-[#0A0A0A] bg-white border dark:border-white/10 border-gray-300 rounded-xl p-6 max-w-md w-full shadow-xl" onClick={(e) => e.stopPropagation()}>
+                        <h3 className="text-xl font-bold mb-4 dark:text-white text-gray-900">Choose Contact Method</h3>
+                        <p className="dark:text-gray-400 text-gray-600 text-sm mb-6">How would you like to contact the seller?</p>
+
+                        <div className="space-y-3">
+                            {availableMethods.map((method) => (
+                                <button
+                                    key={method.type}
+                                    onClick={() => {
+                                        contactViaMethod(method.type);
+                                        setShowContactModal(false);
+                                    }}
+                                    className="w-full flex items-center justify-between p-4 dark:bg-white/5 bg-gray-50 dark:hover:bg-white/10 hover:bg-gray-100 border dark:border-white/10 border-gray-300 dark:hover:border-amber-500/50 hover:border-amber-400 rounded-lg transition-all group"
+                                >
+                                    <span className="dark:text-white text-gray-900 font-medium">{method.label}</span>
+                                    <span className="dark:text-gray-400 text-gray-500 text-sm dark:group-hover:text-amber-400 group-hover:text-amber-600 transition-colors">→</span>
+                                </button>
+                            ))}
+                        </div>
+
+                        <button
+                            onClick={() => setShowContactModal(false)}
+                            className="w-full mt-6 px-4 py-2 dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 transition-colors"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
             )}
         </div>
     );
