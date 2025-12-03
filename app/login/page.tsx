@@ -23,7 +23,7 @@ export default function LoginPage() {
         try {
             // Create a timeout promise
             const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Request timed out')), 15000)
+                setTimeout(() => reject(new Error('Request timed out')), 60000)
             );
 
             // Race between signIn and timeout
