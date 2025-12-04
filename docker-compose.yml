@@ -43,9 +43,8 @@ services:
       # ---------------------------------------------------------
       # 2. CATCH-ALL ROUTERS (Custom Domains) - LOW PRIORITY
       # ---------------------------------------------------------
-      # HTTP Router (Redirects to HTTPS)
-      # Note: Traefik automatically handles /.well-known/acme-challenge/ internally
-      - "traefik.http.routers.domainliq-catchall-http.rule=HostRegexp(`.+`)"
+      # HTTP Router (Redirects to HTTPS, but excludes ACME challenges)
+      - "traefik.http.routers.domainliq-catchall-http.rule=HostRegexp(`.+`) && !PathPrefix(`/.well-known/acme-challenge/`)"
       - "traefik.http.routers.domainliq-catchall-http.entrypoints=http"
       - "traefik.http.routers.domainliq-catchall-http.middlewares=redirect-to-https"
       - "traefik.http.routers.domainliq-catchall-http.priority=1"
