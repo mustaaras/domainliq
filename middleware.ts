@@ -8,6 +8,12 @@ export default async function middleware(req: NextRequest) {
     const url = req.nextUrl;
     const hostname = req.headers.get('host') || '';
 
+    // Redirect www to non-www for custom domains
+    if (hostname.startsWith('www.') && !hostname.includes('domainliq.com')) {
+        const nonWwwHost = hostname.replace(/^www\./, '');
+        return NextResponse.redirect(`https://${nonWwwHost}${url.pathname}${url.search}`, 301);
+    }
+
     // Define main domains that should NOT be rewritten
     // Adjust these based on your actual production domains
     const isMainDomain =
