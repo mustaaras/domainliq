@@ -5,9 +5,16 @@ import { z } from 'zod';
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 
-async function getUser(email: string) {
+async function getUser(identifier: string) {
     try {
-        const user = await db.user.findUnique({ where: { email } });
+        const user = await db.user.findFirst({
+            where: {
+                OR: [
+                    { email: identifier },
+                    { subdomain: identifier.toLowerCase() }
+                ]
+            }
+        });
         return user;
     } catch (error) {
         console.error('Failed to fetch user:', error);
@@ -21,7 +28,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         Credentials({
             async authorize(credentials) {
                 const parsedCredentials = z
-                    .object({ email: z.string().email(), password: z.string().min(6) })
+                    .object({ email: z.string(), password: z.string().min(6) })
                     .safeParse(credentials);
 
                 if (parsedCredentials.success) {

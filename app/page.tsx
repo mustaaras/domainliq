@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { Share2, MessageCircle, Check, Search, Loader2, ShieldCheck, Filter, X, ChevronDown, Trophy, ExternalLink } from 'lucide-react';
+import { db } from '@/lib/db';
+import { auth } from '@/auth';
+import { getProfileUrl } from '@/lib/utils';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { Logo } from '@/components/logo';
@@ -655,9 +658,9 @@ export default function Home() {
                             <div className="flex flex-col gap-1 min-w-0">
                               <div className="flex items-center gap-2 text-[10px] dark:text-gray-500 text-gray-600">
                                 <Link
-                                  href={`https://${domain.user.subdomain}.domainliq.com`}
+                                  href={getProfileUrl(domain.user.subdomain)}
                                   onClick={(e) => e.stopPropagation()}
-                                  className="dark:hover:text-amber-400 hover:text-amber-600 transition-colors truncate max-w-[100px]"
+                                  className="text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-amber-500 dark:hover:text-amber-400 transition-colors flex items-center gap-1"
                                 >
                                   {domain.user.subdomain}
                                 </Link>

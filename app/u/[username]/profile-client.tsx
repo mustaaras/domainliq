@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { MessageCircle, Check, ShieldCheck, Search, Filter, X, Loader2 } from 'lucide-react';
 import { useDebounce } from '@/hooks/use-debounce';
+import { getMainDomainUrl } from '@/lib/utils';
 import { Logo } from '@/components/logo';
 import { ChatWidget } from '@/components/chat-widget';
 
@@ -32,13 +33,14 @@ interface ProfileClientProps {
     user: User;
     initialDomains: Domain[];
     username: string;
+    initialTotal: number;
 }
 
-export default function ProfileClient({ user, initialDomains, username }: ProfileClientProps) {
+export default function ProfileClient({ user, initialDomains, username, initialTotal }: ProfileClientProps) {
     // Data state
     const [domains, setDomains] = useState<Domain[]>(initialDomains);
     const [isLoading, setIsLoading] = useState(false);
-    const [totalDomains, setTotalDomains] = useState(0);
+    const [totalDomains, setTotalDomains] = useState(initialTotal);
 
     // Selection state
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -100,7 +102,13 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
     }, [user.subdomain, page, limit, sortBy, debouncedSearch, selectedTLDs, verificationFilter, priceMin, priceMax]);
 
     // Initial fetch and refetch on filter changes
+    const isFirstRender = useRef(true);
+
     useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
         fetchDomains();
     }, [fetchDomains]);
 
@@ -212,11 +220,11 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
             <div className="max-w-7xl mx-auto px-4 py-8 pb-32 md:pb-12">
                 {/* Header */}
                 <header className="mb-8 text-center">
-                    <Link href="https://domainliq.com" className="inline-block mb-6">
+                    <Link href={getMainDomainUrl()} className="inline-block mb-6">
                         <Logo className="h-8 w-auto" />
                     </Link>
-                    <h1 className="text-3xl font-bold tracking-tight dark:text-white text-gray-900">
-                        {user.name || username}'s Domains
+                    <h1 className="text-3xl font-bold tracking-tight dark:text-white text-gray-900 capitalize">
+                        {user.subdomain}&apos;s Domains
                     </h1>
                     <p className="dark:text-gray-500 text-gray-600 mt-1">Domain Liquidation Platform</p>
                 </header>
@@ -469,7 +477,7 @@ export default function ProfileClient({ user, initialDomains, username }: Profil
                                                             </a>
                                                         )}
                                                         <Link
-                                                            href={`/d/${domain.name}`}
+                                                            href={`${getMainDomainUrl()}/d/${domain.name}`}
                                                             onClick={(e) => e.stopPropagation()}
                                                             className="flex items-center justify-center gap-1 px-2 py-1.5 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-bold dark:bg-white/10 bg-white/60 dark:hover:bg-white/20 hover:bg-white dark:text-gray-200 text-gray-800 dark:hover:text-white hover:text-black rounded-lg transition-all shadow-sm hover:shadow-md backdrop-blur-sm flex-1 sm:flex-none"
                                                         >

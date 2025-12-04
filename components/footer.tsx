@@ -4,9 +4,18 @@ import Link from 'next/link';
 import { Sun, Moon } from 'lucide-react';
 import { useTheme } from './theme-provider';
 import { Logo } from './logo';
+import { getMainDomainUrl } from '@/lib/utils';
+
+import { usePathname } from 'next/navigation';
 
 export default function Footer() {
     const { theme, toggleTheme } = useTheme();
+    const pathname = usePathname();
+
+    // Don't show global footer on domain landing pages (they have their own)
+    if (pathname?.startsWith('/d/')) {
+        return null;
+    }
 
     return (
         <footer className="border-t border-white/10 dark:bg-[#050505] bg-white dark:text-white text-gray-900">
@@ -14,7 +23,7 @@ export default function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                     {/* About */}
                     <div>
-                        <a href="https://domainliq.com">
+                        <a href={getMainDomainUrl()}>
                             <Logo className="h-8 w-auto mb-4 cursor-pointer" />
                         </a>
                         <p className="text-xs dark:text-gray-400 text-gray-600">
@@ -48,17 +57,17 @@ export default function Footer() {
                         <h3 className="font-semibold mb-4 dark:text-white text-gray-900">Resources</h3>
                         <ul className="space-y-2">
                             <li>
-                                <a href="https://domainliq.com/buyer-guide" className="dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 text-xs transition-colors">
+                                <a href={`${getMainDomainUrl()}/buyer-guide`} className="dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 text-xs transition-colors">
                                     Buyer's Guide
                                 </a>
                             </li>
                             <li>
-                                <a href="https://domainliq.com/seller-guide" className="dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 text-xs transition-colors">
+                                <a href={`${getMainDomainUrl()}/seller-guide`} className="dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 text-xs transition-colors">
                                     Seller's Guide
                                 </a>
                             </li>
                             <li>
-                                <a href="https://domainliq.com/resources/faq" className="dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 text-xs transition-colors">
+                                <a href={`${getMainDomainUrl()}/resources/faq`} className="dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 text-xs transition-colors">
                                     FAQ
                                 </a>
                             </li>
@@ -70,17 +79,17 @@ export default function Footer() {
                         <h3 className="font-semibold mb-4 dark:text-white text-gray-900">Legal</h3>
                         <ul className="space-y-2">
                             <li>
-                                <a href="https://domainliq.com/terms" className="dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 text-xs transition-colors">
+                                <a href={`${getMainDomainUrl()}/terms`} className="dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 text-xs transition-colors">
                                     Terms of Service
                                 </a>
                             </li>
                             <li>
-                                <a href="https://domainliq.com/privacy" className="dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 text-xs transition-colors">
+                                <a href={`${getMainDomainUrl()}/privacy`} className="dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 text-xs transition-colors">
                                     Privacy Policy
                                 </a>
                             </li>
                             <li>
-                                <a href="https://domainliq.com/contact" className="dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 text-xs transition-colors">
+                                <a href={`${getMainDomainUrl()}/contact`} className="dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 text-xs transition-colors">
                                     Contact Us
                                 </a>
                             </li>

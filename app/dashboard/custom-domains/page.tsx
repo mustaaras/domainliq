@@ -92,7 +92,10 @@ export default function CustomDomainsPage() {
                     <div>
                         <h2 className="text-2xl font-bold">Custom Domains</h2>
                         <p className="text-gray-500 dark:text-gray-400 mt-1">
-                            Connect your existing domains to DomainLiq.
+                            Connect your existing domains to use as your custom profile URL.
+                        </p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 max-w-xl">
+                            Note: If you only want to list a domain for sale without changing its DNS/Nameservers, please add it in the main Dashboard instead. This page is only for connecting domains to your DomainLiq profile.
                         </p>
                     </div>
                     <button

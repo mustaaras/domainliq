@@ -19,12 +19,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         where: { subdomain: username },
         include: {
             domains: {
-                where: { status: 'available' },
-                take: 10,
+                take: 20,
                 orderBy: { createdAt: 'desc' },
             },
             _count: {
-                select: { domains: { where: { status: 'available' } } }
+                select: { domains: true }
             }
         },
     });
@@ -37,28 +36,31 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
     const totalCount = user._count.domains;
     const domainList = user.domains.map((d: any) => d.name).join(', ');
+    const capitalizedUsername = username.charAt(0).toUpperCase() + username.slice(1);
     const description = totalCount > 0
         ? `${totalCount} domains available: ${domainList}${totalCount > 10 ? '...' : ''}`
-        : `Check out ${user.name || username}'s domain marketplace`;
+        : `Check out ${capitalizedUsername}'s domain marketplace`;
+
+
 
     return {
-        title: `${user.name || username}'s Domains - DomainLiq`,
+        title: `${capitalizedUsername}'s Domains - DomainLiq`,
         description,
         openGraph: {
-            title: `${user.name || username}'s Domain Listing`,
+            title: `${capitalizedUsername}'s Domain Listing`,
             description,
             images: [
                 {
                     url: `/api/og/${username}`,
                     width: 1200,
                     height: 630,
-                    alt: `${user.name || username}'s domains`,
+                    alt: `${capitalizedUsername}'s domains`,
                 },
             ],
         },
         twitter: {
             card: 'summary_large_image',
-            title: `${user.name || username}'s Domain Listing`,
+            title: `${capitalizedUsername}'s Domain Listing`,
             description,
             images: [`/api/og/${username}`],
         },
@@ -74,8 +76,12 @@ export default async function UserProfilePage({ params }: PageProps) {
         where: { subdomain: username },
         include: {
             domains: {
+                take: 20,
                 orderBy: { createdAt: 'desc' },
             },
+            _count: {
+                select: { domains: true }
+            }
         },
     });
 
@@ -104,5 +110,5 @@ export default async function UserProfilePage({ params }: PageProps) {
         verificationToken: domain.verificationToken || null, // Ensure null instead of undefined
     }));
 
-    return <ProfileClient user={userData} initialDomains={serializedDomains} username={username} />;
+    return <ProfileClient user={userData} initialDomains={serializedDomains} username={username} initialTotal={(user as any)._count.domains} />;
 }
