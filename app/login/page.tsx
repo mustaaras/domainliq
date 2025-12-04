@@ -54,8 +54,8 @@ export default function LoginPage() {
                 setIsLoading(false);
             } else {
                 console.log('Login successful, redirecting...');
-                router.push('/dashboard');
-                router.refresh();
+                // Use window.location for a full page refresh to pick up the session cookie
+                window.location.href = '/dashboard';
             }
         } catch (error: any) {
             console.error('Login exception:', error);
