@@ -366,48 +366,17 @@ async function markAsVerified(domainId: string, domainName: string, method: 'txt
     // Only register with Coolify if verified via A record (pointing to our server)
     if (method === 'a') {
         try {
-            // Use host.docker.internal to access host machine from Docker container
-            // Fallback to localhost for local development
-            const COOLIFY_URL = process.env.COOLIFY_API_URL || 'http://host.docker.internal:8000';
-            const COOLIFY_TOKEN = process.env.COOLIFY_API_TOKEN;
-            const APPLICATION_ID = process.env.COOLIFY_APPLICATION_ID;
+            console.log(`[Coolify] Attempting registration for ${domainName}...`);
+            const { addCustomDomainToCoolify } = await import('@/lib/coolify');
+            const result = await addCustomDomainToCoolify(domainName);
 
-            console.log(`[Coolify] Attempting registration:`, {
-                url: COOLIFY_URL,
-                appId: APPLICATION_ID,
-                domain: domainName,
-                hasToken: !!COOLIFY_TOKEN
-            });
-
-            if (COOLIFY_TOKEN && APPLICATION_ID) {
-                const apiUrl = `${COOLIFY_URL}/api/v1/applications/${APPLICATION_ID}/domains`;
-                const payload = { domain: `https://${domainName}` };
-
-                console.log(`[Coolify] Full API URL:`, apiUrl);
-                console.log(`[Coolify] Payload:`, payload);
-
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${COOLIFY_TOKEN}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload),
-                });
-
-                if (response.ok) {
-                    console.log(`✅ [Coolify] Registered ${domainName} for SSL (A record verified)`);
-                } else {
-                    const errorText = await response.text();
-                    console.error(`❌ [Coolify] Failed to register ${domainName}:`, response.status, errorText);
-                }
+            if (result.success) {
+                console.log(`✅ [Coolify] Registered ${domainName} for SSL`);
             } else {
-                console.error(`[Coolify] Missing credentials - Token: ${!!COOLIFY_TOKEN}, AppID: ${!!APPLICATION_ID}`);
+                console.error(`❌ [Coolify] Failed to register ${domainName}:`, result.error);
             }
         } catch (coolifyError: any) {
             console.error('[Coolify] Registration error:', coolifyError.message);
-            console.error('[Coolify] Error details:', coolifyError);
-            // Don't fail verification if Coolify fails
         }
     } else {
         console.log(`ℹ️  [Verification] Domain ${domainName} verified via ${method.toUpperCase()} (not pointing to server, no SSL needed)`);
