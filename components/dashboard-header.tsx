@@ -34,8 +34,9 @@ export function DashboardHeader() {
         }
     }, [session]);
 
-    const handleLogout = () => {
-        signOut({ callbackUrl: '/' });
+    const handleLogout = async () => {
+        await signOut({ redirect: false });
+        window.location.href = '/';
     };
 
     return (
