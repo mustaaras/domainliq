@@ -46,8 +46,8 @@ RUN \
 FROM base AS runner
 WORKDIR /app
 
-# Install OpenSSL for Prisma
-RUN apk add --no-cache openssl
+# Install OpenSSL and curl for Prisma and Healthchecks
+RUN apk add --no-cache openssl curl
 
 ENV NODE_ENV production
 # Uncomment the following line in case you want to disable telemetry during runtime.
