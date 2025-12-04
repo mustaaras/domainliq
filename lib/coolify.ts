@@ -34,14 +34,19 @@ export async function addCustomDomainToCoolify(newDomain: string) {
         const appData = await getResponse.json();
         const currentDomains = appData.fqdn || '';
 
+        console.log('[Coolify] Current Domains:', currentDomains);
+
         // 3. Check if domain already exists
         if (currentDomains.includes(fullUrl)) {
+            console.log('[Coolify] Domain already exists, skipping update.');
             return { success: true, message: 'Domain already exists' };
         }
 
         // 4. Append new domain (comma separated)
-        // IMPORTANT: We must preserve the wildcard and main domain!
-        const newFqdn = `${currentDomains},${fullUrl}`;
+        // Handle empty currentDomains correctly
+        const newFqdn = currentDomains ? `${currentDomains},${fullUrl}` : fullUrl;
+
+        console.log('[Coolify] Sending Update with FQDN:', newFqdn);
 
         // 5. Update the application
         const updateResponse = await fetch(`${COOLIFY_API_URL}/applications/${COOLIFY_APP_UUID}`, {
