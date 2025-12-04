@@ -16,7 +16,6 @@ export const authConfig = {
             return true;
         },
         async jwt({ token, user }) {
-            console.log('[Auth] JWT callback - user:', user?.email, 'token.sub:', token.sub);
             if (user) {
                 token.id = user.id;
                 token.email = user.email;
@@ -24,7 +23,6 @@ export const authConfig = {
             return token;
         },
         session({ session, token }) {
-            console.log('[Auth] Session callback - token.sub:', token.sub);
             if (session.user && token.sub) {
                 session.user.id = token.sub;
             }
