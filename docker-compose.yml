@@ -19,15 +19,18 @@ services:
       - "traefik.enable=true"
       # Manual Wildcard Configuration (The Nuclear Fix)
       # HTTP Router (Redirects to HTTPS)
-      - "traefik.http.routers.domainliq-wildcard-http.rule=Host(`domainliq.com`) || HostRegexp(`{subdomain:[a-z0-9-]+}.domainliq.com`)"
+      - "traefik.http.routers.domainliq-wildcard-http.rule=HostRegexp(`{subdomain:[a-z0-9-]+}.domainliq.com`)"
       - "traefik.http.routers.domainliq-wildcard-http.entrypoints=http"
       - "traefik.http.routers.domainliq-wildcard-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       # HTTPS Router
-      - "traefik.http.routers.domainliq-wildcard.rule=Host(`domainliq.com`) || HostRegexp(`{subdomain:[a-z0-9-]+}.domainliq.com`)"
+      - "traefik.http.routers.domainliq-wildcard.rule=HostRegexp(`{subdomain:[a-z0-9-]+}.domainliq.com`)"
       - "traefik.http.routers.domainliq-wildcard.entrypoints=https"
       - "traefik.http.routers.domainliq-wildcard.tls=true"
       - "traefik.http.routers.domainliq-wildcard.tls.certresolver=letsencrypt"
+      # FORCE Wildcard Certificate
+      - "traefik.http.routers.domainliq-wildcard.tls.domains[0].main=domainliq.com"
+      - "traefik.http.routers.domainliq-wildcard.tls.domains[0].sans=*.domainliq.com"
       - "traefik.http.routers.domainliq-wildcard.service=domainliq-app"
       - "traefik.http.services.domainliq-app.loadbalancer.server.port=3000"
     networks:
