@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { DashboardHeader } from '@/components/dashboard-header';
-import { Plus, Loader2, Check, AlertTriangle, ExternalLink, Trash2, RefreshCw } from 'lucide-react';
+import { Plus, Loader2, Check, AlertTriangle, ExternalLink, Trash2, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { AddCustomDomainModal } from '@/components/add-custom-domain-modal';
 import { DomainSetupInstructions } from '@/components/domain-setup-instructions';
 import { verifyRedirect } from '@/app/actions/verify-redirect';
@@ -24,6 +24,8 @@ export default function CustomDomainsPage() {
     const [isVerifying, setIsVerifying] = useState(false);
     const [activeTab, setActiveTab] = useState<'redirect' | 'arecord'>('redirect');
     const [verificationResult, setVerificationResult] = useState<{ success?: boolean; error?: string } | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     const fetchDomains = async () => {
         try {
@@ -114,42 +116,69 @@ export default function CustomDomainsPage() {
                                 <p className="text-gray-500 dark:text-gray-400">No domains added yet.</p>
                             </div>
                         ) : (
-                            domains.map(domain => (
-                                <div
-                                    key={domain.id}
-                                    onClick={() => {
-                                        setSelectedDomain(domain);
-                                        setVerificationResult(null);
-                                        setActiveTab('redirect'); // Reset tab when changing domain
-                                    }}
-                                    className={`p-4 border rounded-xl cursor-pointer transition-all ${selectedDomain?.id === domain.id
-                                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 ring-1 ring-indigo-500'
-                                        : 'border-gray-200 dark:border-white/10 bg-white dark:bg-[#111] hover:border-indigo-300 dark:hover:border-indigo-700'
-                                        }`}
-                                >
-                                    <div className="flex items-center justify-between mb-2">
-                                        <h3 className="font-medium truncate">{domain.name}</h3>
-                                        {domain.isVerified ? (
-                                            <span className="px-2 py-0.5 text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full flex items-center gap-1">
-                                                <Check className="h-3 w-3" />
-                                                Verified
-                                            </span>
-                                        ) : (
-                                            <span className="px-2 py-0.5 text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-full flex items-center gap-1">
-                                                <AlertTriangle className="h-3 w-3" />
-                                                Unverified
-                                            </span>
-                                        )}
+                            <>
+                                {domains
+                                    .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                                    .map(domain => (
+                                        <div
+                                            key={domain.id}
+                                            onClick={() => {
+                                                setSelectedDomain(domain);
+                                                setVerificationResult(null);
+                                                setActiveTab('redirect'); // Reset tab when changing domain
+                                            }}
+                                            className={`p-4 border rounded-xl cursor-pointer transition-all ${selectedDomain?.id === domain.id
+                                                ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 ring-1 ring-indigo-500'
+                                                : 'border-gray-200 dark:border-white/10 bg-white dark:bg-[#111] hover:border-indigo-300 dark:hover:border-indigo-700'
+                                                }`}
+                                        >
+                                            <div className="flex items-center justify-between mb-2">
+                                                <h3 className="font-medium truncate">{domain.name}</h3>
+                                                {domain.isVerified ? (
+                                                    <span className="px-2 py-0.5 text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full flex items-center gap-1">
+                                                        <Check className="h-3 w-3" />
+                                                        Verified
+                                                    </span>
+                                                ) : (
+                                                    <span className="px-2 py-0.5 text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-full flex items-center gap-1">
+                                                        <AlertTriangle className="h-3 w-3" />
+                                                        Unverified
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                                                {domain.verificationMethod ? (
+                                                    <span className="uppercase">{domain.verificationMethod}</span>
+                                                ) : (
+                                                    <span>Setup Required</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+
+                                {/* Pagination Controls */}
+                                {domains.length > itemsPerPage && (
+                                    <div className="flex items-center justify-between pt-4 border-t dark:border-white/10">
+                                        <button
+                                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                            disabled={currentPage === 1}
+                                            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                        >
+                                            <ChevronLeft className="h-4 w-4" />
+                                        </button>
+                                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                                            Page {currentPage} of {Math.ceil(domains.length / itemsPerPage)}
+                                        </span>
+                                        <button
+                                            onClick={() => setCurrentPage(p => Math.min(Math.ceil(domains.length / itemsPerPage), p + 1))}
+                                            disabled={currentPage === Math.ceil(domains.length / itemsPerPage)}
+                                            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                        >
+                                            <ChevronRight className="h-4 w-4" />
+                                        </button>
                                     </div>
-                                    <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
-                                        {domain.verificationMethod ? (
-                                            <span className="uppercase">{domain.verificationMethod}</span>
-                                        ) : (
-                                            <span>Setup Required</span>
-                                        )}
-                                    </div>
-                                </div>
-                            ))
+                                )}
+                            </>
                         )}
                     </div>
 
