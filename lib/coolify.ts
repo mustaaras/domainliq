@@ -64,32 +64,19 @@ export async function addCustomDomainToCoolify(newDomain: string) {
             return { success: true, message: 'Domain already exists' };
         }
 
-        // 4. Append new domain (comma separated)
-        const newDomainsList = currentDomains ? `${currentDomains},${fullUrl}` : fullUrl;
+        console.log('[Coolify] Adding new domain via POST /domains:', fullUrl);
 
-        console.log('[Coolify] Sending Update with Domains:', newDomainsList);
-
-        // 5. Update the application
-        let payload: any = {};
-
-        if (isDockerCompose) {
-            // Update the JSON structure
-            const serviceName = Object.keys(dockerComposeDomains)[0] || 'app';
-            if (!dockerComposeDomains[serviceName]) dockerComposeDomains[serviceName] = {};
-            dockerComposeDomains[serviceName].domain = newDomainsList;
-
-            payload = { docker_compose_domains: JSON.stringify(dockerComposeDomains) };
-        } else {
-            payload = { fqdn: newDomainsList };
-        }
-
-        const updateResponse = await fetch(`${COOLIFY_API_URL}/applications/${COOLIFY_APP_UUID}`, {
-            method: 'PATCH',
+        // 5. Add the domain using the specific endpoint
+        // This works for both Docker Compose and standard deployments
+        const updateResponse = await fetch(`${COOLIFY_API_URL}/applications/${COOLIFY_APP_UUID}/domains`, {
+            method: 'POST',
             headers: {
                 'Authorization': `Bearer ${COOLIFY_API_TOKEN}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(payload),
+            body: JSON.stringify({
+                domain: fullUrl,
+            }),
         });
 
         if (!updateResponse.ok) {
