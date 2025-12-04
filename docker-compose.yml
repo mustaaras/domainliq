@@ -19,12 +19,12 @@ services:
       - "traefik.docker.network=coolify"
       # Manual Wildcard Configuration (The Nuclear Fix)
       # HTTP Router (Redirects to HTTPS)
-      - "traefik.http.routers.domainliq-wildcard-http.rule=Host(`test.domainliq.com`) || HostRegexp(`{subdomain:[a-z0-9-]+}.domainliq.com`)"
+      - "traefik.http.routers.domainliq-wildcard-http.rule=Host(`test.domainliq.com`) || Host(`aras.domainliq.com`) || HostRegexp(`^.+\\.domainliq\\.com$`)"
       - "traefik.http.routers.domainliq-wildcard-http.entrypoints=http"
       - "traefik.http.routers.domainliq-wildcard-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       # HTTPS Router
-      - "traefik.http.routers.domainliq-wildcard.rule=Host(`test.domainliq.com`) || HostRegexp(`{subdomain:[a-z0-9-]+}.domainliq.com`)"
+      - "traefik.http.routers.domainliq-wildcard.rule=Host(`test.domainliq.com`) || Host(`aras.domainliq.com`) || HostRegexp(`^.+\\.domainliq\\.com$`)"
       - "traefik.http.routers.domainliq-wildcard.entrypoints=https"
       - "traefik.http.routers.domainliq-wildcard.tls=true"
       - "traefik.http.routers.domainliq-wildcard.tls.certresolver=letsencrypt"
