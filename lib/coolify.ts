@@ -15,7 +15,7 @@ export async function addCustomDomainToCoolify(newDomain: string) {
     }
 
     // 1. Clean the domain (remove protocol, trailing slash)
-    const domain cleanDomain = newDomain.replace(/^https?:\/\//, '').replace(/\/$/, '');
+    const cleanDomain = newDomain.replace(/^https?:\/\//, '').replace(/\/$/, '');
     const fullUrl = `https://${cleanDomain}`;
 
     try {
