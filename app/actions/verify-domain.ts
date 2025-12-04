@@ -365,7 +365,7 @@ async function markAsVerified(domainId: string, domainName: string, method: 'txt
 
     // Only register with Coolify if verified via A record (pointing to our server)
     if (method === 'a') {
-        console.log(`ℹ️ [Coolify] Domain ${domainName} verified. Please add it manually to Coolify for SSL.`);
+        console.log(`ℹ️ [Coolify] Domain ${domainName} verified. SSL should be provisioned automatically via On-Demand TLS.`);
     } else {
         console.log(`ℹ️ [Verification] Domain ${domainName} verified via ${method.toUpperCase()}`);
     }
