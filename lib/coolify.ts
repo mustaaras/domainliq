@@ -32,6 +32,8 @@ export async function addCustomDomainToCoolify(newDomain: string) {
         }
 
         const appData = await getResponse.json();
+        console.log('[Coolify] Full App Data:', JSON.stringify(appData, null, 2));
+
         const currentDomains = appData.fqdn || '';
 
         console.log('[Coolify] Current Domains:', currentDomains);
