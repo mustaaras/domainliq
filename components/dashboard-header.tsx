@@ -10,11 +10,21 @@ export function DashboardHeader() {
     const { data: session } = useSession();
     const [unreadCount, setUnreadCount] = useState(0);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-    // Derive subdomain from email (simple logic matching the main dashboard)
-    const userSubdomain = session?.user?.email?.split('@')[0].replace(/[^a-z0-9]/g, '') || '';
+    const [userSubdomain, setUserSubdomain] = useState('');
 
     useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const res = await fetch('/api/user/profile');
+                const data = await res.json();
+                if (data.subdomain) {
+                    setUserSubdomain(data.subdomain);
+                }
+            } catch (e) {
+                console.error('Failed to fetch user profile:', e);
+            }
+        };
+
         const fetchUnread = async () => {
             try {
                 const res = await fetch('/api/user/chat/unread');
@@ -28,6 +38,7 @@ export function DashboardHeader() {
         };
 
         if (session) {
+            fetchUserData();
             fetchUnread();
             const interval = setInterval(fetchUnread, 5000);
             return () => clearInterval(interval);
