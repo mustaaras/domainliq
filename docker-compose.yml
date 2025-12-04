@@ -57,12 +57,12 @@ services:
       - "traefik.http.routers.domainliq-catchall.tls.certresolver=letsencrypt_http"
       - "traefik.http.routers.domainliq-catchall.priority=1"
       # Connect both routers to the same service
-      - "traefik.http.routers.domainliq-catchall.service=app"
+      # - "traefik.http.routers.domainliq-catchall.service=app"
 
       # ---------------------------------------------------------
       # SERVICE DEFINITION
       # ---------------------------------------------------------
-      - "traefik.http.routers.domainliq-wildcard.service=app"
+      # - "traefik.http.routers.domainliq-wildcard.service=app"
       - "traefik.http.services.app.loadbalancer.server.port=3000"
     networks:
       - coolify
