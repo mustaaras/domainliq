@@ -41,7 +41,8 @@ export default async function middleware(req: NextRequest) {
         }
 
         // Otherwise, it's a fully custom domain (e.g. possible.bet) -> Domain Lander
-        console.log(`[Middleware] Custom Domain detected -> Rewriting to: /d/${currentHost}${url.pathname}`);
+        console.log(`[Middleware] Custom Domain detected: ${currentHost}`);
+        console.log(`[Middleware] Rewriting to: /d/${currentHost}${url.pathname}`);
         url.pathname = `/d/${currentHost}${url.pathname}`;
         return NextResponse.rewrite(url);
     }
