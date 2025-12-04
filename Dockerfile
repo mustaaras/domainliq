@@ -88,7 +88,7 @@ USER nextjs
 EXPOSE 3000
 
 ENV PORT 3000
-# Set hostname to localhost (not 0.0.0.0) for correct URL resolution
-ENV HOSTNAME "localhost"
+# HOSTNAME must be 0.0.0.0 for Docker networking. Set AUTH_URL in Coolify env vars to override for NextAuth.
+ENV HOSTNAME "0.0.0.0"
 
 CMD ["./start.sh"]
