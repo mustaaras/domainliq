@@ -367,14 +367,15 @@ async function markAsVerified(domainId: string, domainName: string, method: 'txt
     if (method === 'a') {
         try {
             console.log(`[Coolify] Attempting registration for ${domainName}...`);
-            const { addCustomDomainToCoolify } = await import('@/lib/coolify');
-            const result = await addCustomDomainToCoolify(domainName);
+            // const { addCustomDomainToCoolify } = await import('@/lib/coolify');
+            // const result = await addCustomDomainToCoolify(domainName);
 
-            if (result.success) {
-                console.log(`✅ [Coolify] Registered ${domainName} for SSL`);
-            } else {
-                console.error(`❌ [Coolify] Failed to register ${domainName}:`, result.error);
-            }
+            // if (result.success) {
+            //     console.log(`✅ [Coolify] Registered ${domainName} for SSL`);
+            // } else {
+            //     console.error(`❌ [Coolify] Failed to register ${domainName}:`, result.error);
+            // }
+            console.log(`ℹ️ [Coolify] API automation disabled. Please ensure On-Demand TLS is enabled in Coolify Proxy settings.`);
         } catch (coolifyError: any) {
             console.error('[Coolify] Registration error:', coolifyError.message);
         }
