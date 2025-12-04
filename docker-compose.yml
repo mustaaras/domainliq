@@ -55,15 +55,14 @@ services:
       - "traefik.http.routers.domainliq-catchall.tls=true"
       - "traefik.http.routers.domainliq-catchall.tls.certresolver=letsencrypt"
       - "traefik.http.routers.domainliq-catchall.priority=1"
-
-      # Connect both routers to the same service
-      - "traefik.http.routers.domainliq-catchall.service=domainliq-manual-svc"
+      # Connect both routers to the same service (Implicit default service)
+      # - "traefik.http.routers.domainliq-catchall.service=domainliq-manual-svc"
 
       # ---------------------------------------------------------
       # SERVICE DEFINITION
       # ---------------------------------------------------------
-      - "traefik.http.routers.domainliq-wildcard.service=domainliq-manual-svc"
-      - "traefik.http.services.domainliq-manual-svc.loadbalancer.server.port=3000"
+      # - "traefik.http.routers.domainliq-wildcard.service=domainliq-manual-svc"
+      # - "traefik.http.services.domainliq-manual-svc.loadbalancer.server.port=3000"
     networks:
       - coolify
 
