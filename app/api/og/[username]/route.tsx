@@ -57,16 +57,16 @@ export async function GET(
                                         padding: '12px 40px',
                                     }}
                                 >
-                                    <div style={{ color: '#FFFFFF', fontSize: 46, fontWeight: 700, letterSpacing: '-0.02em' }}>
+                                    <div style={{ display: 'flex', color: '#FFFFFF', fontSize: 46, fontWeight: 700, letterSpacing: '-0.02em' }}>
                                         {domain.name}
                                     </div>
-                                    <div style={{ color: '#F59E0B', fontSize: 46, fontWeight: 600 }}>
+                                    <div style={{ display: 'flex', color: '#F59E0B', fontSize: 46, fontWeight: 600 }}>
                                         ${domain.price.toLocaleString()}
                                     </div>
                                 </div>
                             ))
                         ) : (
-                            <div style={{ color: '#6B7280', fontSize: 32 }}>
+                            <div style={{ display: 'flex', color: '#6B7280', fontSize: 32 }}>
                                 No domains listed yet
                             </div>
                         )}
