@@ -659,7 +659,7 @@ export default function Home() {
                                   onClick={(e) => e.stopPropagation()}
                                   className="dark:hover:text-amber-400 hover:text-amber-600 transition-colors truncate max-w-[100px]"
                                 >
-                                  {domain.user.name || domain.user.subdomain}
+                                  {domain.user.subdomain}
                                 </Link>
                                 {isSold && (
                                   <span className="px-1 py-0.5 text-[9px] font-medium bg-amber-500/20 text-amber-500 dark:text-amber-400 rounded-full">
