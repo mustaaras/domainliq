@@ -15,7 +15,7 @@ export function DashboardHeader() {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const res = await fetch('/api/user/profile');
+                const res = await fetch('/api/user/settings');
                 const data = await res.json();
                 if (data.subdomain) {
                     setUserSubdomain(data.subdomain);
