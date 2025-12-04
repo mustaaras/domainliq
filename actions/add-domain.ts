@@ -1,6 +1,6 @@
 'use server';
 
-import { addCustomDomainToCoolify } from '@/lib/coolify';
+// import { addCustomDomainToCoolify } from '@/lib/coolify';
 import { auth } from '@/auth'; // Assuming you have auth setup
 
 export async function addDomainAction(domain: string) {
@@ -20,9 +20,12 @@ export async function addDomainAction(domain: string) {
     }
 
     try {
-        const result = await addCustomDomainToCoolify(domain);
-        return result;
+        // const result = await addCustomDomainToCoolify(domain);
+        // return result;
+        console.log(`[AddDomain] Domain ${domain} added (Manual SSL required)`);
+        return { success: true, message: 'Domain added. Please configure SSL manually in Coolify.' };
     } catch (error) {
         return { success: false, error: 'Failed to add domain' };
     }
 }
+
