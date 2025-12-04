@@ -53,34 +53,16 @@ export default function DashboardPage() {
     const [showBulkEditPriceModal, setShowBulkEditPriceModal] = useState(false);
     const [bulkEditPriceValue, setBulkEditPriceValue] = useState('');
 
-    // Chat notifications
+    // Chat notifications (in-app only)
     const [unreadCount, setUnreadCount] = useState(0);
 
     useEffect(() => {
-        // Request notification permission on mount
-        if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
-            Notification.requestPermission();
-        }
-
         const fetchUnread = async () => {
             try {
                 const res = await fetch('/api/user/chat/unread');
                 const data = await res.json();
                 if (typeof data.count === 'number') {
-                    setUnreadCount(prev => {
-                        // Trigger notification if count increased
-                        if (data.count > prev && typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
-                            try {
-                                new Notification('New Message', {
-                                    body: `You have ${data.count} unread messages`,
-                                    icon: '/favicon.ico'
-                                });
-                            } catch (e) {
-                                console.error('Notification failed:', e);
-                            }
-                        }
-                        return data.count;
-                    });
+                    setUnreadCount(data.count);
                 }
             } catch (e) {
                 console.error(e);
