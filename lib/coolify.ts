@@ -41,6 +41,7 @@ export async function addCustomDomainToCoolify(newDomain: string) {
 
         if (isDockerCompose) {
             try {
+                // It comes as a string from the API
                 dockerComposeDomains = JSON.parse(appData.docker_compose_domains);
                 // Assuming the service name is 'app' - this is standard for Coolify Next.js
                 // If not found, try to find the first key
@@ -64,19 +65,35 @@ export async function addCustomDomainToCoolify(newDomain: string) {
             return { success: true, message: 'Domain already exists' };
         }
 
-        console.log('[Coolify] Adding new domain via POST /domains:', fullUrl);
+        // 4. Append new domain (comma separated)
+        const newDomainsList = currentDomains ? `${currentDomains},${fullUrl}` : fullUrl;
 
-        // 5. Add the domain using the specific endpoint
-        // This works for both Docker Compose and standard deployments
-        const updateResponse = await fetch(`${COOLIFY_API_URL}/applications/${COOLIFY_APP_UUID}/domains`, {
-            method: 'POST',
+        console.log('[Coolify] Sending Update with Domains:', newDomainsList);
+
+        // 5. Update the application
+        let payload: any = {};
+
+        if (isDockerCompose) {
+            // Update the JSON structure
+            const serviceName = Object.keys(dockerComposeDomains)[0] || 'app';
+            if (!dockerComposeDomains[serviceName]) dockerComposeDomains[serviceName] = {};
+            dockerComposeDomains[serviceName].domain = newDomainsList;
+
+            // IMPORTANT: Send as OBJECT, not string. Coolify should handle the casting.
+            payload = { docker_compose_domains: dockerComposeDomains };
+        } else {
+            payload = { fqdn: newDomainsList };
+        }
+
+        console.log('[Coolify] PATCH Payload:', JSON.stringify(payload, null, 2));
+
+        const updateResponse = await fetch(`${COOLIFY_API_URL}/applications/${COOLIFY_APP_UUID}`, {
+            method: 'PATCH',
             headers: {
                 'Authorization': `Bearer ${COOLIFY_API_TOKEN}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                domain: fullUrl,
-            }),
+            body: JSON.stringify(payload),
         });
 
         if (!updateResponse.ok) {
