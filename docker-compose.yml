@@ -54,8 +54,8 @@ services:
       - "traefik.http.routers.domainliq-catchall.rule=HostRegexp(`.+`)"
       - "traefik.http.routers.domainliq-catchall.entrypoints=https"
       - "traefik.http.routers.domainliq-catchall.tls=true"
-      # Use HTTP Challenge resolver for custom domains (On-Demand)
-      - "traefik.http.routers.domainliq-catchall.tls.certresolver=letsencrypt_http"
+      # Use DNS Challenge resolver for custom domains (same as wildcard)
+      - "traefik.http.routers.domainliq-catchall.tls.certresolver=letsencrypt"
       - "traefik.http.routers.domainliq-catchall.priority=1"
       # Connect both routers to the same service
       - "traefik.http.routers.domainliq-catchall.service=domainliq-service"
