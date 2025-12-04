@@ -59,14 +59,16 @@ export async function addCustomDomainToCoolify(newDomain: string) {
 
         console.log('[Coolify] Current Domains:', currentDomains);
 
-        // 3. Check if domain already exists
-        if (currentDomains.includes(fullUrl)) {
+        // 3. Check if domain already exists (check both with and without protocol)
+        if (currentDomains.includes(fullUrl) || currentDomains.includes(cleanDomain)) {
             console.log('[Coolify] Domain already exists, skipping update.');
             return { success: true, message: 'Domain already exists' };
         }
 
         // 4. Append new domain (comma separated)
-        const newDomainsList = currentDomains ? `${currentDomains},${fullUrl}` : fullUrl;
+        // TRY WITHOUT PROTOCOL FIRST (Coolify might add it, or prefer it without)
+        // Also keep existing domains as is
+        const newDomainsList = currentDomains ? `${currentDomains},${cleanDomain}` : cleanDomain;
 
         console.log('[Coolify] Sending Update with Domains:', newDomainsList);
 
@@ -80,7 +82,10 @@ export async function addCustomDomainToCoolify(newDomain: string) {
             dockerComposeDomains[serviceName].domain = newDomainsList;
 
             // IMPORTANT: Send as OBJECT, not string. Coolify should handle the casting.
-            payload = { docker_compose_domains: dockerComposeDomains };
+            payload = {
+                docker_compose_domains: dockerComposeDomains,
+                description: `Updated via API at ${new Date().toISOString()}` // Control test
+            };
         } else {
             payload = { fqdn: newDomainsList };
         }
