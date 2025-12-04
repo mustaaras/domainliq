@@ -87,9 +87,10 @@ export async function verifyDomain(domainId: string) {
             }
 
             // Check NS via DNS/DoH
+            const validNsRecords = ['ns3verify.domainliq.com', 'ns1.domainliq.com', 'ns2.domainliq.com'];
             const isNsMatch = Array.from(nsRecords).some((record: string) => {
                 const cleanRecord = record.replace(/\.$/, '').toLowerCase();
-                return cleanRecord === expectedNsRecord;
+                return validNsRecords.includes(cleanRecord);
             });
 
             if (isNsMatch) {

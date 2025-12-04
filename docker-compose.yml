@@ -9,7 +9,6 @@ services:
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - AUTH_SECRET=${AUTH_SECRET}
-      - AUTH_URL=http://localhost:3000
       - AUTH_TRUST_HOST=true
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:3000/api/health" ]
@@ -19,6 +18,7 @@ services:
       start_period: 30s
     extra_hosts:
       - "host.docker.internal:host-gateway"
+      - "domainliq.com:host-gateway"
     labels:
       - "traefik.docker.network=coolify"
       # ---------------------------------------------------------
