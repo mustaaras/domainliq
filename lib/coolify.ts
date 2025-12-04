@@ -34,7 +34,27 @@ export async function addCustomDomainToCoolify(newDomain: string) {
         const appData = await getResponse.json();
         console.log('[Coolify] Full App Data:', JSON.stringify(appData, null, 2));
 
-        const currentDomains = appData.fqdn || '';
+        // Handle Docker Compose deployments
+        let currentDomains = '';
+        let dockerComposeDomains: any = {};
+        const isDockerCompose = !!appData.docker_compose_domains;
+
+        if (isDockerCompose) {
+            try {
+                dockerComposeDomains = JSON.parse(appData.docker_compose_domains);
+                // Assuming the service name is 'app' - this is standard for Coolify Next.js
+                // If not found, try to find the first key
+                const serviceName = Object.keys(dockerComposeDomains)[0];
+                if (serviceName) {
+                    currentDomains = dockerComposeDomains[serviceName].domain || '';
+                    console.log(`[Coolify] Found Docker Compose domains for service '${serviceName}':`, currentDomains);
+                }
+            } catch (e) {
+                console.error('[Coolify] Failed to parse docker_compose_domains:', e);
+            }
+        } else {
+            currentDomains = appData.fqdn || '';
+        }
 
         console.log('[Coolify] Current Domains:', currentDomains);
 
@@ -45,21 +65,31 @@ export async function addCustomDomainToCoolify(newDomain: string) {
         }
 
         // 4. Append new domain (comma separated)
-        // Handle empty currentDomains correctly
-        const newFqdn = currentDomains ? `${currentDomains},${fullUrl}` : fullUrl;
+        const newDomainsList = currentDomains ? `${currentDomains},${fullUrl}` : fullUrl;
 
-        console.log('[Coolify] Sending Update with FQDN:', newFqdn);
+        console.log('[Coolify] Sending Update with Domains:', newDomainsList);
 
         // 5. Update the application
+        let payload: any = {};
+
+        if (isDockerCompose) {
+            // Update the JSON structure
+            const serviceName = Object.keys(dockerComposeDomains)[0] || 'app';
+            if (!dockerComposeDomains[serviceName]) dockerComposeDomains[serviceName] = {};
+            dockerComposeDomains[serviceName].domain = newDomainsList;
+
+            payload = { docker_compose_domains: JSON.stringify(dockerComposeDomains) };
+        } else {
+            payload = { fqdn: newDomainsList };
+        }
+
         const updateResponse = await fetch(`${COOLIFY_API_URL}/applications/${COOLIFY_APP_UUID}`, {
             method: 'PATCH',
             headers: {
                 'Authorization': `Bearer ${COOLIFY_API_TOKEN}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                fqdn: newFqdn,
-            }),
+            body: JSON.stringify(payload),
         });
 
         if (!updateResponse.ok) {
