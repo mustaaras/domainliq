@@ -44,13 +44,13 @@ services:
       # 2. CATCH-ALL ROUTERS (Custom Domains) - LOW PRIORITY
       # ---------------------------------------------------------
       # HTTP Router (Redirects to HTTPS)
-      - "traefik.http.routers.domainliq-catchall-http.rule=HostRegexp(`{host:.+}`)"
+      - "traefik.http.routers.domainliq-catchall-http.rule=HostRegexp(`.+`)"
       - "traefik.http.routers.domainliq-catchall-http.entrypoints=http"
       - "traefik.http.routers.domainliq-catchall-http.middlewares=redirect-to-https"
       - "traefik.http.routers.domainliq-catchall-http.priority=1"
 
       # HTTPS Router
-      - "traefik.http.routers.domainliq-catchall.rule=HostRegexp(`{host:.+}`)"
+      - "traefik.http.routers.domainliq-catchall.rule=HostRegexp(`.+`)"
       - "traefik.http.routers.domainliq-catchall.entrypoints=https"
       - "traefik.http.routers.domainliq-catchall.tls=true"
       # Use HTTP Challenge resolver for custom domains (On-Demand)
