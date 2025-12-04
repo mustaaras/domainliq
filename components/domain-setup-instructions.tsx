@@ -7,8 +7,8 @@ interface DomainSetupInstructionsProps {
     domainName: string;
     onVerify: () => void;
     isVerifying: boolean;
-    activeTab: 'redirect' | 'arecord' | 'nameservers';
-    onTabChange: (tab: 'redirect' | 'arecord' | 'nameservers') => void;
+    activeTab: 'redirect' | 'arecord';
+    onTabChange: (tab: 'redirect' | 'arecord') => void;
 }
 
 export function DomainSetupInstructions({ domainName, onVerify, isVerifying, activeTab, onTabChange }: DomainSetupInstructionsProps) {
@@ -43,15 +43,6 @@ export function DomainSetupInstructions({ domainName, onVerify, isVerifying, act
                         }`}
                 >
                     Option 2: A Record
-                </button>
-                <button
-                    onClick={() => onTabChange('nameservers')}
-                    className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors whitespace-nowrap ${activeTab === 'nameservers'
-                        ? 'bg-white dark:bg-white/10 text-indigo-600 dark:text-indigo-400 shadow-sm'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                        }`}
-                >
-                    Option 3: Nameservers
                 </button>
             </div>
 
@@ -141,62 +132,6 @@ export function DomainSetupInstructions({ domainName, onVerify, isVerifying, act
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            )}
-
-            {activeTab === 'nameservers' && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                    <div className="bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 rounded-lg p-4">
-                        <div className="flex items-start gap-3">
-                            <div className="p-2 bg-blue-100 dark:bg-blue-500/20 rounded-full">
-                                <ShieldCheck className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                            </div>
-                            <div>
-                                <h4 className="font-medium text-blue-900 dark:text-blue-200">Managed DNS & SSL</h4>
-                                <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-                                    Point your nameservers to us. We'll handle the DNS configuration and automatically provision SSL certificates for you.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-medium dark:text-white">Setup Instructions</h3>
-                        <ol className="list-decimal list-inside space-y-3 text-gray-600 dark:text-gray-300">
-                            <li>Log in to your domain registrar.</li>
-                            <li>Find the <strong>Nameservers</strong> settings.</li>
-                            <li>Select <strong>Custom Nameservers</strong> and enter:</li>
-                        </ol>
-
-                        <div className="grid gap-3">
-                            <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg font-mono text-sm group">
-                                <span className="text-gray-500 dark:text-gray-400 w-8">NS1</span>
-                                <span className="flex-1 font-medium">ns1.domainliq.com</span>
-                                <button
-                                    onClick={() => copyToClipboard('ns1.domainliq.com')}
-                                    className="p-2 hover:bg-gray-200 dark:hover:bg-white/10 rounded-md transition-colors opacity-0 group-hover:opacity-100"
-                                    title="Copy NS1"
-                                >
-                                    {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                                </button>
-                            </div>
-                            <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg font-mono text-sm group">
-                                <span className="text-gray-500 dark:text-gray-400 w-8">NS2</span>
-                                <span className="flex-1 font-medium">ns2.domainliq.com</span>
-                                <button
-                                    onClick={() => copyToClipboard('ns2.domainliq.com')}
-                                    className="p-2 hover:bg-gray-200 dark:hover:bg-white/10 rounded-md transition-colors opacity-0 group-hover:opacity-100"
-                                    title="Copy NS2"
-                                >
-                                    {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                                </button>
-                            </div>
-                        </div>
-
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                            Note: Nameserver changes can take up to 24-48 hours to propagate globally.
-                        </p>
                     </div>
                 </div>
             )}

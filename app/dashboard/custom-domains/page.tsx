@@ -22,7 +22,7 @@ export default function CustomDomainsPage() {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null);
     const [isVerifying, setIsVerifying] = useState(false);
-    const [activeTab, setActiveTab] = useState<'redirect' | 'arecord' | 'nameservers'>('redirect');
+    const [activeTab, setActiveTab] = useState<'redirect' | 'arecord'>('redirect');
     const [verificationResult, setVerificationResult] = useState<{ success?: boolean; error?: string } | null>(null);
 
     const fetchDomains = async () => {
@@ -71,17 +71,6 @@ export default function CustomDomainsPage() {
                 }
                 setVerificationResult({
                     error: aRecordRes.error || 'A Record not found or incorrect. Please check your DNS settings.'
-                });
-            } else if (activeTab === 'nameservers') {
-                // Try Nameserver verification
-                const nsRes = await verifyDomain(selectedDomain.id);
-                if (nsRes.success) {
-                    setVerificationResult({ success: true });
-                    fetchDomains(); // Refresh list
-                    return;
-                }
-                setVerificationResult({
-                    error: nsRes.error || 'Nameservers not verified. Please ensure they are pointing to ns1.domainliq.com and ns2.domainliq.com'
                 });
             }
 

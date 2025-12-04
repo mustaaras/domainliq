@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
-import { ExternalLink, MessageCircle, Settings, LogOut, Menu, X } from 'lucide-react';
+import { ExternalLink, MessageCircle, Settings, LogOut, Menu, X, Globe } from 'lucide-react';
 import { Logo } from '@/components/logo';
 
 export function DashboardHeader() {
@@ -75,10 +75,11 @@ export function DashboardHeader() {
                         href="/dashboard/custom-domains"
                         className="px-3 py-2 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2"
                     >
+                        <Globe className="h-4 w-4" />
                         Custom Domains
                     </Link>
                     <Link
-                        href={`/u/${userSubdomain}`}
+                        href={`https://${userSubdomain}.domainliq.com`}
                         target="_blank"
                         className="px-3 py-2 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2"
                     >
@@ -140,10 +141,11 @@ export function DashboardHeader() {
                             className="px-4 py-3 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:hover:bg-white/5 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-3"
                             onClick={() => setIsMobileMenuOpen(false)}
                         >
+                            <Globe className="h-4 w-4" />
                             Custom Domains
                         </Link>
                         <Link
-                            href={`/u/${userSubdomain}`}
+                            href={`https://${userSubdomain}.domainliq.com`}
                             target="_blank"
                             className="px-4 py-3 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:hover:bg-white/5 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-3"
                             onClick={() => setIsMobileMenuOpen(false)}

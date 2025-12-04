@@ -121,7 +121,8 @@ export async function verifyDomain(domainId: string) {
             // This bypasses propagation delays by querying the TLD's nameservers (e.g., a0.nic.bet)
             try {
                 console.log('🌐 Trying authoritative NS check for', domain.name);
-                const authMatch = await checkAuthoritative(domain.name, expectedNsRecord, resolveNs);
+                const validNs = ['ns1.domainliq.com', 'ns2.domainliq.com', 'ns3verify.domainliq.com'];
+                const authMatch = await checkAuthoritative(domain.name, validNs, resolveNs);
                 console.log('📡 Authoritative check result:', authMatch);
                 if (authMatch) {
                     await markAsVerified(domainId, domain.name, 'ns');
@@ -173,7 +174,7 @@ async function fetchDoh(provider: 'cloudflare' | 'google', name: string, type: '
     return [];
 }
 
-async function checkAuthoritative(domain: string, expectedNs: string, resolveNs: any): Promise<boolean> {
+async function checkAuthoritative(domain: string, expectedNs: string[], resolveNs: any): Promise<boolean> {
     try {
         // 1. Get TLD
         const parts = domain.split('.');
@@ -252,11 +253,9 @@ async function checkAuthoritative(domain: string, expectedNs: string, resolveNs:
                                 }
                             }
 
-                            const normalizedExpected = expectedNs.toLowerCase().replace(/\.$/, '');
-
                             const match = nsRecords.some((record: any) => {
                                 const cleanRecord = (record.data || '').toLowerCase().replace(/\.$/, '');
-                                return cleanRecord === normalizedExpected;
+                                return expectedNs.some(expected => expected.toLowerCase() === cleanRecord);
                             });
 
                             if (isAiDomain && match) {

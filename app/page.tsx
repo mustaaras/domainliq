@@ -655,7 +655,7 @@ export default function Home() {
                             <div className="flex flex-col gap-1 min-w-0">
                               <div className="flex items-center gap-2 text-[10px] dark:text-gray-500 text-gray-600">
                                 <Link
-                                  href={`/u/${domain.user.subdomain}`}
+                                  href={`https://${domain.user.subdomain}.domainliq.com`}
                                   onClick={(e) => e.stopPropagation()}
                                   className="dark:hover:text-amber-400 hover:text-amber-600 transition-colors truncate max-w-[100px]"
                                 >
@@ -769,7 +769,7 @@ export default function Home() {
                   topSellers.map((seller, index) => (
                     <Link
                       key={seller.id}
-                      href={`/u/${seller.subdomain}`}
+                      href={`https://${seller.subdomain}.domainliq.com`}
                       className="flex items-center justify-between p-3 rounded-lg dark:bg-white/5 bg-gray-50 dark:hover:bg-white/10 hover:bg-gray-100 border border-transparent dark:hover:border-white/10 hover:border-gray-200 transition-all group"
                     >
                       <div className="flex items-center gap-3">
@@ -784,9 +784,8 @@ export default function Home() {
                         </div>
                         <div>
                           <h3 className="font-medium dark:text-white text-gray-900 dark:group-hover:text-amber-400 group-hover:text-amber-600 transition-colors">
-                            {seller.name}
+                            {seller.subdomain}
                           </h3>
-                          <p className="text-xs dark:text-gray-500 text-gray-600">@{seller.subdomain}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 dark:text-gray-400 text-gray-600 dark:group-hover:text-white group-hover:text-gray-900 transition-colors">
