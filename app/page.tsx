@@ -511,36 +511,38 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="flex flex-col md:flex-row items-center gap-3 w-full md:w-auto justify-center md:justify-end">
-                <div className="relative w-full md:w-64 group">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Search className="h-4 w-4 dark:text-gray-600 text-gray-400 group-focus-within:text-gray-500 transition-colors" />
+              {viewMode === 'domains' && (
+                <div className="flex flex-row items-center gap-3 w-full md:w-auto">
+                  <div className="relative flex-1 md:w-64 group">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Search className="h-4 w-4 dark:text-gray-600 text-gray-400 group-focus-within:text-gray-500 transition-colors" />
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Search domains..."
+                      className="block w-full pl-9 pr-4 py-2 dark:border-white/10 border-gray-300 rounded-lg dark:bg-white/5 bg-gray-50 dark:text-gray-300 text-gray-900 dark:placeholder-gray-600 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-amber-500/50 focus:border-amber-500/50 dark:focus:bg-white/10 focus:bg-white transition-all text-sm"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
                   </div>
-                  <input
-                    type="text"
-                    placeholder="Search domains..."
-                    className="block w-full pl-9 pr-4 py-2 dark:border-white/10 border-gray-300 rounded-lg dark:bg-white/5 bg-gray-50 dark:text-gray-300 text-gray-900 dark:placeholder-gray-600 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-amber-500/50 focus:border-amber-500/50 dark:focus:bg-white/10 focus:bg-white transition-all text-sm"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
 
-                <button
-                  onClick={() => setShowFilterPanel(!showFilterPanel)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${showFilterPanel || filterTLD.length > 0 || filterPrice.min || filterPrice.max || filterVerified
-                    ? 'bg-amber-500 text-white'
-                    : 'dark:bg-white/10 bg-gray-100 dark:hover:bg-white/20 hover:bg-gray-200 dark:text-white text-gray-700'
-                    }`}
-                >
-                  <Filter className="h-4 w-4" />
-                  Filter
-                  {(filterTLD.length > 0 || filterPrice.min || filterPrice.max || filterVerified) && (
-                    <span className="ml-1 px-1.5 py-0.5 bg-white/20 rounded-full text-xs">
-                      •
-                    </span>
-                  )}
-                </button>
-              </div>
+                  <button
+                    onClick={() => setShowFilterPanel(!showFilterPanel)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${showFilterPanel || filterTLD.length > 0 || filterPrice.min || filterPrice.max || filterVerified
+                      ? 'bg-amber-500 text-white'
+                      : 'dark:bg-white/10 bg-gray-100 dark:hover:bg-white/20 hover:bg-gray-200 dark:text-white text-gray-700'
+                      }`}
+                  >
+                    <Filter className="h-4 w-4" />
+                    Filter
+                    {(filterTLD.length > 0 || filterPrice.min || filterPrice.max || filterVerified) && (
+                      <span className="ml-1 px-1.5 py-0.5 bg-white/20 rounded-full text-xs">
+                        •
+                      </span>
+                    )}
+                  </button>
+                </div>
+              )}
 
               {/* Filter Panel */}
               {showFilterPanel && (
