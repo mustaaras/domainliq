@@ -121,17 +121,26 @@ export default function MessagesPage() {
             <div className="max-w-5xl mx-auto">
                 <div className="flex items-center justify-between mb-8">
                     <div>
-                        <h1 className="text-3xl font-bold">Contact Messages</h1>
+                        <h1 className="text-3xl font-bold">Contact Form Messages</h1>
                         <p className="text-gray-400 mt-1">
                             {unreadCount} unread message{unreadCount !== 1 ? 's' : ''}
                         </p>
                     </div>
-                    <Link
-                        href="/admin/pending-domains"
-                        className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 hover:text-white transition-all"
-                    >
-                        Back to Admin
-                    </Link>
+                    <div className="flex gap-3">
+                        <Link
+                            href="/admin/chat"
+                            className="px-4 py-2 bg-amber-500 hover:bg-amber-600 rounded-lg text-white font-medium transition-all flex items-center gap-2"
+                        >
+                            <MessageCircle className="h-4 w-4" />
+                            To Support Chat
+                        </Link>
+                        <Link
+                            href="/admin/pending-domains"
+                            className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 hover:text-white transition-all"
+                        >
+                            Back to Admin
+                        </Link>
+                    </div>
                 </div>
 
                 {messages.length === 0 ? (

@@ -27,7 +27,8 @@ export default async function AdminLayout({
                     <div className="font-bold text-xl">DomainLiq Admin</div>
                     <div className="flex gap-4 text-sm">
                         <a href="/admin/pending-domains" className="hover:text-blue-500">Pending Domains</a>
-                        <a href="/admin/messages" className="hover:text-blue-500">Messages</a>
+                        <a href="/admin/chat" className="hover:text-blue-500">Support Chat</a>
+                        <a href="/admin/messages" className="hover:text-blue-500">Contact Form</a>
                         <a href="/dashboard" className="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100">Exit to Dashboard</a>
                     </div>
                 </div>
