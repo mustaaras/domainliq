@@ -238,17 +238,7 @@ export default function ProfileClient({ user, initialDomains, username, initialT
                                 Found <span className="dark:text-white text-gray-900 font-medium">{totalDomains}</span> domains
                             </div>
                             <div className="flex items-center gap-2 sm:gap-4">
-                                <select
-                                    value={sortBy}
-                                    onChange={(e) => setSortBy(e.target.value)}
-                                    className="dark:bg-[#0A0A0A] bg-white border dark:border-white/10 border-gray-300 rounded-lg px-3 py-2 text-sm dark:text-white text-gray-900 focus:outline-none focus:border-amber-500/50 transition-colors"
-                                >
-                                    <option value="newest">Newest Listed</option>
-                                    <option value="price_asc">Price: Low to High</option>
-                                    <option value="price_desc">Price: High to Low</option>
-                                    <option value="expires_asc">Expiring Soon</option>
-                                    <option value="expires_desc">Expiring Later</option>
-                                </select>
+
 
                                 <div className="relative">
                                     <button
@@ -365,6 +355,22 @@ export default function ProfileClient({ user, initialDomains, username, initialT
                                                                 </label>
                                                             ))}
                                                         </div>
+                                                    </div>
+
+                                                    {/* Sort By - Mobile Only */}
+                                                    <div>
+                                                        <label className="text-[10px] font-medium dark:text-gray-400 text-gray-500 mb-2 block uppercase tracking-wider">Sort By</label>
+                                                        <select
+                                                            value={sortBy}
+                                                            onChange={(e) => setSortBy(e.target.value)}
+                                                            className="w-full dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-2 py-1.5 text-xs dark:text-white text-gray-900 focus:outline-none focus:border-amber-500/50"
+                                                        >
+                                                            <option value="newest">Newest Listed</option>
+                                                            <option value="price_asc">Price: Low to High</option>
+                                                            <option value="price_desc">Price: High to Low</option>
+                                                            <option value="expires_asc">Expiring Soon</option>
+                                                            <option value="expires_desc">Expiring Later</option>
+                                                        </select>
                                                     </div>
                                                 </div>
                                             </div>
