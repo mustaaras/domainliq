@@ -19,13 +19,18 @@ export async function GET(req: NextRequest) {
 
         const count = await db.chatMessage.count({
             where: {
-                session: {
-                    domain: {
-                        userId: user.id,
-                    },
-                },
                 sender: 'visitor',
                 read: false,
+                session: {
+                    OR: [
+                        { userId: user.id },
+                        {
+                            domain: {
+                                userId: user.id,
+                            },
+                        },
+                    ],
+                },
             },
         });
 
