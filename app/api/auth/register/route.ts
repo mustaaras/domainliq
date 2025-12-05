@@ -47,6 +47,16 @@ export async function POST(req: NextRequest) {
             );
         }
 
+        // Validate subdomain format (alphanumeric and hyphens only, no dots)
+        const subdomainRegex = /^[a-z0-9-]+$/;
+        if (!subdomainRegex.test(subdomain.toLowerCase())) {
+            return NextResponse.json(
+                { error: 'Subdomain can only contain letters, numbers, and hyphens. Dots (.) are not allowed.' },
+                { status: 400 }
+            );
+        }
+
+
         // Check if subdomain is reserved (DB check)
         const isReserved = await db.reservedSubdomain.findUnique({
             where: { name: subdomain.toLowerCase() },
@@ -71,6 +81,31 @@ export async function POST(req: NextRequest) {
                 subdomain: subdomain.toLowerCase(),
             },
         });
+
+        // Create Welcome Support Chat
+        try {
+            const session = await db.chatSession.create({
+                data: {
+                    userId: user.id,
+                    visitorId: 'ADMIN',
+                    visitorName: 'DomainLiq Support',
+                    visitorEmail: 'support@domainliq.com',
+                    domainId: null,
+                },
+            });
+
+            await db.chatMessage.create({
+                data: {
+                    sessionId: session.id,
+                    sender: 'visitor', // Admin
+                    content: 'Welcome to DomainLiq! If you have any questions, you can ask them directly here. Our support team will reply as soon as possible.',
+                    read: false,
+                },
+            });
+        } catch (chatError) {
+            console.error('Failed to create welcome chat:', chatError);
+            // Don't fail registration
+        }
 
         // Register subdomain with Coolify for automatic SSL
         const userSubdomain = `${subdomain.toLowerCase()}.domainliq.com`;

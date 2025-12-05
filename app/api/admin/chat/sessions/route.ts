@@ -1,3 +1,4 @@
+
 import { db } from '@/lib/db';
 import { auth } from '@/auth';
 import { NextRequest, NextResponse } from 'next/server';
@@ -5,40 +6,21 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET(req: NextRequest) {
     try {
         const session = await auth();
-        if (!session?.user?.email) {
+        if (session?.user?.email !== 'huldil@icloud.com') {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const user = await db.user.findUnique({
-            where: { email: session.user.email },
-        });
-
-        if (!user) {
-            return NextResponse.json({ error: 'User not found' }, { status: 404 });
-        }
-
-        // Update lastSeen
-        await db.user.update({
-            where: { id: user.id },
-            data: { lastSeen: new Date() },
-        });
-
-        // Fetch sessions for the user (both domain-specific and direct support)
+        // Fetch sessions where visitorId is 'ADMIN'
         const sessions = await db.chatSession.findMany({
             where: {
-                OR: [
-                    { userId: user.id },
-                    {
-                        domain: {
-                            userId: user.id,
-                        },
-                    },
-                ],
+                visitorId: 'ADMIN',
             },
             include: {
-                domain: {
+                user: {
                     select: {
                         name: true,
+                        email: true,
+                        subdomain: true,
                     },
                 },
                 messages: {
@@ -51,7 +33,7 @@ export async function GET(req: NextRequest) {
                     select: {
                         messages: {
                             where: {
-                                sender: 'visitor',
+                                sender: 'seller', // User messages are 'seller'
                                 read: false,
                             },
                         },
@@ -66,9 +48,9 @@ export async function GET(req: NextRequest) {
         // Format response
         const formattedSessions = sessions.map(session => ({
             id: session.id,
-            domainName: session.domain?.name || 'DomainLiq Support',
-            visitorName: session.visitorName || 'Visitor',
-            visitorEmail: session.visitorEmail,
+            userName: session.user?.name || 'User',
+            userEmail: session.user?.email,
+            userSubdomain: session.user?.subdomain,
             lastMessage: session.messages[0]?.content || '',
             lastMessageAt: session.updatedAt,
             unreadCount: session._count.messages,
@@ -76,7 +58,7 @@ export async function GET(req: NextRequest) {
 
         return NextResponse.json({ sessions: formattedSessions });
     } catch (error) {
-        console.error('Error fetching chat sessions:', error);
+        console.error('Error fetching admin sessions:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { Mail, MailOpen, Trash2 } from 'lucide-react';
+import { Mail, MailOpen, Trash2, Reply, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 
 interface ContactMessage {
@@ -85,6 +85,27 @@ export default function MessagesPage() {
         }
     };
 
+    const startChat = async (email: string) => {
+        try {
+            const res = await fetch('/api/admin/chat/initiate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email }),
+            });
+
+            const data = await res.json();
+
+            if (res.ok && data.sessionId) {
+                router.push(`/admin/chat?sessionId=${data.sessionId}`);
+            } else {
+                alert(data.error || 'Failed to start chat');
+            }
+        } catch (error) {
+            console.error('Failed to start chat:', error);
+            alert('Failed to start chat');
+        }
+    };
+
     if (status === 'loading' || isLoading) {
         return (
             <div className="min-h-screen bg-[#050505] flex items-center justify-center">
@@ -152,6 +173,20 @@ export default function MessagesPage() {
                                         </p>
                                     </div>
                                     <div className="flex gap-2">
+                                        <button
+                                            onClick={() => startChat(msg.email)}
+                                            className="p-2 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-lg text-amber-400 hover:text-amber-300 transition-all"
+                                            title="Chat with User"
+                                        >
+                                            <MessageCircle className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                            onClick={() => window.location.href = `mailto:${msg.email}?subject=Re: Your message to DomainLiq&body=Hi ${msg.name},%0D%0A%0D%0ARegarding your message:%0D%0A> ${msg.message}%0D%0A%0D%0A`}
+                                            className="p-2 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 rounded-lg text-blue-400 hover:text-blue-300 transition-all"
+                                            title="Reply via Email"
+                                        >
+                                            <Reply className="h-4 w-4" />
+                                        </button>
                                         {!msg.read && (
                                             <button
                                                 onClick={() => markAsRead(msg.id)}
