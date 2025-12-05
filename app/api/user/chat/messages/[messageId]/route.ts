@@ -38,7 +38,14 @@ export async function DELETE(
             where: { email: session.user.email },
         });
 
-        if (!user || message.session.domain.userId !== user.id) {
+        if (!user) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
+
+        const isOwner = message.session.userId === user.id;
+        const isDomainOwner = message.session.domain?.userId === user.id;
+
+        if (!isOwner && !isDomainOwner) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
         }
 
