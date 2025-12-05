@@ -91,7 +91,7 @@ export function useDomainVerification(options: UseDomainVerificationOptions = {}
         for (const id of domainIds) {
             try {
                 const result = await verifyDomainAction(id);
-                results.push({ id, success: result.success });
+                results.push({ id, success: !!result.success });
                 if (result.success) {
                     onDomainVerified?.(id);
                 }
