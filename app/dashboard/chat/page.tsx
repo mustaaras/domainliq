@@ -64,6 +64,11 @@ export default function ChatPage() {
     useEffect(() => {
         if (!selectedSessionId) return;
 
+        // Optimistically mark as read in UI
+        setSessions(prev => prev.map(s =>
+            s.id === selectedSessionId ? { ...s, unreadCount: 0 } : s
+        ));
+
         const fetchMessages = async () => {
             setIsLoadingMessages(true);
             try {
@@ -255,13 +260,20 @@ export default function ChatPage() {
                                     <p className="text-sm text-gray-500 dark:text-gray-400 truncate flex-1 pr-2">
                                         {session.lastMessage}
                                     </p>
-                                    <button
-                                        onClick={(e) => handleDeleteSession(e, session.id)}
-                                        className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
-                                        title="Delete conversation"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </button>
+                                    <div className="flex items-center gap-2">
+                                        {session.unreadCount > 0 && (
+                                            <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">
+                                                {session.unreadCount}
+                                            </span>
+                                        )}
+                                        <button
+                                            onClick={(e) => handleDeleteSession(e, session.id)}
+                                            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                                            title="Delete conversation"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         ))
