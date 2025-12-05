@@ -42,6 +42,25 @@ interface TopSeller {
   domainCount: number;
 }
 
+interface Portfolio {
+  id: string;
+  name: string;
+  price: number | null;
+  createdAt: string;
+  user: {
+    subdomain: string;
+    name: string | null;
+    contactEmail: string | null;
+    twitterHandle: string | null;
+    whatsappNumber: string | null;
+    linkedinProfile: string | null;
+    telegramUsername: string | null;
+    preferredContact: string;
+    escrowEmail: string | null;
+  };
+  domains: Domain[];
+}
+
 export default function Home() {
   const { data: session } = useSession();
   const [domains, setDomains] = useState<Domain[]>([]);
@@ -57,6 +76,11 @@ export default function Home() {
   const [showContactModal, setShowContactModal] = useState(false);
   const [showEscrowModal, setShowEscrowModal] = useState(false);
   const [selectedEscrowDomain, setSelectedEscrowDomain] = useState<Domain | null>(null);
+
+  // Portfolio State
+  const [viewMode, setViewMode] = useState<'domains' | 'portfolios'>('domains');
+  const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
+  const [loadingPortfolios, setLoadingPortfolios] = useState(false);
 
   // Filter State
   const [showFilterPanel, setShowFilterPanel] = useState(false);
@@ -101,6 +125,21 @@ export default function Home() {
     }
   };
 
+  const fetchPortfolios = async () => {
+    try {
+      setLoadingPortfolios(true);
+      const res = await fetch('/api/portfolios?limit=10');
+      const data = await res.json();
+      if (data.portfolios) {
+        setPortfolios(data.portfolios);
+      }
+    } catch (error) {
+      console.error('Failed to fetch portfolios:', error);
+    } finally {
+      setLoadingPortfolios(false);
+    }
+  };
+
   const fetchTopSellers = async () => {
     try {
       const res = await fetch('/api/sellers/top');
@@ -116,6 +155,12 @@ export default function Home() {
   useEffect(() => {
     fetchTopSellers();
   }, []);
+
+  useEffect(() => {
+    if (viewMode === 'portfolios' && portfolios.length === 0) {
+      fetchPortfolios();
+    }
+  }, [viewMode]);
 
   useEffect(() => {
     // Debounce search
@@ -443,8 +488,27 @@ export default function Home() {
             {/* Section Title & Controls */}
             <div className="mb-6 flex flex-col md:flex-row justify-between items-center gap-4 relative">
               <div className="text-center md:text-left w-full md:w-auto">
-                <h2 className="text-xl font-bold dark:text-white text-gray-900">Recently Added Domains</h2>
-                <p className="dark:text-gray-400 text-gray-600 text-xs mt-1">Fresh listing from the sellers</p>
+                <h2 className="text-xl font-bold dark:text-white text-gray-900">Recently Added {viewMode === 'domains' ? 'Domains' : 'Portfolios'}</h2>
+                <div className="flex items-center gap-2 mt-2">
+                  <button
+                    onClick={() => setViewMode('domains')}
+                    className={`text-xs px-3 py-1 rounded-full font-medium transition-colors border ${viewMode === 'domains'
+                      ? 'bg-amber-500 border-amber-500 text-white'
+                      : 'bg-transparent border-gray-200 dark:border-white/10 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
+                      }`}
+                  >
+                    Domains
+                  </button>
+                  <button
+                    onClick={() => setViewMode('portfolios')}
+                    className={`text-xs px-3 py-1 rounded-full font-medium transition-colors border ${viewMode === 'portfolios'
+                      ? 'bg-amber-500 border-amber-500 text-white'
+                      : 'bg-transparent border-gray-200 dark:border-white/10 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
+                      }`}
+                  >
+                    Portfolios
+                  </button>
+                </div>
               </div>
 
               <div className="flex flex-col md:flex-row items-center gap-3 w-full md:w-auto justify-center md:justify-end">
@@ -590,7 +654,7 @@ export default function Home() {
             </div>
 
             {/* List */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${viewMode === 'portfolios' ? 'hidden' : ''}`}>
               {isLoading ? (
                 // Skeleton loading
                 [...Array(6)].map((_, i) => (
@@ -719,8 +783,91 @@ export default function Home() {
               )}
             </div>
 
+            {/* Portfolio Grid */}
+            {viewMode === 'portfolios' && (
+              <div className="grid grid-cols-1 gap-4">
+                {loadingPortfolios ? (
+                  [...Array(3)].map((_, i) => (
+                    <div key={i} className="h-48 rounded-xl bg-white/5 animate-pulse" />
+                  ))
+                ) : portfolios.length > 0 ? (
+                  portfolios.map(portfolio => (
+                    <div
+                      key={portfolio.id}
+                      className="dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-200 rounded-xl p-6 hover:border-amber-500/50 transition-all group relative overflow-hidden"
+                    >
+                      <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
+                        <div className="flex-1">
+                          <div className="flex flex-col md:flex-row md:items-center gap-y-2 gap-x-3 mb-3">
+                            <div className="flex items-center gap-2">
+                              <h3 className="text-xl font-bold dark:text-white text-gray-900">{portfolio.name}</h3>
+                              {portfolio.domains.length > 0 && portfolio.domains.every((d: any) => d.isVerified) && (
+                                <div className="relative group/tooltip cursor-default">
+                                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700 border border-green-200 dark:bg-green-500/20 dark:text-green-400 dark:border-green-500/30">
+                                    <ShieldCheck className="h-3 w-3" />
+                                    <span className="uppercase tracking-wider">Verified</span>
+                                  </div>
+                                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2 py-1 bg-gray-900 text-white text-[10px] font-medium rounded shadow-sm whitespace-nowrap opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 pointer-events-none select-none z-50">
+                                    All domains verified
+                                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-[3px] border-transparent border-t-gray-900" />
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                            <span className="self-start md:self-auto px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                              {portfolio.domains.length} Domains
+                            </span>
+                          </div>
+
+                          <div className="flex flex-wrap gap-2 mb-2 md:mb-4">
+                            {portfolio.domains.slice(0, 5).map(domain => (
+                              <span key={domain.id} className="text-xs px-2 py-1.5 rounded-lg dark:bg-white/10 bg-white border dark:border-white/5 border-gray-200 dark:text-gray-300 text-gray-600 font-medium">
+                                {domain.name}
+                              </span>
+                            ))}
+                            {portfolio.domains.length > 5 && (
+                              <span className="text-xs px-2 py-1.5 rounded-lg dark:bg-white/5 bg-gray-100 border dark:border-white/5 border-gray-200 dark:text-gray-500 text-gray-500 font-medium">
+                                +{portfolio.domains.length - 5} more
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-xs dark:text-gray-500 text-gray-600">
+                            By <Link href={getProfileUrl(portfolio.user.subdomain)} className="hover:text-amber-500 transition-colors">{portfolio.user.subdomain}</Link>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-row items-center justify-between md:justify-end gap-4 border-t md:border-t-0 dark:border-white/10 border-gray-100 pt-4 md:pt-0 mt-2 md:mt-0 w-full md:w-auto">
+                          <div className="text-left md:text-right">
+                            {portfolio.price && (
+                              <div className="text-2xl font-mono font-bold dark:text-white text-gray-900 leading-none mb-1">
+                                ${portfolio.price.toLocaleString()}
+                              </div>
+                            )}
+                            <p className="text-[10px] uppercase font-bold tracking-wider dark:text-gray-500 text-gray-400">
+                              Listed {new Date(portfolio.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
+
+                          <Link
+                            href={getProfileUrl(portfolio.user.subdomain)}
+                            className="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white font-medium rounded-lg shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 transition-all flex items-center gap-2"
+                          >
+                            View
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-12 dark:text-gray-600 text-gray-500">
+                    No portfolios found.
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Pagination Controls */}
-            {domains.length > 0 && (
+            {domains.length > 0 && viewMode === 'domains' && (
               <div className="mt-8 flex flex-col md:flex-row items-center justify-between border-t border-gray-200 dark:border-white/10 pt-4 gap-4">
                 <div className="flex items-center gap-4">
                   <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -807,10 +954,10 @@ export default function Home() {
           </div>
 
         </div>
-      </div>
+      </div >
 
       {/* Floating Action Bar (Mobile Optimized) */}
-      <div className={`
+      < div className={`
         fixed bottom-0 left-0 right-0 p-4 dark:bg-[#050505]/90 bg-white/95 backdrop-blur-md border-t dark:border-white/10 border-gray-200 z-50 transition-transform duration-300 shadow-xl
         ${selectedIds.length > 0 ? 'translate-y-0' : 'translate-y-full'}
       `}>
@@ -837,7 +984,7 @@ export default function Home() {
             </button>
           </div>
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }

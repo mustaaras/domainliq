@@ -40,7 +40,11 @@ model User {
   lastSeen          DateTime  @default(now())
 
   // Chat
+  // Chat
   chatSessions      ChatSession[]
+
+  // Portfolios
+  portfolios        Portfolio[]
 }
 
 model Domain {
@@ -70,6 +74,23 @@ model Domain {
 
   // Chat
   chatSessions      ChatSession[]
+  
+  // Portfolios (many-to-many)
+  portfolios        Portfolio[]
+
+  @@index([userId])
+}
+
+model Portfolio {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  price       Float?
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  domains     Domain[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@index([userId])
 }

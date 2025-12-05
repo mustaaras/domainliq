@@ -12,6 +12,18 @@ export async function GET() {
         const domains = await db.domain.findMany({
             where: { user: { email: session.user.email } },
             orderBy: { createdAt: 'desc' },
+            select: {
+                id: true,
+                name: true,
+                price: true,
+                status: true,
+                createdAt: true,
+                updatedAt: true,
+                isVerified: true,
+                verificationToken: true,
+                verificationMethod: true,
+                checkoutLink: true,
+            },
         });
 
         return NextResponse.json(domains);

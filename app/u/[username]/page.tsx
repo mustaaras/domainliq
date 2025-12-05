@@ -79,6 +79,12 @@ export default async function UserProfilePage({ params }: PageProps) {
                 take: 20,
                 orderBy: { createdAt: 'desc' },
             },
+            portfolios: {
+                include: {
+                    domains: true,
+                },
+                orderBy: { createdAt: 'desc' },
+            },
             _count: {
                 select: { domains: true }
             }
@@ -110,5 +116,18 @@ export default async function UserProfilePage({ params }: PageProps) {
         verificationToken: domain.verificationToken || null, // Ensure null instead of undefined
     }));
 
-    return <ProfileClient user={userData} initialDomains={serializedDomains} username={username} initialTotal={(user as any)._count.domains} />;
+    const serializedPortfolios = user.portfolios.map(portfolio => ({
+        ...portfolio,
+        createdAt: portfolio.createdAt.toISOString(),
+        updatedAt: portfolio.updatedAt.toISOString(),
+        domains: portfolio.domains.map(d => ({
+            ...d,
+            createdAt: d.createdAt.toISOString(),
+            expiresAt: d.expiresAt ? d.expiresAt.toISOString() : null,
+            verificationToken: d.verificationToken || null,
+        }))
+    }));
+
+    return <ProfileClient user={userData} initialDomains={serializedDomains} initialPortfolios={serializedPortfolios} username={username} initialTotal={(user as any)._count.domains} />;
 }
+

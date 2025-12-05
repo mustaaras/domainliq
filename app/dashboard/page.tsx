@@ -3,11 +3,16 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Loader2, Plus, Trash2, Settings, ExternalLink, DollarSign, LogOut, Shield, ShieldCheck, Copy, Check, CheckSquare, Filter, X, Menu, Pencil, Link as LinkIcon, MessageCircle } from 'lucide-react';
+import { Loader2, Plus, Trash2, Edit2, Settings, ExternalLink, DollarSign, LogOut, Shield, ShieldCheck, Copy, Check, CheckSquare, Filter, X, Menu, Pencil, Link as LinkIcon, MessageCircle } from 'lucide-react';
 import { useSession, signOut } from 'next-auth/react';
 import { verifyDomain } from '../actions/verify-domain';
 import { Logo } from '@/components/logo';
 import { DashboardHeader } from '@/components/dashboard-header';
+import { AddDomainForm, BulkUploadForm, BulkPriceModal } from '@/components/dashboard';
+import { PortfolioForm } from '@/components/dashboard/PortfolioForm'; // Specific import for PortfolioForm
+import { EditPortfolioModal } from '@/components/dashboard/EditPortfolioModal';
+import { DomainCard } from '@/components/dashboard/DomainCard';
+
 
 interface Domain {
     id: string;
@@ -34,6 +39,9 @@ export default function DashboardPage() {
     const [verifyingId, setVerifyingId] = useState<string | null>(null);
     const [showVerifyModal, setShowVerifyModal] = useState(false);
     const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null);
+    const [editingPortfolio, setEditingPortfolio] = useState<Portfolio | null>(null);
+
+    // Filter state
     const [verificationStatus, setVerificationStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
     const [verificationMessage, setVerificationMessage] = useState('');
     const [activeMethod, setActiveMethod] = useState<'txt' | 'ns' | null>(null);
@@ -43,9 +51,25 @@ export default function DashboardPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const [domainsPerPage, setDomainsPerPage] = useState(10);
 
+
+    interface Portfolio {
+        id: string;
+        name: string;
+        price: number | null;
+        domains: Domain[];
+        createdAt: string;
+    }
+
     // New domain form state
     const [newDomain, setNewDomain] = useState({ name: '', price: '' });
     const [addError, setAddError] = useState('');
+    const [addTab, setAddTab] = useState<'single' | 'bulk' | 'portfolio'>('single');
+
+    // Portfolio state
+    const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
+    const [newPortfolio, setNewPortfolio] = useState({ name: '', price: '', domainIds: new Set<string>() });
+    const [viewMode, setViewMode] = useState<'domains' | 'portfolios'>('domains');
+    const [isLoadingPortfolios, setIsLoadingPortfolios] = useState(false);
 
     const [editingDomainId, setEditingDomainId] = useState<string | null>(null);
     const [editDomainData, setEditDomainData] = useState({ price: '', checkoutLink: '', status: '' });
@@ -75,6 +99,94 @@ export default function DashboardPage() {
             return () => clearInterval(interval);
         }
     }, [status]);
+
+    // ... (rest of useEffects) ...
+
+    const fetchUserPortfolios = async () => {
+        setIsLoadingPortfolios(true);
+        try {
+            const res = await fetch('/api/user/portfolios');
+            if (res.ok) {
+                const data = await res.json();
+                setPortfolios(data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch portfolios:', error);
+        } finally {
+            setIsLoadingPortfolios(false);
+        }
+    };
+
+    useEffect(() => {
+        if (status === 'authenticated') {
+            fetchUserPortfolios();
+        }
+    }, [status]);
+
+    const handleCreatePortfolio = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newPortfolio.name || newPortfolio.domainIds.size === 0) {
+            setAddError('Name and at least one domain are required');
+            return;
+        }
+
+        setIsAdding(true);
+        setAddError('');
+
+        try {
+            const res = await fetch('/api/user/portfolios', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: newPortfolio.name,
+                    price: newPortfolio.price ? parseFloat(newPortfolio.price) : null,
+                    domainIds: Array.from(newPortfolio.domainIds)
+                })
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.error || 'Failed to create portfolio');
+            }
+
+            await fetchUserPortfolios();
+            setNewPortfolio({ name: '', price: '', domainIds: new Set() });
+            alert('Portfolio created successfully!');
+        } catch (error: any) {
+            setAddError(error.message);
+        } finally {
+            setIsAdding(false);
+        }
+    };
+
+    const handleDeletePortfolio = async (id: string) => {
+        if (!confirm('Are you sure you want to delete this portfolio? The domains inside will remain in your account.')) return;
+
+        try {
+            const res = await fetch(`/api/user/portfolios/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                setPortfolios(prev => prev.filter(p => p.id !== id));
+            } else {
+                alert('Failed to delete portfolio');
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Error deleting portfolio');
+        }
+    };
+
+    const togglePortfolioDomain = (domainId: string) => {
+        setNewPortfolio(prev => {
+            const newSet = new Set(prev.domainIds);
+            if (newSet.has(domainId)) newSet.delete(domainId);
+            else newSet.add(domainId);
+            return { ...prev, domainIds: newSet };
+        });
+    };
+
+    // ... (rest of handlers) ...
+
+
 
     // ... (bulk upload state) ...
 
@@ -192,6 +304,23 @@ export default function DashboardPage() {
 
     // Mobile menu state
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    // Expanded portfolios state
+    const [expandedPortfolios, setExpandedPortfolios] = useState<Set<string>>(new Set());
+
+    const togglePortfolioExpanded = (e: React.MouseEvent, portfolioId: string) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setExpandedPortfolios(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(portfolioId)) {
+                newSet.delete(portfolioId);
+            } else {
+                newSet.add(portfolioId);
+            }
+            return newSet;
+        });
+    };
 
     useEffect(() => {
         if (status === 'unauthenticated') {
@@ -349,9 +478,53 @@ export default function DashboardPage() {
         }
     };
 
+    const handleUpdatePortfolio = async (id: string, name: string, price: number | null, domainIds: Set<string>) => {
+        setIsAdding(true); // Reusing existing loading state
+        try {
+            // Find original portfolio to calculate diffs
+            const original = portfolios.find(p => p.id === id);
+            if (!original) throw new Error('Portfolio not found');
 
+            const originalIds = new Set(original.domains.map(d => d.id));
+            const addDomainIds: string[] = [];
+            const removeDomainIds: string[] = [];
 
+            // Find added domains
+            domainIds.forEach(did => {
+                if (!originalIds.has(did)) addDomainIds.push(did);
+            });
 
+            // Find removed domains
+            originalIds.forEach(did => {
+                if (!domainIds.has(did)) removeDomainIds.push(did);
+            });
+
+            const res = await fetch(`/api/user/portfolios/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name,
+                    price,
+                    addDomainIds,
+                    removeDomainIds
+                })
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.error || 'Failed to update portfolio');
+            }
+
+            await fetchUserPortfolios();
+            setEditingPortfolio(null);
+            alert('Portfolio updated successfully!');
+            return { success: true };
+        } catch (error: any) {
+            return { success: false, error: error.message };
+        } finally {
+            setIsAdding(false);
+        }
+    };
 
     const handleDeleteDomain = async (domainId: string) => {
         if (!confirm('Are you sure you want to delete this domain?')) return;
@@ -619,517 +792,649 @@ export default function DashboardPage() {
                             </div>
                         )}
 
-                        <div className="dark:bg-white/5 bg-white border dark:border-white/10 border-gray-200 rounded-xl p-6 sticky top-8 shadow-sm">
-                            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                                <Plus className="h-5 w-5 text-amber-500" />
-                                Add New Domain
-                            </h2>
+                        <div className="dark:bg-white/5 bg-white border dark:border-white/10 border-gray-200 rounded-xl overflow-hidden sticky top-8 shadow-sm">
+                            {/* Tabs */}
+                            <div className="flex border-b dark:border-white/10 border-gray-200">
+                                <button
+                                    onClick={() => setAddTab('single')}
+                                    className={`flex-1 py-3 text-sm font-medium transition-colors ${addTab === 'single' ? 'bg-amber-500/10 text-amber-500 border-b-2 border-amber-500' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                                >
+                                    Single
+                                </button>
+                                <button
+                                    onClick={() => setAddTab('bulk')}
+                                    className={`flex-1 py-3 text-sm font-medium transition-colors ${addTab === 'bulk' ? 'bg-amber-500/10 text-amber-500 border-b-2 border-amber-500' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                                >
+                                    Bulk
+                                </button>
+                                <button
+                                    onClick={() => setAddTab('portfolio')}
+                                    className={`flex-1 py-3 text-sm font-medium transition-colors ${addTab === 'portfolio' ? 'bg-amber-500/10 text-amber-500 border-b-2 border-amber-500' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                                >
+                                    Portfolio
+                                </button>
+                            </div>
 
-                            <form onSubmit={handleAddDomain} className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-1">Domain Name</label>
-                                    <input
-                                        type="text"
-                                        value={newDomain.name}
-                                        onChange={e => setNewDomain({ ...newDomain, name: e.target.value })}
-                                        placeholder="example.com"
-                                        className="w-full dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-4 py-2 dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
-                                        required
+                            <div className="p-6">
+                                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                                    <Plus className="h-5 w-5 text-amber-500" />
+                                    {addTab === 'single' ? 'Add New Domain' : addTab === 'bulk' ? 'Bulk Upload' : 'Create Portfolio'}
+                                </h2>
+
+                                {addTab === 'single' && (
+                                    <AddDomainForm
+                                        onSubmit={async (name, price) => {
+                                            try {
+                                                const res = await fetch('/api/user/domains', {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({ name, price })
+                                                });
+                                                if (!res.ok) {
+                                                    const data = await res.json();
+                                                    return { success: false, error: data.error || 'Failed to add domain' };
+                                                }
+                                                const addedDomain = await res.json();
+                                                setDomains([addedDomain, ...domains]);
+                                                return { success: true };
+                                            } catch (error: any) {
+                                                return { success: false, error: error.message };
+                                            }
+                                        }}
+                                        isSubmitting={isAdding}
                                     />
-                                </div>
+                                )}
 
-                                <div>
-                                    <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-1">Price ($)</label>
-                                    <div className="relative">
-                                        <DollarSign className="absolute left-3 top-2.5 h-4 w-4 dark:text-gray-500 text-gray-400" />
-                                        <input
-                                            type="number"
-                                            value={newDomain.price}
-                                            onChange={e => setNewDomain({ ...newDomain, price: e.target.value })}
-                                            placeholder="1000"
-                                            className="w-full dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg pl-9 pr-4 py-2 dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
-                                            required
-                                            min="0"
-                                        />
-                                    </div>
-                                </div>
+                                {addTab === 'bulk' && (
+                                    <BulkUploadForm
+                                        onSubmit={async (domainsToAdd) => {
+                                            try {
+                                                const res = await fetch('/api/user/domains', {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify(domainsToAdd)
+                                                });
+                                                if (!res.ok) {
+                                                    const data = await res.json();
+                                                    return { success: false, error: data.error || 'Failed to add domains' };
+                                                }
+                                                await fetchUserDomains();
+                                                return { success: true };
+                                            } catch (error: any) {
+                                                return { success: false, error: error.message };
+                                            }
+                                        }}
+                                        isSubmitting={isAdding}
+                                    />
+                                )}
+
+                                {addTab === 'portfolio' && (
+                                    <PortfolioForm
+                                        domains={domains}
+                                        name={newPortfolio.name}
+                                        price={newPortfolio.price}
+                                        selectedDomainIds={newPortfolio.domainIds}
+                                        isSubmitting={isAdding}
+                                        error={addError}
+                                        onNameChange={(value) => setNewPortfolio(prev => ({ ...prev, name: value }))}
+                                        onPriceChange={(value) => setNewPortfolio(prev => ({ ...prev, price: value }))}
+                                        onToggleDomain={togglePortfolioDomain}
+                                        onSelectionChange={(newSet) => setNewPortfolio(prev => ({ ...prev, domainIds: newSet }))}
+                                        onSubmit={async () => {
+                                            if (!newPortfolio.name || newPortfolio.domainIds.size === 0) {
+                                                setAddError('Name and at least one domain are required');
+                                                return { success: false, error: 'Name and at least one domain are required' };
+                                            }
+                                            setIsAdding(true);
+                                            setAddError('');
+                                            try {
+                                                const res = await fetch('/api/user/portfolios', {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({
+                                                        name: newPortfolio.name,
+                                                        price: newPortfolio.price ? parseFloat(newPortfolio.price) : null,
+                                                        domainIds: Array.from(newPortfolio.domainIds)
+                                                    })
+                                                });
+                                                if (!res.ok) {
+                                                    const data = await res.json();
+                                                    throw new Error(data.error || 'Failed to create portfolio');
+                                                }
+                                                await fetchUserPortfolios();
+                                                setNewPortfolio({ name: '', price: '', domainIds: new Set() });
+                                                alert('Portfolio created successfully!');
+                                                return { success: true };
+                                            } catch (error: any) {
+                                                setAddError(error.message);
+                                                return { success: false, error: error.message };
+                                            } finally {
+                                                setIsAdding(false);
+                                            }
+                                        }}
+                                    />
+                                )}
 
                                 {addError && (
-                                    <div className="dark:text-red-400 text-red-600 text-sm dark:bg-red-500/10 bg-red-50 p-3 rounded-lg border dark:border-red-500/20 border-red-300">
+                                    <div className="mt-4 dark:text-red-400 text-red-600 text-sm dark:bg-red-500/10 bg-red-50 p-3 rounded-lg border dark:border-red-500/20 border-red-300">
                                         {addError}
                                     </div>
                                 )}
-
-                                <button
-                                    type="submit"
-                                    disabled={isAdding}
-                                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 dark:hover:bg-amber-400 text-white rounded-lg font-medium transition-all disabled:opacity-50"
-                                >
-                                    {isAdding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                                    Add Domain
-                                </button>
-                            </form>
-
-                            {/* Divider */}
-                            <div className="relative my-6">
-                                <div className="absolute inset-0 flex items-center">
-                                    <div className="w-full border-t dark:border-white/10 border-gray-200"></div>
-                                </div>
-                                <div className="relative flex justify-center text-xs uppercase">
-                                    <span className="dark:bg-white/5 bg-white px-2 dark:text-gray-500 text-gray-600">Or Bulk Upload</span>
-                                </div>
                             </div>
-
-                            {/* Bulk Upload Form */}
-                            <form onSubmit={handleBulkUpload} className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium dark:text-gray-300 text-gray-700 mb-1">
-                                        Bulk Upload (max 500 domains)
-                                    </label>
-                                    <textarea
-                                        value={bulkText}
-                                        onChange={e => setBulkText(e.target.value)}
-                                        placeholder={"example.com 1000\ntest.com 500\ndomain.com 2500"}
-                                        className="w-full dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-4 py-2 dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 font-mono text-sm min-h-[120px]"
-                                        disabled={isAdding}
-                                    />
-                                    <p className="text-xs dark:text-gray-500 text-gray-600 mt-1">Format: domain.com price (one per line)</p>
-                                </div>
-
-                                {bulkError && (
-                                    <div className="dark:text-red-400 text-red-600 text-sm dark:bg-red-500/10 bg-red-50 p-3 rounded-lg border dark:border-red-500/20 border-red-300">
-                                        {bulkError}
-                                    </div>
-                                )}
-
-                                <button
-                                    type="submit"
-                                    disabled={isAdding || !bulkText.trim()}
-                                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 dark:hover:bg-green-500 text-white rounded-lg font-medium transition-all disabled:opacity-50"
-                                >
-                                    {isAdding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                                    Upload Domains
-                                </button>
-                            </form>
                         </div>
                     </div>
 
                     {/* Domain List */}
                     <div className="lg:col-span-2">
                         <div className="dark:bg-white/5 bg-white border dark:border-white/10 border-gray-200 rounded-xl shadow-sm">
-                            <div className="p-6 border-b dark:border-white/10 border-gray-200 flex items-center justify-between">
-                                <h2 className="text-xl font-semibold">Your Domains</h2>
-                                <div className="flex items-center gap-2">
-                                    {/* Combined Manage Button */}
-                                    <div className="relative">
+                            <div className="p-4 md:p-6 border-b dark:border-white/10 border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
+                                    <h2 className="text-xl font-semibold">Your Assets</h2>
+                                    <div className="flex bg-gray-100 dark:bg-white/5 rounded-lg p-1 border dark:border-white/10 border-gray-200 self-start sm:self-auto">
                                         <button
-                                            onClick={() => setShowManagePanel(!showManagePanel)}
-                                            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${activeFiltersCount > 0 || isInSelectionMode || showManagePanel
-                                                ? 'bg-amber-600 hover:bg-amber-500 text-white'
-                                                : 'dark:bg-white/10 bg-gray-100 dark:hover:bg-white/20 hover:bg-gray-200 dark:text-white text-gray-900'
-                                                }`}
+                                            onClick={() => setViewMode('domains')}
+                                            className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${viewMode === 'domains' ? 'bg-white dark:bg-white/10 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}
                                         >
-                                            {isInSelectionMode ? <CheckSquare className="h-4 w-4" /> : <Filter className="h-4 w-4" />}
-                                            Manage
-                                            {(activeFiltersCount > 0 || selectedDomainIds.size > 0) && (
-                                                <span className="ml-1 px-2 py-0.5 dark:bg-white/20 bg-white/30 rounded-full text-xs">
-                                                    {activeFiltersCount + (selectedDomainIds.size > 0 ? 1 : 0)}
-                                                </span>
-                                            )}
+                                            Domains
                                         </button>
+                                        <button
+                                            onClick={() => setViewMode('portfolios')}
+                                            className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${viewMode === 'portfolios' ? 'bg-white dark:bg-white/10 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}
+                                        >
+                                            Portfolios
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    {/* Combined Manage Button - Only show for domains */}
+                                    {viewMode === 'domains' && (
+                                        <div className="relative">
+                                            <button
+                                                onClick={() => setShowManagePanel(!showManagePanel)}
+                                                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${activeFiltersCount > 0 || isInSelectionMode || showManagePanel
+                                                    ? 'bg-amber-600 hover:bg-amber-500 text-white'
+                                                    : 'dark:bg-white/10 bg-gray-100 dark:hover:bg-white/20 hover:bg-gray-200 dark:text-white text-gray-900'
+                                                    }`}
+                                            >
+                                                {isInSelectionMode ? <CheckSquare className="h-4 w-4" /> : <Filter className="h-4 w-4" />}
+                                                Manage
+                                                {(activeFiltersCount > 0 || selectedDomainIds.size > 0) && (
+                                                    <span className="ml-1 px-2 py-0.5 dark:bg-white/20 bg-white/30 rounded-full text-xs">
+                                                        {activeFiltersCount + (selectedDomainIds.size > 0 ? 1 : 0)}
+                                                    </span>
+                                                )}
+                                            </button>
 
-                                        {/* Combined Management Panel */}
-                                        {showManagePanel && (
-                                            <div className="absolute right-0 mt-2 w-[85vw] sm:w-[420px] dark:bg-[#0A0A0A] bg-white border dark:border-white/20 border-gray-300 rounded-xl shadow-2xl z-50 overflow-hidden">
-                                                {/* Tabs */}
-                                                <div className="flex border-b dark:border-white/10 border-gray-200">
-                                                    <button
-                                                        onClick={() => setActiveTab('filter')}
-                                                        className={`flex-1 px-4 py-3 font-medium transition-colors ${activeTab === 'filter'
-                                                            ? 'text-amber-500 dark:text-amber-400 border-b-2 border-amber-500 dark:border-amber-400'
-                                                            : 'dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900'
-                                                            }`}
-                                                    >
-                                                        <Filter className="h-4 w-4 inline mr-2" />
-                                                        Filter
-                                                        {activeFiltersCount > 0 && (
-                                                            <span className="ml-2 px-2 py-0.5 bg-amber-600 rounded-full text-xs text-white">
-                                                                {activeFiltersCount}
-                                                            </span>
-                                                        )}
-                                                    </button>
-                                                    <button
-                                                        onClick={() => setActiveTab('select')}
-                                                        className={`flex-1 px-4 py-3 font-medium transition-colors ${activeTab === 'select'
-                                                            ? 'text-amber-500 dark:text-amber-400 border-b-2 border-amber-500 dark:border-amber-400'
-                                                            : 'dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900'
-                                                            }`}
-                                                    >
-                                                        <CheckSquare className="h-4 w-4 inline mr-2" />
-                                                        Select & Actions
-                                                        {selectedDomainIds.size > 0 && (
-                                                            <span className="ml-2 px-2 py-0.5 bg-amber-600 rounded-full text-xs text-white">
-                                                                {selectedDomainIds.size}
-                                                            </span>
-                                                        )}
-                                                    </button>
-                                                </div>
+                                            {/* Combined Management Panel */}
+                                            {showManagePanel && (
+                                                <div className="absolute left-0 sm:right-0 sm:left-auto mt-2 w-[85vw] sm:w-[420px] dark:bg-[#0A0A0A] bg-white border dark:border-white/20 border-gray-300 rounded-xl shadow-2xl z-50 overflow-hidden">
+                                                    {/* Tabs */}
+                                                    <div className="flex border-b dark:border-white/10 border-gray-200">
+                                                        <button
+                                                            onClick={() => setActiveTab('filter')}
+                                                            className={`flex-1 px-4 py-3 font-medium transition-colors ${activeTab === 'filter'
+                                                                ? 'text-amber-500 dark:text-amber-400 border-b-2 border-amber-500 dark:border-amber-400'
+                                                                : 'dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900'
+                                                                }`}
+                                                        >
+                                                            <Filter className="h-4 w-4 inline mr-2" />
+                                                            Filter
+                                                            {activeFiltersCount > 0 && (
+                                                                <span className="ml-2 px-2 py-0.5 bg-amber-600 rounded-full text-xs text-white">
+                                                                    {activeFiltersCount}
+                                                                </span>
+                                                            )}
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setActiveTab('select')}
+                                                            className={`flex-1 px-4 py-3 font-medium transition-colors ${activeTab === 'select'
+                                                                ? 'text-amber-500 dark:text-amber-400 border-b-2 border-amber-500 dark:border-amber-400'
+                                                                : 'dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900'
+                                                                }`}
+                                                        >
+                                                            <CheckSquare className="h-4 w-4 inline mr-2" />
+                                                            Select & Actions
+                                                            {selectedDomainIds.size > 0 && (
+                                                                <span className="ml-2 px-2 py-0.5 bg-amber-600 rounded-full text-xs text-white">
+                                                                    {selectedDomainIds.size}
+                                                                </span>
+                                                            )}
+                                                        </button>
+                                                    </div>
 
-                                                <div className="p-4">
-                                                    {/* Filter Tab Content */}
-                                                    {activeTab === 'filter' && (
-                                                        <div>
-                                                            <div className="flex items-center justify-between mb-4">
-                                                                <h3 className="font-semibold">Filter Domains</h3>
-                                                                {activeFiltersCount > 0 && (
-                                                                    <button
-                                                                        onClick={clearFilters}
-                                                                        className="text-xs dark:text-amber-400 text-amber-600 dark:hover:text-amber-300 hover:text-amber-700"
-                                                                    >
-                                                                        Clear all
-                                                                    </button>
-                                                                )}
-                                                            </div>
-
-                                                            {/* TLD Filter */}
-                                                            <div className="mb-4">
-                                                                <label className="text-sm font-medium dark:text-gray-300 text-gray-700 mb-2 block">Extension (TLD)</label>
-                                                                <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
-                                                                    {uniqueTLDs.map(tld => (
+                                                    <div className="p-4">
+                                                        {/* Filter Tab Content */}
+                                                        {activeTab === 'filter' && (
+                                                            <div>
+                                                                <div className="flex items-center justify-between mb-4">
+                                                                    <h3 className="font-semibold">Filter Domains</h3>
+                                                                    {activeFiltersCount > 0 && (
                                                                         <button
-                                                                            key={tld}
-                                                                            onClick={() => toggleTLD(tld)}
-                                                                            className={`px-3 py-1 rounded-lg text-sm transition-all ${selectedTLDs.has(tld)
+                                                                            onClick={clearFilters}
+                                                                            className="text-xs dark:text-amber-400 text-amber-600 dark:hover:text-amber-300 hover:text-amber-700"
+                                                                        >
+                                                                            Clear all
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+
+                                                                {/* TLD Filter */}
+                                                                <div className="mb-4">
+                                                                    <label className="text-sm font-medium dark:text-gray-300 text-gray-700 mb-2 block">Extension (TLD)</label>
+                                                                    <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+                                                                        {uniqueTLDs.map(tld => (
+                                                                            <button
+                                                                                key={tld}
+                                                                                onClick={() => toggleTLD(tld)}
+                                                                                className={`px-3 py-1 rounded-lg text-sm transition-all ${selectedTLDs.has(tld)
+                                                                                    ? 'bg-amber-600 text-white'
+                                                                                    : 'dark:bg-white/10 bg-gray-100 dark:text-gray-300 text-gray-700 dark:hover:bg-white/20 hover:bg-gray-200'
+                                                                                    }`}
+                                                                            >
+                                                                                .{tld}
+                                                                            </button>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Verification Status Filter */}
+                                                                <div className="mb-4">
+                                                                    <label className="text-sm font-medium dark:text-gray-300 text-gray-700 mb-2 block">Verification Status</label>
+                                                                    <div className="flex gap-2">
+                                                                        <button
+                                                                            onClick={() => setVerificationFilter('all')}
+                                                                            className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${verificationFilter === 'all'
                                                                                 ? 'bg-amber-600 text-white'
                                                                                 : 'dark:bg-white/10 bg-gray-100 dark:text-gray-300 text-gray-700 dark:hover:bg-white/20 hover:bg-gray-200'
                                                                                 }`}
                                                                         >
-                                                                            .{tld}
+                                                                            All
                                                                         </button>
-                                                                    ))}
-                                                                </div>
-                                                            </div>
-
-                                                            {/* Verification Status Filter */}
-                                                            <div className="mb-4">
-                                                                <label className="text-sm font-medium dark:text-gray-300 text-gray-700 mb-2 block">Verification Status</label>
-                                                                <div className="flex gap-2">
-                                                                    <button
-                                                                        onClick={() => setVerificationFilter('all')}
-                                                                        className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${verificationFilter === 'all'
-                                                                            ? 'bg-amber-600 text-white'
-                                                                            : 'dark:bg-white/10 bg-gray-100 dark:text-gray-300 text-gray-700 dark:hover:bg-white/20 hover:bg-gray-200'
-                                                                            }`}
-                                                                    >
-                                                                        All
-                                                                    </button>
-                                                                    <button
-                                                                        onClick={() => setVerificationFilter('verified')}
-                                                                        className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${verificationFilter === 'verified'
-                                                                            ? 'bg-green-600 text-white'
-                                                                            : 'dark:bg-white/10 bg-gray-100 dark:text-gray-300 text-gray-700 dark:hover:bg-white/20 hover:bg-gray-200'
-                                                                            }`}
-                                                                    >
-                                                                        Verified
-                                                                    </button>
-                                                                    <button
-                                                                        onClick={() => setVerificationFilter('unverified')}
-                                                                        className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${verificationFilter === 'unverified'
-                                                                            ? 'bg-gray-600 text-white'
-                                                                            : 'dark:bg-white/10 bg-gray-100 dark:text-gray-300 text-gray-700 dark:hover:bg-white/20 hover:bg-gray-200'
-                                                                            }`}
-                                                                    >
-                                                                        Unverified
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-
-                                                            {/* Price Filter */}
-                                                            <div>
-                                                                <label className="text-sm font-medium dark:text-gray-300 text-gray-700 mb-2 block">Price Range ($)</label>
-                                                                <div className="flex gap-2">
-                                                                    <input
-                                                                        type="number"
-                                                                        placeholder="Min"
-                                                                        value={priceMin}
-                                                                        onChange={(e) => setPriceMin(e.target.value)}
-                                                                        className="flex-1 min-w-0 dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-3 py-2 text-sm dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:border-amber-500/50"
-                                                                    />
-                                                                    <span className="dark:text-gray-500 text-gray-400 self-center">-</span>
-                                                                    <input
-                                                                        type="number"
-                                                                        placeholder="Max"
-                                                                        value={priceMax}
-                                                                        onChange={(e) => setPriceMax(e.target.value)}
-                                                                        className="flex-1 min-w-0 dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-3 py-2 text-sm dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:border-amber-500/50"
-                                                                    />
-                                                                </div>
-                                                            </div>
-
-                                                            {/* Sort Filter */}
-                                                            <div className="mt-4">
-                                                                <label className="text-sm font-medium dark:text-gray-300 text-gray-700 mb-2 block">Sort By</label>
-                                                                <select
-                                                                    value={sortBy}
-                                                                    onChange={(e) => setSortBy(e.target.value)}
-                                                                    className="w-full dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-3 py-2 text-sm dark:text-white text-gray-900 focus:outline-none focus:border-amber-500/50"
-                                                                >
-                                                                    <option value="newest">Newest Listed</option>
-                                                                    <option value="price_asc">Price: Low to High</option>
-                                                                    <option value="price_desc">Price: High to Low</option>
-                                                                    <option value="expires_asc">Expiring Soon</option>
-                                                                    <option value="expires_desc">Expiring Later</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    )}
-
-                                                    {/* Select & Actions Tab Content */}
-                                                    {activeTab === 'select' && (
-                                                        <div>
-                                                            <h3 className="font-semibold mb-4">Bulk Actions</h3>
-
-                                                            {!isInSelectionMode ? (
-                                                                <div className="text-center py-8">
-                                                                    <CheckSquare className="h-12 w-12 mx-auto dark:text-gray-600 text-gray-400 mb-3" />
-                                                                    <p className="dark:text-gray-400 text-gray-600 mb-4">Enable selection mode to perform bulk actions</p>
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            setIsInSelectionMode(true);
-                                                                            setShowManagePanel(false);
-                                                                        }}
-                                                                        className="px-4 py-2 bg-amber-600 hover:bg-amber-700 dark:hover:bg-amber-500 text-white rounded-lg font-medium transition-all"
-                                                                    >
-                                                                        Enable Selection Mode
-                                                                    </button>
-                                                                </div>
-                                                            ) : (
-                                                                <div className="space-y-3">
-                                                                    <div className="dark:bg-white/5 bg-gray-100 rounded-lg p-3 border dark:border-white/10 border-gray-300">
-                                                                        <div className="flex items-center justify-between mb-2">
-                                                                            <span className="text-sm dark:text-gray-400 text-gray-600">Selected</span>
-                                                                            <span className="text-lg font-semibold dark:text-amber-400 text-amber-600">{selectedDomainIds.size}</span>
-                                                                        </div>
                                                                         <button
-                                                                            onClick={() => {
-                                                                                toggleSelectAll();
-                                                                            }}
-                                                                            className="w-full px-3 py-2 dark:bg-white/10 bg-gray-50 dark:hover:bg-white/20 hover:bg-gray-200 dark:text-white text-gray-900 rounded-lg text-sm transition-all border dark:border-transparent border-gray-300"
+                                                                            onClick={() => setVerificationFilter('verified')}
+                                                                            className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${verificationFilter === 'verified'
+                                                                                ? 'bg-green-600 text-white'
+                                                                                : 'dark:bg-white/10 bg-gray-100 dark:text-gray-300 text-gray-700 dark:hover:bg-white/20 hover:bg-gray-200'
+                                                                                }`}
                                                                         >
-                                                                            {selectedDomainIds.size === filteredDomains.slice((currentPage - 1) * domainsPerPage, currentPage * domainsPerPage).length
-                                                                                ? 'Deselect All on Page'
-                                                                                : 'Select All on Page'}
+                                                                            Verified
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={() => setVerificationFilter('unverified')}
+                                                                            className={`flex-1 px-3 py-2 rounded-lg text-sm transition-all ${verificationFilter === 'unverified'
+                                                                                ? 'bg-gray-600 text-white'
+                                                                                : 'dark:bg-white/10 bg-gray-100 dark:text-gray-300 text-gray-700 dark:hover:bg-white/20 hover:bg-gray-200'
+                                                                                }`}
+                                                                        >
+                                                                            Unverified
                                                                         </button>
                                                                     </div>
-
-                                                                    {selectedDomainIds.size > 0 && (
-                                                                        <>
-                                                                            <button
-                                                                                onClick={() => {
-                                                                                    handleBulkVerify();
-                                                                                    setShowManagePanel(false);
-                                                                                }}
-                                                                                disabled={isBulkVerifying}
-                                                                                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 dark:hover:bg-green-500 text-white rounded-lg font-medium transition-all disabled:opacity-50"
-                                                                            >
-                                                                                {isBulkVerifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
-                                                                                Verify Selected ({selectedDomainIds.size})
-                                                                            </button>
-                                                                            <button
-                                                                                onClick={() => {
-                                                                                    setBulkEditPriceValue('');
-                                                                                    setShowBulkEditPriceModal(true);
-                                                                                    setShowManagePanel(false);
-                                                                                }}
-                                                                                disabled={selectedDomainIds.size === 0}
-                                                                                className="w-full py-2 bg-amber-600 hover:bg-amber-700 dark:hover:bg-amber-500 text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                                                            >
-                                                                                <DollarSign className="h-4 w-4" />
-                                                                                Set Price ({selectedDomainIds.size})
-                                                                            </button>
-                                                                            <button
-                                                                                onClick={() => {
-                                                                                    handleBulkDelete();
-                                                                                    setShowManagePanel(false);
-                                                                                }}
-                                                                                disabled={isDeleting}
-                                                                                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 dark:hover:bg-red-500 text-white rounded-lg font-medium transition-all disabled:opacity-50"
-                                                                            >
-                                                                                {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-                                                                                Delete Selected ({selectedDomainIds.size})
-                                                                            </button>
-                                                                        </>
-                                                                    )}
-
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            setIsInSelectionMode(false);
-                                                                            setSelectedDomainIds(new Set());
-                                                                            setShowManagePanel(false);
-                                                                        }}
-                                                                        className="w-full px-4 py-2 dark:bg-white/10 bg-gray-100 dark:hover:bg-white/20 hover:bg-gray-200 dark:text-white text-gray-900 rounded-lg font-medium transition-all border dark:border-transparent border-gray-300"
-                                                                    >
-                                                                        Exit Selection Mode
-                                                                    </button>
                                                                 </div>
-                                                            )}
-                                                        </div>
-                                                    )}
+
+                                                                {/* Price Filter */}
+                                                                <div>
+                                                                    <label className="text-sm font-medium dark:text-gray-300 text-gray-700 mb-2 block">Price Range ($)</label>
+                                                                    <div className="flex gap-2">
+                                                                        <input
+                                                                            type="number"
+                                                                            placeholder="Min"
+                                                                            value={priceMin}
+                                                                            onChange={(e) => setPriceMin(e.target.value)}
+                                                                            className="flex-1 min-w-0 dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-3 py-2 text-sm dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:border-amber-500/50"
+                                                                        />
+                                                                        <span className="dark:text-gray-500 text-gray-400 self-center">-</span>
+                                                                        <input
+                                                                            type="number"
+                                                                            placeholder="Max"
+                                                                            value={priceMax}
+                                                                            onChange={(e) => setPriceMax(e.target.value)}
+                                                                            className="flex-1 min-w-0 dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-3 py-2 text-sm dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:border-amber-500/50"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Sort Filter */}
+                                                                <div className="mt-4">
+                                                                    <label className="text-sm font-medium dark:text-gray-300 text-gray-700 mb-2 block">Sort By</label>
+                                                                    <select
+                                                                        value={sortBy}
+                                                                        onChange={(e) => setSortBy(e.target.value)}
+                                                                        className="w-full dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-3 py-2 text-sm dark:text-white text-gray-900 focus:outline-none focus:border-amber-500/50"
+                                                                    >
+                                                                        <option value="newest">Newest Listed</option>
+                                                                        <option value="price_asc">Price: Low to High</option>
+                                                                        <option value="price_desc">Price: High to Low</option>
+                                                                        <option value="expires_asc">Expiring Soon</option>
+                                                                        <option value="expires_desc">Expiring Later</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Select & Actions Tab Content */}
+                                                        {activeTab === 'select' && (
+                                                            <div>
+                                                                <h3 className="font-semibold mb-4">Bulk Actions</h3>
+
+                                                                {!isInSelectionMode ? (
+                                                                    <div className="text-center py-8">
+                                                                        <CheckSquare className="h-12 w-12 mx-auto dark:text-gray-600 text-gray-400 mb-3" />
+                                                                        <p className="dark:text-gray-400 text-gray-600 mb-4">Enable selection mode to perform bulk actions</p>
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                setIsInSelectionMode(true);
+                                                                                setShowManagePanel(false);
+                                                                            }}
+                                                                            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 dark:hover:bg-amber-500 text-white rounded-lg font-medium transition-all"
+                                                                        >
+                                                                            Enable Selection Mode
+                                                                        </button>
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="space-y-3">
+                                                                        <div className="dark:bg-white/5 bg-gray-100 rounded-lg p-3 border dark:border-white/10 border-gray-300">
+                                                                            <div className="flex items-center justify-between mb-2">
+                                                                                <span className="text-sm dark:text-gray-400 text-gray-600">Selected</span>
+                                                                                <span className="text-lg font-semibold dark:text-amber-400 text-amber-600">{selectedDomainIds.size}</span>
+                                                                            </div>
+                                                                            <button
+                                                                                onClick={() => {
+                                                                                    toggleSelectAll();
+                                                                                }}
+                                                                                className="w-full px-3 py-2 dark:bg-white/10 bg-gray-50 dark:hover:bg-white/20 hover:bg-gray-200 dark:text-white text-gray-900 rounded-lg text-sm transition-all border dark:border-transparent border-gray-300"
+                                                                            >
+                                                                                {selectedDomainIds.size === filteredDomains.slice((currentPage - 1) * domainsPerPage, currentPage * domainsPerPage).length
+                                                                                    ? 'Deselect All on Page'
+                                                                                    : 'Select All on Page'}
+                                                                            </button>
+                                                                        </div>
+
+                                                                        {selectedDomainIds.size > 0 && (
+                                                                            <>
+                                                                                <button
+                                                                                    onClick={() => {
+                                                                                        handleBulkVerify();
+                                                                                        setShowManagePanel(false);
+                                                                                    }}
+                                                                                    disabled={isBulkVerifying}
+                                                                                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 dark:hover:bg-green-500 text-white rounded-lg font-medium transition-all disabled:opacity-50"
+                                                                                >
+                                                                                    {isBulkVerifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
+                                                                                    Verify Selected ({selectedDomainIds.size})
+                                                                                </button>
+                                                                                <button
+                                                                                    onClick={() => {
+                                                                                        setBulkEditPriceValue('');
+                                                                                        setShowBulkEditPriceModal(true);
+                                                                                        setShowManagePanel(false);
+                                                                                    }}
+                                                                                    disabled={selectedDomainIds.size === 0}
+                                                                                    className="w-full py-2 bg-amber-600 hover:bg-amber-700 dark:hover:bg-amber-500 text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                                                                >
+                                                                                    <DollarSign className="h-4 w-4" />
+                                                                                    Set Price ({selectedDomainIds.size})
+                                                                                </button>
+                                                                                <button
+                                                                                    onClick={() => {
+                                                                                        handleBulkDelete();
+                                                                                        setShowManagePanel(false);
+                                                                                    }}
+                                                                                    disabled={isDeleting}
+                                                                                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 dark:hover:bg-red-500 text-white rounded-lg font-medium transition-all disabled:opacity-50"
+                                                                                >
+                                                                                    {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                                                                                    Delete Selected ({selectedDomainIds.size})
+                                                                                </button>
+                                                                            </>
+                                                                        )}
+
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                setIsInSelectionMode(false);
+                                                                                setSelectedDomainIds(new Set());
+                                                                                setShowManagePanel(false);
+                                                                            }}
+                                                                            className="w-full px-4 py-2 dark:bg-white/10 bg-gray-100 dark:hover:bg-white/20 hover:bg-gray-200 dark:text-white text-gray-900 rounded-lg font-medium transition-all border dark:border-transparent border-gray-300"
+                                                                        >
+                                                                            Exit Selection Mode
+                                                                        </button>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        )}
-                                    </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
-                            {filteredDomains.length === 0 ? (
-                                <div className="p-12 text-center dark:text-gray-500 text-gray-600">
-                                    You haven't added any domains yet.
-                                </div>
-                            ) : (
+                            {viewMode === 'portfolios' && (
                                 <div className="divide-y dark:divide-white/5 divide-gray-200">
-                                    {/* Select All Row - Only show in selection mode */}
-                                    {isInSelectionMode && filteredDomains.length > 0 && (
-                                        <div className="p-4 dark:bg-white/5 bg-gray-50 flex items-center gap-3">
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedDomainIds.size > 0 && selectedDomainIds.size === filteredDomains.slice((currentPage - 1) * domainsPerPage, currentPage * domainsPerPage).length}
-                                                onChange={toggleSelectAll}
-                                                className="h-4 w-4 rounded dark:border-white/20 border-gray-300 dark:bg-black/20 bg-gray-50 text-amber-500 focus:ring-amber-500/50"
-                                            />
-                                            <span className="text-sm dark:text-gray-400 text-gray-600">
-                                                Select all on this page
-                                            </span>
+                                    {portfolios.length === 0 ? (
+                                        <div className="p-12 text-center dark:text-gray-500 text-gray-600">
+                                            You haven't created any portfolios yet.
                                         </div>
-                                    )}
-
-                                    {filteredDomains.slice((currentPage - 1) * domainsPerPage, currentPage * domainsPerPage).map(domain => (
-                                        <div key={domain.id} className="p-4 flex items-center gap-3 dark:hover:bg-white/5 hover:bg-gray-50 transition-colors">
-                                            {isInSelectionMode && (
-                                                <input
-                                                    type="checkbox"
-                                                    checked={selectedDomainIds.has(domain.id)}
-                                                    onChange={() => toggleSelectDomain(domain.id)}
-                                                    className="h-4 w-4 rounded dark:border-white/20 border-gray-300 dark:bg-black/20 bg-gray-50 text-amber-500 focus:ring-amber-500/50"
-                                                />
-                                            )}
-                                            <div className="flex-1 flex items-center justify-between">
+                                    ) : (
+                                        portfolios.map(portfolio => (
+                                            <div key={portfolio.id} className="p-4 flex items-center justify-between dark:hover:bg-white/5 hover:bg-gray-50 transition-colors">
                                                 <div>
-                                                    <div className="flex items-center gap-2">
-                                                        <h3 className={`font-medium ${domain.status === 'sold' ? 'line-through dark:text-gray-500 text-gray-400' : 'dark:text-white text-gray-900'}`}>
-                                                            {domain.name}
-                                                        </h3>
-                                                        {domain.isVerified ? (
-                                                            <div className="group relative">
-                                                                <ShieldCheck className="h-4 w-4 text-green-500 dark:text-green-400" />
-                                                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 dark:bg-gray-800 bg-gray-900 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                                                                    Ownership Verified
-                                                                </div>
-                                                            </div>
-                                                        ) : (
-                                                            domain.status !== 'sold' && (
-                                                                <button
-                                                                    onClick={() => openVerifyModal(domain)}
-                                                                    className="text-xs dark:text-amber-500 text-amber-600 dark:hover:text-amber-400 hover:text-amber-700 flex items-center gap-1 dark:bg-amber-500/10 bg-amber-50 dark:hover:bg-amber-500/20 hover:bg-amber-100 px-2 py-0.5 rounded transition-colors"
-                                                                >
-                                                                    <Shield className="h-3 w-3" />
-                                                                    Verify
-                                                                </button>
-                                                            )
-                                                        )}
-                                                    </div>
-                                                    <p className="text-[10px] dark:text-gray-500 text-gray-600 flex items-center gap-2 mt-0.5">
-                                                        {domain.expiresAt ? (
-                                                            <>
-                                                                <span className="dark:text-amber-500/80 text-amber-600">
-                                                                    Expires {new Date(domain.expiresAt).toLocaleDateString('en-US')}
-                                                                </span>
-                                                                <span className="dark:text-gray-700 text-gray-400">•</span>
-                                                                <span suppressHydrationWarning>
-                                                                    {(() => {
-                                                                        const daysRemaining = Math.ceil((new Date(domain.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-                                                                        return daysRemaining > 0
-                                                                            ? `${daysRemaining} days to expire`
-                                                                            : daysRemaining === 0
-                                                                                ? 'Expires today'
-                                                                                : `Expired ${Math.abs(daysRemaining)} days ago`;
-                                                                    })()}
-                                                                </span>
-                                                            </>
-                                                        ) : (
-                                                            <span className="dark:text-gray-600 text-gray-500">No expiration data</span>
-                                                        )}
+                                                    <h3 className="font-medium dark:text-white text-gray-900">{portfolio.name}</h3>
+                                                    <p className="text-xs dark:text-gray-500 text-gray-600 mt-1">
+                                                        {portfolio.domains.length} domains • Created {new Date(portfolio.createdAt).toLocaleDateString()}
                                                     </p>
-                                                </div>
-
-                                                <div className="flex items-center gap-4">
-                                                    <div className="text-right">
-                                                        <div className="font-mono dark:text-white text-gray-900 font-medium">
-                                                            ${domain.price.toLocaleString()}
-                                                        </div>
-
+                                                    <div className="flex flex-wrap gap-1 mt-2">
+                                                        {(expandedPortfolios.has(portfolio.id) ? portfolio.domains : portfolio.domains.slice(0, 5)).map(d => (
+                                                            <span key={d.id} className="text-[10px] px-1.5 py-0.5 rounded dark:bg-white/10 bg-gray-200 dark:text-gray-300 text-gray-700">
+                                                                {d.name}
+                                                            </span>
+                                                        ))}
+                                                        {portfolio.domains.length > 5 && (
+                                                            <button
+                                                                onClick={(e) => togglePortfolioExpanded(e, portfolio.id)}
+                                                                className="text-[10px] px-1.5 py-0.5 rounded dark:bg-white/5 bg-gray-100 dark:text-gray-500 text-gray-500 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
+                                                            >
+                                                                {expandedPortfolios.has(portfolio.id)
+                                                                    ? 'Show less'
+                                                                    : `+${portfolio.domains.length - 5} more`}
+                                                            </button>
+                                                        )}
                                                     </div>
-
+                                                </div>
+                                                <div className="flex items-center gap-4">
+                                                    {portfolio.price && (
+                                                        <div className="font-mono dark:text-white text-gray-900 font-medium">
+                                                            ${portfolio.price.toLocaleString()}
+                                                        </div>
+                                                    )}
                                                     <div className="flex items-center gap-2">
                                                         <button
-                                                            onClick={() => openEditModal(domain)}
-                                                            className="px-3 py-1.5 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg transition-colors"
+                                                            onClick={() => setEditingPortfolio(portfolio)}
+                                                            className="p-2 dark:text-gray-400 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"
+                                                            title="Edit Portfolio"
                                                         >
-                                                            Edit
+                                                            <Edit2 className="h-4 w-4" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDeletePortfolio(portfolio.id)}
+                                                            className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                                                            title="Delete Portfolio"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
                                                         </button>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        ))
+                                    )}
                                 </div>
                             )}
 
-                            {/* Pagination */}
-                            {filteredDomains.length > 0 && (
-                                <div className="p-4 border-t dark:border-white/10 border-gray-200 flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm dark:text-gray-500 text-gray-600">Show:</span>
-                                        <select
-                                            value={domainsPerPage}
-                                            onChange={(e) => {
-                                                setDomainsPerPage(Number(e.target.value));
-                                                setCurrentPage(1);
-                                            }}
-                                            className="dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded px-2 py-1 text-sm dark:text-gray-300 text-gray-900 focus:outline-none focus:border-amber-500/50"
-                                        >
-                                            <option value="10">10 per page</option>
-                                            <option value="50">50 per page</option>
-                                            <option value="100">100 per page</option>
-                                            <option value="200">200 per page</option>
-                                        </select>
-                                    </div>
+                            {viewMode === 'domains' && (
+                                <>
+                                    {filteredDomains.length === 0 ? (
+                                        <div className="p-12 text-center dark:text-gray-500 text-gray-600">
+                                            You haven't added any domains yet.
+                                        </div>
+                                    ) : (
+                                        <div className="divide-y dark:divide-white/5 divide-gray-200">
+                                            {/* Select All Row - Only show in selection mode */}
+                                            {isInSelectionMode && filteredDomains.length > 0 && (
+                                                <div className="p-4 dark:bg-white/5 bg-gray-50 flex items-center gap-3">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedDomainIds.size > 0 && selectedDomainIds.size === filteredDomains.slice((currentPage - 1) * domainsPerPage, currentPage * domainsPerPage).length}
+                                                        onChange={toggleSelectAll}
+                                                        className="h-4 w-4 rounded dark:border-white/20 border-gray-300 dark:bg-black/20 bg-gray-50 text-amber-500 focus:ring-amber-500/50"
+                                                    />
+                                                    <span className="text-sm dark:text-gray-400 text-gray-600">
+                                                        Select all on this page
+                                                    </span>
+                                                </div>
+                                            )}
 
-                                    <div className="flex items-center gap-2">
-                                        <button
-                                            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                                            disabled={currentPage === 1}
-                                            className="px-3 py-1 text-sm dark:bg-white/10 bg-gray-100 dark:hover:bg-white/20 hover:bg-gray-200 border dark:border-white/10 border-gray-300 rounded dark:text-white text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                                        >
-                                            Previous
-                                        </button>
-                                        <span className="text-sm dark:text-gray-400 text-gray-600">
-                                            Page {currentPage} of {Math.ceil(filteredDomains.length / domainsPerPage)}
-                                        </span>
-                                        <button
-                                            onClick={() => setCurrentPage(Math.min(Math.ceil(filteredDomains.length / domainsPerPage), currentPage + 1))}
-                                            disabled={currentPage >= Math.ceil(filteredDomains.length / domainsPerPage)}
-                                            className="px-3 py-1 text-sm dark:bg-white/10 bg-gray-100 dark:hover:bg-white/20 hover:bg-gray-200 border dark:border-white/10 border-gray-300 rounded dark:text-white text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                                        >
-                                            Next
-                                        </button>
-                                    </div>
-                                </div>
+                                            {filteredDomains.slice((currentPage - 1) * domainsPerPage, currentPage * domainsPerPage).map(domain => (
+                                                <div key={domain.id} className="p-4 flex items-center gap-3 dark:hover:bg-white/5 hover:bg-gray-50 transition-colors">
+                                                    {isInSelectionMode && (
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={selectedDomainIds.has(domain.id)}
+                                                            onChange={() => toggleSelectDomain(domain.id)}
+                                                            className="h-4 w-4 rounded dark:border-white/20 border-gray-300 dark:bg-black/20 bg-gray-50 text-amber-500 focus:ring-amber-500/50"
+                                                        />
+                                                    )}
+                                                    <div className="flex-1 flex items-center justify-between">
+                                                        <div>
+                                                            <div className="flex items-center gap-2">
+                                                                <h3 className={`font-medium ${domain.status === 'sold' ? 'line-through dark:text-gray-500 text-gray-400' : 'dark:text-white text-gray-900'}`}>
+                                                                    {domain.name}
+                                                                </h3>
+                                                                {domain.isVerified ? (
+                                                                    <div className="group relative">
+                                                                        <ShieldCheck className="h-4 w-4 text-green-500 dark:text-green-400" />
+                                                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 dark:bg-gray-800 bg-gray-900 text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                                                                            Ownership Verified
+                                                                        </div>
+                                                                    </div>
+                                                                ) : (
+                                                                    domain.status !== 'sold' && (
+                                                                        <button
+                                                                            onClick={() => openVerifyModal(domain)}
+                                                                            className="text-xs dark:text-amber-500 text-amber-600 dark:hover:text-amber-400 hover:text-amber-700 flex items-center gap-1 dark:bg-amber-500/10 bg-amber-50 dark:hover:bg-amber-500/20 hover:bg-amber-100 px-2 py-0.5 rounded transition-colors"
+                                                                        >
+                                                                            <Shield className="h-3 w-3" />
+                                                                            Verify
+                                                                        </button>
+                                                                    )
+                                                                )}
+                                                            </div>
+                                                            <p className="text-[10px] dark:text-gray-500 text-gray-600 flex items-center gap-2 mt-0.5">
+                                                                {domain.expiresAt ? (
+                                                                    <>
+                                                                        <span className="dark:text-amber-500/80 text-amber-600">
+                                                                            Expires {new Date(domain.expiresAt).toLocaleDateString('en-US')}
+                                                                        </span>
+                                                                        <span className="dark:text-gray-700 text-gray-400">•</span>
+                                                                        <span suppressHydrationWarning>
+                                                                            {(() => {
+                                                                                const daysRemaining = Math.ceil((new Date(domain.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                                                                                return daysRemaining > 0
+                                                                                    ? `${daysRemaining} days to expire`
+                                                                                    : daysRemaining === 0
+                                                                                        ? 'Expires today'
+                                                                                        : `Expired ${Math.abs(daysRemaining)} days ago`;
+                                                                            })()}
+                                                                        </span>
+                                                                    </>
+                                                                ) : (
+                                                                    <span className="dark:text-gray-600 text-gray-500">No expiration data</span>
+                                                                )}
+                                                            </p>
+                                                        </div>
+
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="text-right">
+                                                                <div className="font-mono dark:text-white text-gray-900 font-medium">
+                                                                    ${domain.price.toLocaleString()}
+                                                                </div>
+
+                                                            </div>
+
+                                                            <div className="flex items-center gap-2">
+                                                                <button
+                                                                    onClick={() => openEditModal(domain)}
+                                                                    className="px-3 py-1.5 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg transition-colors"
+                                                                >
+                                                                    Edit
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {/* Pagination */}
+                                    {filteredDomains.length > 0 && (
+                                        <div className="p-4 border-t dark:border-white/10 border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                            <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
+                                                <span className="text-sm dark:text-gray-500 text-gray-600">Show:</span>
+                                                <select
+                                                    value={domainsPerPage}
+                                                    onChange={(e) => {
+                                                        setDomainsPerPage(Number(e.target.value));
+                                                        setCurrentPage(1);
+                                                    }}
+                                                    className="dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded px-2 py-1 text-sm dark:text-gray-300 text-gray-900 focus:outline-none focus:border-amber-500/50"
+                                                >
+                                                    <option value="10">10 per page</option>
+                                                    <option value="50">50 per page</option>
+                                                    <option value="100">100 per page</option>
+                                                    <option value="200">200 per page</option>
+                                                </select>
+                                            </div>
+
+                                            <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+                                                <button
+                                                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                                                    disabled={currentPage === 1}
+                                                    className="px-3 py-1 text-sm dark:bg-white/10 bg-gray-100 dark:hover:bg-white/20 hover:bg-gray-200 border dark:border-white/10 border-gray-300 rounded dark:text-white text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                                >
+                                                    Previous
+                                                </button>
+                                                <span className="text-sm dark:text-gray-400 text-gray-600">
+                                                    Page {currentPage} of {Math.ceil(filteredDomains.length / domainsPerPage)}
+                                                </span>
+                                                <button
+                                                    onClick={() => setCurrentPage(Math.min(Math.ceil(filteredDomains.length / domainsPerPage), currentPage + 1))}
+                                                    disabled={currentPage >= Math.ceil(filteredDomains.length / domainsPerPage)}
+                                                    className="px-3 py-1 text-sm dark:bg-white/10 bg-gray-100 dark:hover:bg-white/20 hover:bg-gray-200 border dark:border-white/10 border-gray-300 rounded dark:text-white text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                                >
+                                                    Next
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
                             )}
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* Edit Portfolio Modal */}
+            {editingPortfolio && (
+                <EditPortfolioModal
+                    portfolio={editingPortfolio}
+                    domains={domains}
+                    isOpen={!!editingPortfolio}
+                    isSubmitting={isAdding}
+                    onClose={() => setEditingPortfolio(null)}
+                    onSubmit={handleUpdatePortfolio}
+                />
+            )}
 
             {/* Verification Modal */}
             {showVerifyModal && selectedDomain && (
@@ -1380,51 +1685,35 @@ export default function DashboardPage() {
             )}
 
             {/* Bulk Edit Price Modal */}
-            {showBulkEditPriceModal && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowBulkEditPriceModal(false)}>
-                    <div className="bg-[#0A0A0A] border border-white/10 rounded-xl max-w-sm w-full p-6" onClick={e => e.stopPropagation()}>
-                        <h3 className="text-xl font-bold text-white mb-4">Set Price for {selectedDomainIds.size} Domains</h3>
-                        <form onSubmit={handleBulkUpdatePrice}>
-                            <div className="mb-6">
-                                <label className="block text-sm font-medium text-gray-300 mb-2">New Price ($)</label>
-                                <div className="relative">
-                                    <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
-                                    <input
-                                        type="number"
-                                        value={bulkEditPriceValue}
-                                        onChange={e => setBulkEditPriceValue(e.target.value)}
-                                        className="w-full bg-white/5 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-amber-500/50"
-                                        placeholder="1000"
-                                        required
-                                        min="0"
-                                        autoFocus
-                                    />
-                                </div>
-                                <p className="text-xs text-gray-500 mt-2">
-                                    This will update the price for all {selectedDomainIds.size} selected domains.
-                                </p>
-                            </div>
-                            <div className="flex justify-end gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowBulkEditPriceModal(false)}
-                                    className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={isEditingDomain}
-                                    className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-white rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
-                                >
-                                    {isEditingDomain && <Loader2 className="h-4 w-4 animate-spin" />}
-                                    Update All
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
+            <BulkPriceModal
+                isOpen={showBulkEditPriceModal}
+                selectedCount={selectedDomainIds.size}
+                onClose={() => setShowBulkEditPriceModal(false)}
+                onSave={async (price) => {
+                    if (selectedDomainIds.size === 0) return { success: false, error: 'No domains selected' };
+                    setIsEditingDomain(true);
+                    try {
+                        const updatePromises = Array.from(selectedDomainIds).map(id =>
+                            fetch(`/api/user/domains/${id}`, {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ price })
+                            })
+                        );
+                        await Promise.all(updatePromises);
+                        setDomains(domains.map(d =>
+                            selectedDomainIds.has(d.id) ? { ...d, price } : d
+                        ));
+                        setSelectedDomainIds(new Set());
+                        setIsInSelectionMode(false);
+                        return { success: true };
+                    } catch (error: any) {
+                        return { success: false, error: error.message };
+                    } finally {
+                        setIsEditingDomain(false);
+                    }
+                }}
+            />
         </div>
     );
 }
