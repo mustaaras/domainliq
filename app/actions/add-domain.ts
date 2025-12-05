@@ -63,7 +63,7 @@ export async function addDomain(formData: FormData) {
             },
         });
 
-        revalidatePath('/dashboard/custom-domains');
+        revalidatePath('/settings/custom-domains');
         return { success: true };
 
     } catch (error) {

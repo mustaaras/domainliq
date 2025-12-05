@@ -72,13 +72,7 @@ export function DashboardHeader() {
                     >
                         Overview
                     </Link>
-                    <Link
-                        href="/dashboard/custom-domains"
-                        className="px-3 py-2 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2"
-                    >
-                        <Globe className="h-4 w-4" />
-                        Custom Domains
-                    </Link>
+
                     <Link
                         href={getProfileUrl(userSubdomain)}
                         target="_blank"
@@ -137,14 +131,7 @@ export function DashboardHeader() {
                         >
                             Overview
                         </Link>
-                        <Link
-                            href="/dashboard/custom-domains"
-                            className="px-4 py-3 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:hover:bg-white/5 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-3"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                            <Globe className="h-4 w-4" />
-                            Custom Domains
-                        </Link>
+
                         <Link
                             href={getProfileUrl(userSubdomain)}
                             target="_blank"

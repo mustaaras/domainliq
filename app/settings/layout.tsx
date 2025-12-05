@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { User, CreditCard, Shield, Settings, LogOut, LayoutDashboard, ArrowLeft } from 'lucide-react';
+import { User, CreditCard, Shield, Settings, LogOut, LayoutDashboard, ArrowLeft, Globe } from 'lucide-react';
 import { Logo } from '@/components/logo';
 
 export default function SettingsLayout({
@@ -14,6 +14,7 @@ export default function SettingsLayout({
 
     const tabs = [
         { name: 'Profile', href: '/settings', icon: User },
+        { name: 'Custom Domains', href: '/settings/custom-domains', icon: Globe },
         { name: 'Integrations', href: '/settings/integrations', icon: LayoutDashboard },
     ];
 

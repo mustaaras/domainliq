@@ -48,7 +48,7 @@ export default function DashboardPage() {
     const [addError, setAddError] = useState('');
 
     const [editingDomainId, setEditingDomainId] = useState<string | null>(null);
-    const [editDomainData, setEditDomainData] = useState({ price: '', checkoutLink: '' });
+    const [editDomainData, setEditDomainData] = useState({ price: '', checkoutLink: '', status: '' });
     const [isEditingDomain, setIsEditingDomain] = useState(false);
     const [showBulkEditPriceModal, setShowBulkEditPriceModal] = useState(false);
     const [bulkEditPriceValue, setBulkEditPriceValue] = useState('');
@@ -143,7 +143,7 @@ export default function DashboardPage() {
             ));
 
             setEditingDomainId(null);
-            setEditDomainData({ price: '', checkoutLink: '' });
+            setEditDomainData({ price: '', checkoutLink: '', status: '' });
         } catch (error: any) {
             console.error(error);
             alert(error.message || 'Failed to update domain');
@@ -156,7 +156,8 @@ export default function DashboardPage() {
         setEditingDomainId(domain.id);
         setEditDomainData({
             price: domain.price.toString(),
-            checkoutLink: domain.checkoutLink || ''
+            checkoutLink: domain.checkoutLink || '',
+            status: domain.status
         });
     };
 
@@ -715,7 +716,7 @@ export default function DashboardPage() {
 
                     {/* Domain List */}
                     <div className="lg:col-span-2">
-                        <div className="dark:bg-white/5 bg-white border dark:border-white/10 border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                        <div className="dark:bg-white/5 bg-white border dark:border-white/10 border-gray-200 rounded-xl shadow-sm">
                             <div className="p-6 border-b dark:border-white/10 border-gray-200 flex items-center justify-between">
                                 <h2 className="text-xl font-semibold">Your Domains</h2>
                                 <div className="flex items-center gap-2">
@@ -723,7 +724,7 @@ export default function DashboardPage() {
                                     <div className="relative">
                                         <button
                                             onClick={() => setShowManagePanel(!showManagePanel)}
-                                            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${activeFiltersCount > 0 || isInSelectionMode
+                                            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${activeFiltersCount > 0 || isInSelectionMode || showManagePanel
                                                 ? 'bg-amber-600 hover:bg-amber-500 text-white'
                                                 : 'dark:bg-white/10 bg-gray-100 dark:hover:bg-white/20 hover:bg-gray-200 dark:text-white text-gray-900'
                                                 }`}
@@ -739,7 +740,7 @@ export default function DashboardPage() {
 
                                         {/* Combined Management Panel */}
                                         {showManagePanel && (
-                                            <div className="absolute right-0 mt-2 w-[85vw] sm:w-96 dark:bg-[#0A0A0A] bg-white border dark:border-white/20 border-gray-300 rounded-xl shadow-2xl z-50">
+                                            <div className="absolute right-0 mt-2 w-[85vw] sm:w-[420px] dark:bg-[#0A0A0A] bg-white border dark:border-white/20 border-gray-300 rounded-xl shadow-2xl z-50 overflow-hidden">
                                                 {/* Tabs */}
                                                 <div className="flex border-b dark:border-white/10 border-gray-200">
                                                     <button
@@ -852,7 +853,7 @@ export default function DashboardPage() {
                                                                         placeholder="Min"
                                                                         value={priceMin}
                                                                         onChange={(e) => setPriceMin(e.target.value)}
-                                                                        className="flex-1 dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-3 py-2 text-sm dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:border-amber-500/50"
+                                                                        className="flex-1 min-w-0 dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-3 py-2 text-sm dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:border-amber-500/50"
                                                                     />
                                                                     <span className="dark:text-gray-500 text-gray-400 self-center">-</span>
                                                                     <input
@@ -860,7 +861,7 @@ export default function DashboardPage() {
                                                                         placeholder="Max"
                                                                         value={priceMax}
                                                                         onChange={(e) => setPriceMax(e.target.value)}
-                                                                        className="flex-1 dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-3 py-2 text-sm dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:border-amber-500/50"
+                                                                        className="flex-1 min-w-0 dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-3 py-2 text-sm dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:border-amber-500/50"
                                                                     />
                                                                 </div>
                                                             </div>
@@ -1063,36 +1064,20 @@ export default function DashboardPage() {
 
                                                 <div className="flex items-center gap-4">
                                                     <div className="text-right">
-                                                        <div className="flex items-center justify-end gap-2">
-                                                            <div className="font-mono dark:text-white text-gray-900 font-medium">
-                                                                ${domain.price.toLocaleString()}
-                                                            </div>
-                                                            <button
-                                                                onClick={() => openEditModal(domain)}
-                                                                className="p-1 dark:text-gray-500 text-gray-400 dark:hover:text-amber-400 hover:text-amber-600 transition-colors"
-                                                                title="Edit Price"
-                                                            >
-                                                                <Pencil className="h-3 w-3" />
-                                                            </button>
+                                                        <div className="font-mono dark:text-white text-gray-900 font-medium">
+                                                            ${domain.price.toLocaleString()}
                                                         </div>
-                                                        <button
-                                                            onClick={() => handleToggleSold(domain.id, domain.status)}
-                                                            className={`text-xs font-medium mt-1 ${domain.status === 'sold'
-                                                                ? 'dark:text-green-400 text-green-600 dark:hover:text-green-300 hover:text-green-700'
-                                                                : 'dark:text-amber-500 text-amber-600 dark:hover:text-amber-400 hover:text-amber-700'
-                                                                }`}
-                                                        >
-                                                            {domain.status === 'sold' ? 'Mark Available' : 'Mark Sold'}
-                                                        </button>
+
                                                     </div>
 
-                                                    <button
-                                                        onClick={() => handleDeleteDomain(domain.id)}
-                                                        className="p-2 dark:text-gray-500 text-gray-400 dark:hover:text-red-400 hover:text-red-600 dark:hover:bg-red-500/10 hover:bg-red-50 rounded-lg transition-colors"
-                                                        title="Delete Domain"
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </button>
+                                                    <div className="flex items-center gap-2">
+                                                        <button
+                                                            onClick={() => openEditModal(domain)}
+                                                            className="px-3 py-1.5 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg transition-colors"
+                                                        >
+                                                            Edit
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -1334,6 +1319,28 @@ export default function DashboardPage() {
                                 </div>
                             )}
 
+                            <div className="pt-2">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        if (editingDomainId) {
+                                            handleToggleSold(editingDomainId, editDomainData.status);
+                                            // Update local state to reflect change immediately in UI
+                                            setEditDomainData(prev => ({
+                                                ...prev,
+                                                status: prev.status === 'sold' ? 'available' : 'sold'
+                                            }));
+                                        }
+                                    }}
+                                    className={`w-full py-2 rounded-lg font-medium transition-colors border ${editDomainData.status === 'sold'
+                                        ? 'border-green-500/20 bg-green-500/10 text-green-600 dark:text-green-400 hover:bg-green-500/20'
+                                        : 'border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20'
+                                        }`}
+                                >
+                                    {editDomainData.status === 'sold' ? 'Mark as Available' : 'Mark as Sold'}
+                                </button>
+                            </div>
+
                             <div className="flex gap-3 mt-6">
                                 <button
                                     type="button"
@@ -1349,6 +1356,22 @@ export default function DashboardPage() {
                                 >
                                     {isEditingDomain && <Loader2 className="h-4 w-4 animate-spin" />}
                                     Save Changes
+                                </button>
+                            </div>
+
+                            <div className="pt-4 mt-4 border-t dark:border-white/10 border-gray-200">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        if (editingDomainId) {
+                                            handleDeleteDomain(editingDomainId);
+                                            setEditingDomainId(null);
+                                        }
+                                    }}
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg font-medium transition-colors"
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                    Delete Domain
                                 </button>
                             </div>
                         </form>
