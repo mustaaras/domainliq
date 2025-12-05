@@ -23,6 +23,7 @@ export async function GET() {
                 verificationToken: true,
                 verificationMethod: true,
                 checkoutLink: true,
+                expiresAt: true,
             },
         });
 
