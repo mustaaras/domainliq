@@ -54,7 +54,7 @@ services:
       - "traefik.http.routers.domainliq-catchall.rule=HostRegexp(`.+`)"
       - "traefik.http.routers.domainliq-catchall.entrypoints=https"
       - "traefik.http.routers.domainliq-catchall.tls=true"
-      - "traefik.http.routers.domainliq-catchall.tls.certresolver=letsencrypt_http"
+      - "traefik.http.routers.domainliq-catchall.tls.certresolver=letsencrypt"
       - "traefik.http.routers.domainliq-catchall.priority=1"
       - "traefik.http.routers.domainliq-catchall.service=domainliq-service"
 
