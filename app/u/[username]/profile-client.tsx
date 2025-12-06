@@ -89,7 +89,7 @@ export default function ProfileClient({ user, initialDomains, initialPortfolios,
 
     // Pagination state
     const [page, setPage] = useState(1);
-    const [limit, setLimit] = useState(20);
+    const [limit, setLimit] = useState(12);
 
     // Mobile filter state
     const [showMobileFilters, setShowMobileFilters] = useState(false);
@@ -680,9 +680,9 @@ export default function ProfileClient({ user, initialDomains, initialPortfolios,
                                         }}
                                         className="dark:bg-[#0A0A0A] bg-white border dark:border-white/10 border-gray-300 rounded-lg px-2 py-1 text-sm dark:text-white text-gray-900 focus:outline-none focus:border-amber-500/50"
                                     >
-                                        <option value={20}>20</option>
-                                        <option value={50}>50</option>
-                                        <option value={100}>100</option>
+                                        <option value={12}>12</option>
+                                        <option value={24}>24</option>
+                                        <option value={60}>60</option>
                                     </select>
                                 </div>
 

@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         where: { subdomain: username },
         include: {
             domains: {
-                take: 20,
+                take: 12,
                 orderBy: { createdAt: 'desc' },
             },
             _count: {
@@ -76,7 +76,7 @@ export default async function UserProfilePage({ params }: PageProps) {
         where: { subdomain: username },
         include: {
             domains: {
-                take: 20,
+                take: 12,
                 orderBy: { createdAt: 'desc' },
             },
             portfolios: {
