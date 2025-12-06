@@ -10,17 +10,33 @@ export async function POST(req: NextRequest) {
         }
 
         if (domainName) {
-            await db.domain.updateMany({
-                where: { name: domainName },
-                data: { views: { increment: 1 } }
-            });
+            const domain = await db.domain.findFirst({ where: { name: domainName } });
+            if (domain) {
+                await db.$transaction([
+                    db.domain.update({
+                        where: { id: domain.id },
+                        data: { views: { increment: 1 } }
+                    }),
+                    db.domainView.create({
+                        data: { domainId: domain.id }
+                    })
+                ]);
+            }
         }
 
         if (subdomain) {
-            await db.user.update({
-                where: { subdomain },
-                data: { profileViews: { increment: 1 } }
-            });
+            const user = await db.user.findUnique({ where: { subdomain } });
+            if (user) {
+                await db.$transaction([
+                    db.user.update({
+                        where: { id: user.id },
+                        data: { profileViews: { increment: 1 } }
+                    }),
+                    db.profileView.create({
+                        data: { userId: user.id }
+                    })
+                ]);
+            }
         }
 
         return NextResponse.json({ success: true });

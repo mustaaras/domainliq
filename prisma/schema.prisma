@@ -45,6 +45,7 @@ model User {
   
   // Stats
   profileViews      Int       @default(0)
+  profileViewEvents ProfileView[]
 
   // Portfolios
   portfolios        Portfolio[]
@@ -61,6 +62,7 @@ model Domain {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   views       Int      @default(0)
+  viewEvents  DomainView[]
 
   // Content
   content     String?  @db.Text
@@ -142,4 +144,24 @@ model ChatMessage {
   createdAt DateTime @default(now())
   
   @@index([sessionId])
+}
+
+model DomainView {
+  id        String   @id @default(cuid())
+  domainId  String
+  domain    Domain   @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([domainId])
+  @@index([createdAt])
+}
+
+model ProfileView {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
 }
