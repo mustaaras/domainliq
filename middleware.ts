@@ -20,7 +20,8 @@ export default async function middleware(req: NextRequest) {
         hostname === 'localhost:3000' ||
         hostname === 'domainliq.com' ||
         hostname === 'www.domainliq.com' ||
-        hostname.endsWith('.vercel.app'); // Allow Vercel preview URLs
+        hostname.endsWith('.vercel.app') || // Allow Vercel preview URLs
+        /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/.test(hostname); // Allow direct IP access (for health checks)
 
     // If it's a custom domain (e.g., "example.com" pointing to our server)
     if (!isMainDomain) {
