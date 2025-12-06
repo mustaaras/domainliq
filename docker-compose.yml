@@ -45,23 +45,14 @@ services:
       context: .
       dockerfile: Dockerfile.caddy
     restart: always
+    ports:
+      - "8080:8080"
+      - "8443:8443"
     volumes:
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
       - app
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=coolify"
-      # TCP Router for Custom Domains (TLS Passthrough to Caddy)
-      # Priority 1: Lowest, so *.domainliq.com (Priority 100) takes precedence.
-      - "traefik.tcp.routers.caddy-catchall.rule=HostSNI(`*`)"
-      - "traefik.tcp.routers.caddy-catchall.entrypoints=https"
-      - "traefik.tcp.routers.caddy-catchall.tls.passthrough=true"
-      - "traefik.tcp.routers.caddy-catchall.service=caddy-service"
-      - "traefik.tcp.routers.caddy-catchall.priority=1"
-      # Caddy Service
-      - "traefik.tcp.services.caddy-service.loadbalancer.server.port=8443"
     networks:
       - coolify
 
