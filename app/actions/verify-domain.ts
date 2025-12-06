@@ -3,6 +3,23 @@
 import { db } from '@/lib/db';
 import * as whois from 'whois';
 
+// Strict domain validation to prevent command injection
+// The whois package internally executes shell commands, so we MUST sanitize
+function isValidDomainName(domain: string): boolean {
+    // Only allow alphanumeric, hyphens, and dots
+    // Max 253 chars total, labels max 63 chars each
+    const domainRegex = /^(?!-)(?:[a-zA-Z0-9-]{1,63}\.)+[a-zA-Z]{2,63}$/;
+
+    // Additional security: reject any shell metacharacters
+    const dangerousChars = /[;&|`$(){}[\]<>\\'"!\n\r\t]/;
+
+    if (!domain || domain.length > 253) return false;
+    if (dangerousChars.test(domain)) return false;
+    if (!domainRegex.test(domain)) return false;
+
+    return true;
+}
+
 export async function verifyDomain(domainId: string) {
     try {
         // Dynamic imports to avoid client-side bundling issues
@@ -309,6 +326,17 @@ async function markAsVerified(domainId: string, domainName: string, method: 'txt
     let expiresAt: Date | null = null;
 
     try {
+        // SECURITY: Validate domain name before WHOIS lookup to prevent command injection
+        if (!isValidDomainName(domainName)) {
+            console.error(`[SECURITY] Blocked malicious domain name: ${domainName}`);
+            // Still mark as verified but skip WHOIS (attacker domain, but verification passed)
+            await db.domain.update({
+                where: { id: domainId },
+                data: { isVerified: true }
+            });
+            return;
+        }
+
         // Try to fetch expiration date
         const whoisData = await new Promise<string>((resolve, reject) => {
             whois.lookup(domainName, (err, data) => {
