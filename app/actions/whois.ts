@@ -79,8 +79,17 @@ export async function lookupWhois(domain: string) {
         }
     }
 
-    // Basic validation
-    const domainRegex = /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/;
+    // Strict Domain Validation (Security)
+    const domainRegex = /^(?!-)(?:[a-zA-Z0-9-]{1,63}\.)+[a-zA-Z]{2,63}$/;
+    const dangerousChars = /[;&|`$(){}[\]<>\\'"!\n\r\t]/;
+
+    if (!domain || domain.length > 253) {
+        return { error: 'Invalid domain length' };
+    }
+    if (dangerousChars.test(domain)) {
+        console.error(`[SECURITY] Blocked malicious WHOIS input: ${domain}`);
+        return { error: 'Invalid characters in domain' };
+    }
     if (!domainRegex.test(domain)) {
         return { error: 'Invalid domain format' };
     }
