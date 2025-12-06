@@ -3,7 +3,16 @@ import { db } from '@/lib/db';
 import { auth } from '@/auth';
 import { addCustomDomainToCoolify } from '@/lib/coolify';
 
+// Support both GET and POST for convenience
+export async function GET() {
+    return syncDomains();
+}
+
 export async function POST() {
+    return syncDomains();
+}
+
+async function syncDomains() {
     try {
         const session = await auth();
         // Basic admin check (revise if you have specific admin roles)
