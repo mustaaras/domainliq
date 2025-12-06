@@ -50,7 +50,15 @@ export default async function middleware(req: NextRequest) {
         console.log(`[Middleware] Custom Domain detected: ${currentHost}`);
         console.log(`[Middleware] Rewriting to: /d/${currentHost}${url.pathname}`);
         url.pathname = `/d/${currentHost}${url.pathname}`;
-        return NextResponse.rewrite(url);
+
+        const requestHeaders = new Headers(req.headers);
+        requestHeaders.set('x-is-custom-domain', 'true');
+
+        return NextResponse.rewrite(url, {
+            request: {
+                headers: requestHeaders,
+            },
+        });
     }
 
     // For main domain, run normal auth middleware

@@ -6,6 +6,7 @@ import { auth } from "@/auth";
 import Script from "next/script";
 import Footer from "@/components/footer";
 import CookieConsent from "@/components/cookie-consent";
+import { headers } from "next/headers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,6 +45,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await auth();
+  const headersList = await headers();
+  const isCustomDomain = headersList.get('x-is-custom-domain') === 'true';
 
   return (
     <html lang="en">
@@ -66,7 +69,7 @@ export default async function RootLayout({
 
         <Providers session={session}>
           {children}
-          <Footer />
+          {!isCustomDomain && <Footer />}
           <CookieConsent />
         </Providers>
       </body>
