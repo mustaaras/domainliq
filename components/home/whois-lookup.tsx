@@ -54,7 +54,13 @@ export function WhoisLookup() {
                     <input
                         type="text"
                         value={domain}
-                        onChange={(e) => setDomain(e.target.value)}
+                        onChange={(e) => {
+                            // Frontend Input Sanitization
+                            // Deny: spaces, ;, |, &, $, `, <, >, \
+                            const val = e.target.value;
+                            if (/[; |&`$<>\\]/.test(val)) return;
+                            setDomain(val);
+                        }}
                         placeholder="Enter domain name (e.g., domainliq.com)"
                         className="w-full pl-10 pr-28 py-3 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 outline-none text-gray-900 dark:text-white transition-all"
                     />
