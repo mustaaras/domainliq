@@ -16,50 +16,55 @@ services:
       timeout: 5s
       retries: 3
       start_period: 30s
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     labels:
-      - "traefik.enable=true"
       - "traefik.docker.network=coolify"
-      # HTTP Router - Redirect to HTTPS
-      - "traefik.http.routers.domainliq-http.rule=Host(`domainliq.com`) || Host(`www.domainliq.com`) || HostRegexp(`^.+\\.domainliq\\.com$$`)"
-      - "traefik.http.routers.domainliq-http.entrypoints=http"
-      - "traefik.http.routers.domainliq-http.middlewares=redirect-to-https"
-      - "traefik.http.routers.domainliq-http.priority=100"
+      # ---------------------------------------------------------
+      # 1. WILDCARD ROUTERS (*.domainliq.com) - HIGH PRIORITY
+      # ---------------------------------------------------------
+      # HTTP Router (Redirects to HTTPS)
+      - "traefik.http.routers.domainliq-wildcard-http.rule=Host(`test.domainliq.com`) || Host(`aras.domainliq.com`) || HostRegexp(`^.+\\.domainliq\\.com$$`)"
+      - "traefik.http.routers.domainliq-wildcard-http.entrypoints=http"
+      - "traefik.http.routers.domainliq-wildcard-http.middlewares=redirect-to-https"
+      - "traefik.http.routers.domainliq-wildcard-http.priority=100"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
       # HTTPS Router
-      - "traefik.http.routers.domainliq-https.rule=Host(`domainliq.com`) || Host(`www.domainliq.com`) || HostRegexp(`^.+\\.domainliq\\.com$$`)"
-      - "traefik.http.routers.domainliq-https.entrypoints=https"
-      - "traefik.http.routers.domainliq-https.tls=true"
-      - "traefik.http.routers.domainliq-https.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.domainliq-https.priority=100"
-      # Wildcard Certificate
-      - "traefik.http.routers.domainliq-https.tls.domains[0].main=domainliq.com"
-      - "traefik.http.routers.domainliq-https.tls.domains[0].sans=*.domainliq.com"
-      # Service
-      - "traefik.http.routers.domainliq-https.service=domainliq-service"
+      - "traefik.http.routers.domainliq-wildcard.rule=Host(`test.domainliq.com`) || Host(`aras.domainliq.com`) || HostRegexp(`^.+\\.domainliq\\.com$$`)"
+      - "traefik.http.routers.domainliq-wildcard.entrypoints=https"
+      - "traefik.http.routers.domainliq-wildcard.tls=true"
+      - "traefik.http.routers.domainliq-wildcard.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.domainliq-wildcard.priority=100"
+
+      # FORCE Wildcard Certificate (Only for these domains)
+      - "traefik.http.routers.domainliq-wildcard.tls.domains[0].main=domainliq.com"
+      - "traefik.http.routers.domainliq-wildcard.tls.domains[0].sans=*.domainliq.com"
+
+      # ---------------------------------------------------------
+      # 2. CATCH-ALL ROUTERS (Custom Domains) - LOW PRIORITY
+      # ---------------------------------------------------------
+      # HTTP Router (allows ACME challenges through, no redirect)
+      - "traefik.http.routers.domainliq-catchall-http.rule=HostRegexp(`.+`) && !PathPrefix(`/.well-known/acme-challenge/`)"
+      - "traefik.http.routers.domainliq-catchall-http.entrypoints=http"
+      - "traefik.http.routers.domainliq-catchall-http.priority=1"
+      - "traefik.http.routers.domainliq-catchall-http.service=domainliq-service"
+
+      # HTTPS Router
+      - "traefik.http.routers.domainliq-catchall.rule=HostRegexp(`.+`)"
+      - "traefik.http.routers.domainliq-catchall.entrypoints=https"
+      - "traefik.http.routers.domainliq-catchall.tls=true"
+      - "traefik.http.routers.domainliq-catchall.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.domainliq-catchall.priority=1"
+      - "traefik.http.routers.domainliq-catchall.service=domainliq-service"
+
+      # ---------------------------------------------------------
+      # SERVICE DEFINITION
+      # ---------------------------------------------------------
+      - "traefik.http.routers.domainliq-wildcard.service=domainliq-service"
       - "traefik.http.services.domainliq-service.loadbalancer.server.port=3000"
     networks:
       - coolify
-
-  caddy:
-    build:
-      context: .
-      dockerfile: Dockerfile.caddy
-    restart: always
-    ports:
-      - "8080:8080"
-      - "8443:8443"
-    volumes:
-      - caddy_data:/data
-      - caddy_config:/config
-    depends_on:
-      - app
-    networks:
-      - coolify
-
-volumes:
-  caddy_data:
-  caddy_config:
-
 
 networks:
   coolify:
