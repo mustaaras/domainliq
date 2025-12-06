@@ -35,6 +35,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         },
     });
 
+    // Dynamic routes (Public Domain Landers)
+    const domains = await db.domain.findMany({
+        select: {
+            name: true,
+            updatedAt: true,
+        },
+        orderBy: {
+            updatedAt: 'desc',
+        },
+    });
+
     const userRoutes = users.map((user) => ({
         url: `${baseUrl}/u/${user.subdomain}`,
         lastModified: user.updatedAt,
@@ -42,5 +53,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.6,
     }));
 
-    return [...routes, ...userRoutes];
+    const domainRoutes = domains.map((domain) => ({
+        url: `${baseUrl}/d/${domain.name}`,
+        lastModified: domain.updatedAt,
+        changeFrequency: 'daily' as const,
+        priority: 0.7,
+    }));
+
+    return [...routes, ...userRoutes, ...domainRoutes];
 }
