@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
-import { ExternalLink, MessageCircle, Settings, LogOut, Menu, X, Globe } from 'lucide-react';
+import { ExternalLink, MessageCircle, Settings, LogOut, Menu, X, Globe, LayoutDashboard, BarChart3 } from 'lucide-react';
 import { getProfileUrl } from '@/lib/utils';
 import { Logo } from '@/components/logo';
 
@@ -70,12 +70,14 @@ export function DashboardHeader() {
                         href="/dashboard"
                         className="px-3 py-2 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2"
                     >
+                        <LayoutDashboard className="h-4 w-4" />
                         Overview
                     </Link>
                     <Link
                         href="/dashboard/statistics"
                         className="px-3 py-2 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2"
                     >
+                        <BarChart3 className="h-4 w-4" />
                         Statistics
                     </Link>
 
@@ -101,17 +103,19 @@ export function DashboardHeader() {
                     </Link>
                     <Link
                         href="/settings"
-                        className="p-2 dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg transition-colors"
+                        className="px-3 py-2 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2"
                         title="Settings"
                     >
-                        <Settings className="h-5 w-5" />
+                        <Settings className="h-4 w-4" />
+                        Settings
                     </Link>
                     <button
                         onClick={handleLogout}
-                        className="p-2 dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg transition-colors"
+                        className="px-3 py-2 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2"
                         title="Logout"
                     >
-                        <LogOut className="h-5 w-5" />
+                        <LogOut className="h-4 w-4" />
+                        Logout
                     </button>
                 </div>
 
@@ -135,6 +139,7 @@ export function DashboardHeader() {
                             className="px-4 py-3 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:hover:bg-white/5 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-3"
                             onClick={() => setIsMobileMenuOpen(false)}
                         >
+                            <LayoutDashboard className="h-4 w-4" />
                             Overview
                         </Link>
                         <Link
@@ -142,6 +147,7 @@ export function DashboardHeader() {
                             className="px-4 py-3 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:hover:bg-white/5 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-3"
                             onClick={() => setIsMobileMenuOpen(false)}
                         >
+                            <BarChart3 className="h-4 w-4" />
                             Statistics
                         </Link>
 
