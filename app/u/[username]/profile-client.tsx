@@ -265,9 +265,9 @@ export default function ProfileClient({ user, initialDomains, initialPortfolios,
                     {/* Main Content */}
                     <div className="flex-1">
                         {/* Controls Bar */}
-                        <div className="flex flex-wrap items-center justify-center gap-4 mb-6 relative z-30">
+                        <div className="relative flex items-center justify-center mb-6 z-30 min-h-[44px]">
 
-                            {/* View Toggle */}
+                            {/* Center: View Toggle */}
                             <div className="flex bg-gray-100 dark:bg-white/5 rounded-lg p-1 border dark:border-white/10 border-gray-200">
                                 <button
                                     onClick={() => setViewMode('domains')}
@@ -287,149 +287,150 @@ export default function ProfileClient({ user, initialDomains, initialPortfolios,
                                 </button>
                             </div>
 
+                            {/* Right Side: Filters & Count (Absolute on Desktop) */}
                             {viewMode === 'domains' && (
-                                <div className="text-sm dark:text-gray-400 text-gray-600">
-                                    Found <span className="dark:text-white text-gray-900 font-medium">{totalDomains}</span> domains
-                                </div>
-                            )}
+                                <div className="absolute right-0 top-0 bottom-0 flex items-center gap-3">
+                                    <div className="text-sm dark:text-gray-400 text-gray-600 hidden sm:block">
+                                        Found <span className="dark:text-white text-gray-900 font-medium">{totalDomains}</span> domains
+                                    </div>
 
-                            {viewMode === 'domains' && (
-                                <div className="relative">
-                                    <button
-                                        onClick={() => setShowMobileFilters(!showMobileFilters)}
-                                        className={`
+                                    <div className="relative">
+                                        <button
+                                            onClick={() => setShowMobileFilters(!showMobileFilters)}
+                                            className={`
                                             flex items-center justify-center px-3 py-2 border rounded-lg transition-all focus:outline-none focus:border-amber-500/50 relative
                                             ${showMobileFilters
-                                                ? 'bg-amber-500/10 border-amber-500/50 text-amber-500'
-                                                : 'dark:bg-[#0A0A0A] bg-white dark:border-white/10 border-gray-300 dark:text-gray-400 text-gray-600 hover:text-gray-900 dark:hover:text-white hover:border-gray-400 dark:hover:border-white/20'
-                                            }
+                                                    ? 'bg-amber-500/10 border-amber-500/50 text-amber-500'
+                                                    : 'dark:bg-[#0A0A0A] bg-white dark:border-white/10 border-gray-300 dark:text-gray-400 text-gray-600 hover:text-gray-900 dark:hover:text-white hover:border-gray-400 dark:hover:border-white/20'
+                                                }
                                         `}
-                                        aria-label="Filters"
-                                    >
-                                        <Filter className="h-4 w-4" />
-                                        {activeFiltersCount > 0 && !showMobileFilters && (
-                                            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-amber-500 rounded-full border-2 dark:border-[#050505] border-white" />
-                                        )}
-                                    </button>
+                                            aria-label="Filters"
+                                        >
+                                            <Filter className="h-4 w-4" />
+                                            {activeFiltersCount > 0 && !showMobileFilters && (
+                                                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-amber-500 rounded-full border-2 dark:border-[#050505] border-white" />
+                                            )}
+                                        </button>
 
-                                    {/* Filter Popover */}
-                                    {showMobileFilters && (
-                                        <>
-                                            {/* Mobile Backdrop */}
-                                            <div
-                                                className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 sm:hidden"
-                                                onClick={() => setShowMobileFilters(false)}
-                                            />
+                                        {/* Filter Popover */}
+                                        {showMobileFilters && (
+                                            <>
+                                                {/* Mobile Backdrop */}
+                                                <div
+                                                    className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 sm:hidden"
+                                                    onClick={() => setShowMobileFilters(false)}
+                                                />
 
-                                            <div className={`
+                                                <div className={`
                                                 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85vw] max-w-[260px] z-50
                                                 sm:absolute sm:top-full sm:left-auto sm:right-0 sm:translate-x-0 sm:translate-y-0 sm:mt-2 sm:w-64
                                                 dark:bg-[#0A0A0A] bg-white border dark:border-white/10 border-gray-200 rounded-xl shadow-xl p-4
                                             `}>
-                                                <div className="flex items-center justify-between mb-4">
-                                                    <h3 className="font-semibold flex items-center gap-2 dark:text-white text-gray-900 text-sm">
-                                                        Filters
-                                                    </h3>
-                                                    {activeFiltersCount > 0 && (
-                                                        <button onClick={clearFilters} className="text-xs dark:text-amber-400 text-amber-600 hover:underline">
-                                                            Clear all
-                                                        </button>
-                                                    )}
-                                                </div>
-
-                                                <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
-                                                    {/* Search */}
-                                                    <div>
-                                                        <div className="relative">
-                                                            <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 dark:text-gray-500 text-gray-400" />
-                                                            <input
-                                                                type="text"
-                                                                placeholder="Search..."
-                                                                value={search}
-                                                                onChange={(e) => setSearch(e.target.value)}
-                                                                className="w-full dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg pl-8 pr-3 py-1.5 text-xs dark:text-white text-gray-900 focus:outline-none focus:border-amber-500/50"
-                                                            />
-                                                        </div>
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        <h3 className="font-semibold flex items-center gap-2 dark:text-white text-gray-900 text-sm">
+                                                            Filters
+                                                        </h3>
+                                                        {activeFiltersCount > 0 && (
+                                                            <button onClick={clearFilters} className="text-xs dark:text-amber-400 text-amber-600 hover:underline">
+                                                                Clear all
+                                                            </button>
+                                                        )}
                                                     </div>
 
-                                                    {/* TLDs */}
-                                                    <div>
-                                                        <label className="text-[10px] font-medium dark:text-gray-400 text-gray-500 mb-2 block uppercase tracking-wider">Extensions</label>
-                                                        <div className="flex flex-wrap gap-1.5">
-                                                            {uniqueTLDs.map(tld => (
-                                                                <button
-                                                                    key={tld}
-                                                                    onClick={() => toggleTLD(tld)}
-                                                                    className={`px-2 py-1 rounded text-[10px] transition-colors border ${selectedTLDs.has(tld)
-                                                                        ? 'bg-amber-500 border-amber-500 text-white'
-                                                                        : 'dark:bg-white/5 bg-gray-50 border-transparent dark:text-gray-300 text-gray-700 hover:bg-gray-100 dark:hover:bg-white/10'
-                                                                        }`}
-                                                                >
-                                                                    .{tld}
-                                                                </button>
-                                                            ))}
+                                                    <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                                                        {/* Search */}
+                                                        <div>
+                                                            <div className="relative">
+                                                                <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 dark:text-gray-500 text-gray-400" />
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="Search..."
+                                                                    value={search}
+                                                                    onChange={(e) => setSearch(e.target.value)}
+                                                                    className="w-full dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg pl-8 pr-3 py-1.5 text-xs dark:text-white text-gray-900 focus:outline-none focus:border-amber-500/50"
+                                                                />
+                                                            </div>
                                                         </div>
-                                                    </div>
 
-                                                    {/* Price */}
-                                                    <div>
-                                                        <label className="text-[10px] font-medium dark:text-gray-400 text-gray-500 mb-2 block uppercase tracking-wider">Price Range</label>
-                                                        <div className="flex gap-2">
-                                                            <input
-                                                                type="number"
-                                                                placeholder="Min"
-                                                                value={priceMin}
-                                                                onChange={(e) => setPriceMin(e.target.value)}
+                                                        {/* TLDs */}
+                                                        <div>
+                                                            <label className="text-[10px] font-medium dark:text-gray-400 text-gray-500 mb-2 block uppercase tracking-wider">Extensions</label>
+                                                            <div className="flex flex-wrap gap-1.5">
+                                                                {uniqueTLDs.map(tld => (
+                                                                    <button
+                                                                        key={tld}
+                                                                        onClick={() => toggleTLD(tld)}
+                                                                        className={`px-2 py-1 rounded text-[10px] transition-colors border ${selectedTLDs.has(tld)
+                                                                            ? 'bg-amber-500 border-amber-500 text-white'
+                                                                            : 'dark:bg-white/5 bg-gray-50 border-transparent dark:text-gray-300 text-gray-700 hover:bg-gray-100 dark:hover:bg-white/10'
+                                                                            }`}
+                                                                    >
+                                                                        .{tld}
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Price */}
+                                                        <div>
+                                                            <label className="text-[10px] font-medium dark:text-gray-400 text-gray-500 mb-2 block uppercase tracking-wider">Price Range</label>
+                                                            <div className="flex gap-2">
+                                                                <input
+                                                                    type="number"
+                                                                    placeholder="Min"
+                                                                    value={priceMin}
+                                                                    onChange={(e) => setPriceMin(e.target.value)}
+                                                                    className="w-full dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-2 py-1.5 text-xs dark:text-white text-gray-900 focus:outline-none focus:border-amber-500/50"
+                                                                />
+                                                                <input
+                                                                    type="number"
+                                                                    placeholder="Max"
+                                                                    value={priceMax}
+                                                                    onChange={(e) => setPriceMax(e.target.value)}
+                                                                    className="w-full dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-2 py-1.5 text-xs dark:text-white text-gray-900 focus:outline-none focus:border-amber-500/50"
+                                                                />
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Status */}
+                                                        <div>
+                                                            <label className="text-[10px] font-medium dark:text-gray-400 text-gray-500 mb-2 block uppercase tracking-wider">Status</label>
+                                                            <div className="space-y-1.5">
+                                                                {['all', 'verified', 'unverified'].map((status) => (
+                                                                    <label key={status} className="flex items-center gap-2 text-xs dark:text-gray-300 text-gray-700 cursor-pointer hover:text-amber-500 transition-colors">
+                                                                        <input
+                                                                            type="radio"
+                                                                            name="verification"
+                                                                            checked={verificationFilter === status}
+                                                                            onChange={() => setVerificationFilter(status as any)}
+                                                                            className="text-amber-500 focus:ring-amber-500 bg-transparent dark:border-white/20 border-gray-300 scale-90"
+                                                                        />
+                                                                        <span className="capitalize">{status === 'all' ? 'All Domains' : status}</span>
+                                                                    </label>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Sort By - Mobile Only */}
+                                                        <div>
+                                                            <label className="text-[10px] font-medium dark:text-gray-400 text-gray-500 mb-2 block uppercase tracking-wider">Sort By</label>
+                                                            <select
+                                                                value={sortBy}
+                                                                onChange={(e) => setSortBy(e.target.value)}
                                                                 className="w-full dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-2 py-1.5 text-xs dark:text-white text-gray-900 focus:outline-none focus:border-amber-500/50"
-                                                            />
-                                                            <input
-                                                                type="number"
-                                                                placeholder="Max"
-                                                                value={priceMax}
-                                                                onChange={(e) => setPriceMax(e.target.value)}
-                                                                className="w-full dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-2 py-1.5 text-xs dark:text-white text-gray-900 focus:outline-none focus:border-amber-500/50"
-                                                            />
+                                                            >
+                                                                <option value="newest">Newest Listed</option>
+                                                                <option value="price_asc">Price: Low to High</option>
+                                                                <option value="price_desc">Price: High to Low</option>
+                                                                <option value="expires_asc">Expiring Soon</option>
+                                                                <option value="expires_desc">Expiring Later</option>
+                                                            </select>
                                                         </div>
-                                                    </div>
-
-                                                    {/* Status */}
-                                                    <div>
-                                                        <label className="text-[10px] font-medium dark:text-gray-400 text-gray-500 mb-2 block uppercase tracking-wider">Status</label>
-                                                        <div className="space-y-1.5">
-                                                            {['all', 'verified', 'unverified'].map((status) => (
-                                                                <label key={status} className="flex items-center gap-2 text-xs dark:text-gray-300 text-gray-700 cursor-pointer hover:text-amber-500 transition-colors">
-                                                                    <input
-                                                                        type="radio"
-                                                                        name="verification"
-                                                                        checked={verificationFilter === status}
-                                                                        onChange={() => setVerificationFilter(status as any)}
-                                                                        className="text-amber-500 focus:ring-amber-500 bg-transparent dark:border-white/20 border-gray-300 scale-90"
-                                                                    />
-                                                                    <span className="capitalize">{status === 'all' ? 'All Domains' : status}</span>
-                                                                </label>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Sort By - Mobile Only */}
-                                                    <div>
-                                                        <label className="text-[10px] font-medium dark:text-gray-400 text-gray-500 mb-2 block uppercase tracking-wider">Sort By</label>
-                                                        <select
-                                                            value={sortBy}
-                                                            onChange={(e) => setSortBy(e.target.value)}
-                                                            className="w-full dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-2 py-1.5 text-xs dark:text-white text-gray-900 focus:outline-none focus:border-amber-500/50"
-                                                        >
-                                                            <option value="newest">Newest Listed</option>
-                                                            <option value="price_asc">Price: Low to High</option>
-                                                            <option value="price_desc">Price: High to Low</option>
-                                                            <option value="expires_asc">Expiring Soon</option>
-                                                            <option value="expires_desc">Expiring Later</option>
-                                                        </select>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </>
-                                    )}
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
                             )}
                         </div>
