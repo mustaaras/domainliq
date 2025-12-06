@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Share2, MessageCircle, Check, Search, Loader2, ShieldCheck, Filter, X, ChevronDown, Trophy, ExternalLink } from 'lucide-react';
+import { Share2, MessageCircle, Check, Search, Loader2, ShieldCheck, Filter, X, ChevronDown, Trophy, ExternalLink, Crown } from 'lucide-react';
 import { db } from '@/lib/db';
 import { auth } from '@/auth';
 import { getProfileUrl } from '@/lib/utils';
@@ -72,7 +72,7 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [itemsPerPage, setItemsPerPage] = useState(16);
   const [totalDomains, setTotalDomains] = useState(0);
   const [showContactModal, setShowContactModal] = useState(false);
   const [showEscrowModal, setShowEscrowModal] = useState(false);
@@ -883,9 +883,9 @@ export default function Home() {
                       onChange={handleLimitChange}
                       className="bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-2 py-1 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500/50"
                     >
-                      <option value={20}>20</option>
-                      <option value={40}>40</option>
-                      <option value={60}>60</option>
+                      <option value={16}>16</option>
+                      <option value={30}>30</option>
+                      <option value={100}>100</option>
                     </select>
                   </div>
                 </div>
@@ -926,15 +926,18 @@ export default function Home() {
                       className="flex items-center justify-between p-3 rounded-lg dark:bg-white/5 bg-gray-50 dark:hover:bg-white/10 hover:bg-gray-100 border border-transparent dark:hover:border-white/10 hover:border-gray-200 transition-all group"
                     >
                       <div className="flex items-center gap-3">
-                        <div className={`
-                          w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm
-                          ${index === 0 ? 'bg-amber-500 text-white' :
-                            index === 1 ? 'dark:bg-gray-300 bg-gray-400 text-black' :
-                              index === 2 ? 'bg-amber-700 text-white' :
-                                'dark:bg-white/10 bg-gray-200 dark:text-gray-400 text-gray-600'}\
-                        `}>
-                          {index + 1}
-                        </div>
+                        {index < 3 ? (
+                          <div className="w-6 h-6 flex items-center justify-center">
+                            <Crown className={`h-4 w-4 ${index === 0 ? 'text-yellow-500 fill-yellow-500' :
+                              index === 1 ? 'text-slate-400 fill-slate-400' :
+                                'text-amber-700 fill-amber-700'
+                              }`} />
+                          </div>
+                        ) : (
+                          <div className="w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs dark:bg-white/10 bg-gray-200 dark:text-gray-400 text-gray-600">
+                            {index + 1}
+                          </div>
+                        )}
                         <div>
                           <h3 className="font-medium dark:text-white text-gray-900 dark:group-hover:text-amber-400 group-hover:text-amber-600 transition-colors">
                             {seller.subdomain}
