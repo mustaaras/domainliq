@@ -364,7 +364,7 @@ async function markAsVerified(domainId: string, domainName: string, method: 'txt
     });
 
     // Only register with Coolify if verified via A record (pointing to our server)
-    if (method === 'a' || method === 'ns') {
+    if (method === 'a') {
         try {
             console.log(`[Coolify] Attempting registration for ${domainName}...`);
             const { addCustomDomainToCoolify } = await import('@/lib/coolify');

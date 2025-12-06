@@ -26,9 +26,12 @@ async function syncDomains() {
             return NextResponse.json({ error: 'Coolify configuration missing' }, { status: 500 });
         }
 
-        // 1. Get all verified domains
+        // 1. Get only A-record verified domains (those actually pointing to our server)
         const verifiedDomains = await db.domain.findMany({
-            where: { isVerified: true },
+            where: {
+                isVerified: true,
+                verificationMethod: 'a'  // Only domains pointing to our server
+            },
             select: { name: true }
         });
 
