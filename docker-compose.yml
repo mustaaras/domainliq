@@ -20,10 +20,11 @@ services:
       - coolify
 
   caddy:
-    image: caddy:alpine
+    build:
+      context: .
+      dockerfile: Dockerfile.caddy
     restart: always
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
