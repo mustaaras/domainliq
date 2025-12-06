@@ -391,22 +391,7 @@ async function markAsVerified(domainId: string, domainName: string, method: 'txt
         },
     });
 
-    // Only register with Coolify if verified via A record (pointing to our server)
-    if (method === 'a') {
-        try {
-            console.log(`[Coolify] Attempting registration for ${domainName}...`);
-            const { addCustomDomainToCoolify } = await import('@/lib/coolify');
-            const result = await addCustomDomainToCoolify(domainName);
-
-            if (result.success) {
-                console.log(`✅ [Coolify] Registered ${domainName} for SSL`);
-            } else {
-                console.error(`❌ [Coolify] Failed to register ${domainName}:`, result.error);
-            }
-        } catch (coolifyError: any) {
-            console.error('[Coolify] Registration error:', coolifyError.message);
-        }
-    } else {
-        console.log(`ℹ️ [Verification] Domain ${domainName} verified via ${method.toUpperCase()} (but skipped Coolify registration)`);
-    }
+    // Caddy handles SSL on-demand now. We don't need to call any API.
+    // Just verify the domain and let Caddy do the rest.
+    console.log(`ℹ️ [Verification] Domain ${domainName} verified via ${method.toUpperCase()} (Caddy handles SSL)`);
 }
