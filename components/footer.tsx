@@ -71,6 +71,12 @@ export default function Footer() {
                                     FAQ
                                 </a>
                             </li>
+                            <li>
+                                <a href={`${getMainDomainUrl()}/whois`} className=" dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 text-xs transition-colors flex items-center gap-2">
+                                    WHOIS Lookup
+                                    <span className="bg-amber-500/10 text-amber-500 px-1.5 py-0.5 rounded text-[10px] font-medium border border-amber-500/20">New</span>
+                                </a>
+                            </li>
                         </ul>
                     </div>
 
