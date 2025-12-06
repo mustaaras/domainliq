@@ -77,8 +77,12 @@ async function syncDomains() {
         });
 
         if (!updateResponse.ok) {
+            const errorBody = await updateResponse.text();
+            console.error('Coolify update failed:', errorBody);
             return NextResponse.json({
-                error: `Failed to update: ${updateResponse.statusText}`
+                error: `Failed to update: ${updateResponse.statusText}`,
+                details: errorBody,
+                attemptedFqdn: newFqdn.substring(0, 500) + '...' // First 500 chars
             }, { status: 500 });
         }
 
