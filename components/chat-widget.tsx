@@ -13,6 +13,7 @@ interface Message {
     sender: 'visitor' | 'seller';
     content: string;
     createdAt: string;
+    read: boolean;
 }
 
 export function ChatWidget({ domainId, sellerName }: ChatWidgetProps) {
@@ -23,6 +24,7 @@ export function ChatWidget({ domainId, sellerName }: ChatWidgetProps) {
     const [visitorId, setVisitorId] = useState('');
     const [lastPoll, setLastPoll] = useState<string | null>(null);
     const [sellerLastSeen, setSellerLastSeen] = useState<string | null>(null);
+    const [unreadCount, setUnreadCount] = useState(0);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     // Initialize visitor ID
@@ -40,17 +42,30 @@ export function ChatWidget({ domainId, sellerName }: ChatWidgetProps) {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    const [unreadCount, setUnreadCount] = useState(0);
-
-    // ... (visitor init) ...
-
-    // Reset unread count when opening
+    // Mark messages as read
     useEffect(() => {
+        if (isOpen && visitorId && unreadCount > 0) {
+            const markRead = async () => {
+                try {
+                    await fetch('/api/chat/read', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ domainId, visitorId }),
+                    });
+                    setUnreadCount(0);
+                    // Optimistically update local messages
+                    setMessages(prev => prev.map(m => m.sender === 'seller' ? { ...m, read: true } : m));
+                } catch (error) {
+                    console.error('Error marking read:', error);
+                }
+            };
+            markRead();
+        }
+
         if (isOpen) {
-            setUnreadCount(0);
             scrollToBottom();
         }
-    }, [isOpen]);
+    }, [isOpen, visitorId, domainId, unreadCount]);
 
     // Poll for messages (even when closed)
     useEffect(() => {
@@ -61,7 +76,11 @@ export function ChatWidget({ domainId, sellerName }: ChatWidgetProps) {
                 const url = new URL('/api/chat/poll', window.location.origin);
                 url.searchParams.append('domainId', domainId);
                 url.searchParams.append('visitorId', visitorId);
-                if (lastPoll) {
+                // We typically want all messages on first load to check read status correctly
+                // Optimally we'd only fetch new ones, but for unread counts on refresh we need status.
+                // Simplified: If we key off lastPoll, we trust local state. 
+                // But on refresh local state is empty. So first poll fetches ALL.
+                if (lastPoll && messages.length > 0) {
                     url.searchParams.append('after', lastPoll);
                 }
 
@@ -74,11 +93,26 @@ export function ChatWidget({ domainId, sellerName }: ChatWidgetProps) {
 
                 if (data.messages && data.messages.length > 0) {
                     setMessages(prev => {
+                        // Merge strategies
                         const existingIds = new Set(prev.map(m => m.id));
                         const newMessages = data.messages.filter((m: Message) => !existingIds.has(m.id));
+
+                        // If completely new load (prev empty), calculate unread from DB status
+                        if (prev.length === 0) {
+                            const unread = data.messages.filter((m: Message) => m.sender === 'seller' && !m.read).length;
+                            setUnreadCount(unread);
+
+                            if (data.messages.length > 0) {
+                                const lastMsg = data.messages[data.messages.length - 1];
+                                setLastPoll(lastMsg.createdAt);
+                            }
+                            return data.messages;
+                        }
+
+                        // If incremental update
                         if (newMessages.length === 0) return prev;
 
-                        // Calculate unread messages (if widget is closed)
+                        // If widget is closed, any NEW message from seller increments count
                         if (!isOpen) {
                             const newReceivedMessages = newMessages.filter((m: Message) => m.sender === 'seller');
                             if (newReceivedMessages.length > 0) {
@@ -86,7 +120,6 @@ export function ChatWidget({ domainId, sellerName }: ChatWidgetProps) {
                             }
                         }
 
-                        // Update last poll time
                         const lastMsg = newMessages[newMessages.length - 1];
                         setLastPoll(lastMsg.createdAt);
 
@@ -104,7 +137,7 @@ export function ChatWidget({ domainId, sellerName }: ChatWidgetProps) {
         // Poll interval
         const interval = setInterval(pollMessages, 3000);
         return () => clearInterval(interval);
-    }, [visitorId, domainId, lastPoll, isOpen]); // Added isOpen to deps to access current state
+    }, [visitorId, domainId, lastPoll, isOpen]); // removed messages dep to avoid loop, managed inside setter
 
     const handleSendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -115,6 +148,7 @@ export function ChatWidget({ domainId, sellerName }: ChatWidgetProps) {
             sender: 'visitor',
             content: newMessage,
             createdAt: new Date().toISOString(),
+            read: false
         };
 
         setMessages(prev => [...prev, tempMessage]);
@@ -140,7 +174,6 @@ export function ChatWidget({ domainId, sellerName }: ChatWidgetProps) {
             }
         } catch (error) {
             console.error('Error sending message:', error);
-            // TODO: Show error state
         } finally {
             setIsLoading(false);
         }
