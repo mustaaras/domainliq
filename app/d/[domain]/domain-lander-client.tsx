@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ShieldCheck, ExternalLink, Edit2, Wand2, Save, X, Check, Globe, Zap, Lock, ChevronDown, ChevronUp, ArrowRight, Star, MessageCircle } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
@@ -78,6 +78,21 @@ export default function DomainLanderClient({ domain, isOwner }: DomainLanderClie
                 break;
         }
     };
+
+    // Track view
+    useEffect(() => {
+        const trackView = async () => {
+            try {
+                await fetch('/api/health/ping', {
+                    method: 'POST',
+                    body: JSON.stringify({ domainName: domain.name })
+                });
+            } catch (e) {
+                // Ignore tracking errors
+            }
+        };
+        trackView();
+    }, [domain.name]);
 
     // AI Generation Logic
     const handleGenerateAI = async () => {

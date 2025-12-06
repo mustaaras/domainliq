@@ -47,6 +47,22 @@ interface ProfileClientProps {
 }
 
 export default function ProfileClient({ user, initialDomains, initialPortfolios, username, initialTotal }: ProfileClientProps) {
+    // Track profile view
+    useEffect(() => {
+        const trackView = async () => {
+            if (!user?.subdomain) return;
+            try {
+                await fetch('/api/health/ping', {
+                    method: 'POST',
+                    body: JSON.stringify({ subdomain: user.subdomain })
+                });
+            } catch (e) {
+                // Ignore
+            }
+        };
+        trackView();
+    }, [user?.subdomain]);
+
     // Data state
     const [domains, setDomains] = useState<Domain[]>(initialDomains);
     const [portfolios, setPortfolios] = useState<Portfolio[]>(initialPortfolios || []);

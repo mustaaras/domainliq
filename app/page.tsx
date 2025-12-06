@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { Logo } from '@/components/logo';
 import { ArrowRight, TrendingUp, Shield, Zap, Globe, DollarSign, CheckCircle } from 'lucide-react';
+import { WhoisLookup } from '@/components/home/whois-lookup';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -953,13 +954,16 @@ export default function Home() {
                 )}
               </div>
             </div>
+
+            {/* WHOIS Lookup Tool */}
+            <WhoisLookup />
           </div>
 
         </div>
-      </div >
+      </div>
 
       {/* Floating Action Bar (Mobile Optimized) */}
-      < div className={`
+      <div className={`
         fixed bottom-0 left-0 right-0 p-4 dark:bg-[#050505]/90 bg-white/95 backdrop-blur-md border-t dark:border-white/10 border-gray-200 z-50 transition-transform duration-300 shadow-xl
         ${selectedIds.length > 0 ? 'translate-y-0' : 'translate-y-full'}
       `}>
@@ -986,7 +990,7 @@ export default function Home() {
             </button>
           </div>
         </div>
-      </div >
-    </div >
+      </div>
+    </div>
   );
 }
