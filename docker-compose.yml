@@ -22,15 +22,23 @@ services:
   caddy:
     image: caddy:alpine
     restart: always
-    ports:
-      - "80:80"
-      - "443:443"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
       - app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=coolify"
+      # TCP Router for Custom Domains (Passthrough to Caddy)
+      # Priority 1: Lowest, so *.domainliq.com (Priority 100) takes precedence.
+      - "traefik.tcp.routers.caddy-catchall.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.caddy-catchall.entrypoints=https"
+      - "traefik.tcp.routers.caddy-catchall.service=caddy-service"
+      - "traefik.tcp.routers.caddy-catchall.priority=1"
+      # Caddy Service
+      - "traefik.tcp.services.caddy-service.loadbalancer.server.port=8443"
     networks:
       - coolify
 
