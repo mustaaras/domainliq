@@ -294,22 +294,22 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 py-8 pb-32 md:pb-12">
         {/* Header */}
         <header className="mb-8">
-          <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-6 mb-8">
-            <div className="text-center md:text-left w-full md:w-auto">
+          <div className="flex flex-row justify-between items-center md:items-end gap-4 mb-8">
+            <div className="text-left w-auto">
               <Link href="/" className="inline-block group">
-                <div className="flex items-center gap-3 justify-center md:justify-start">
+                <div className="flex items-center gap-3 justify-start">
                   <Logo className="h-11 w-auto transition-transform group-hover:scale-105 duration-300" />
                 </div>
               </Link>
-              <div className="flex items-center gap-3 justify-center md:justify-start mt-3">
-                <span className="h-px w-8 bg-gradient-to-r from-amber-500/50 to-transparent hidden md:block"></span>
+              <div className="flex items-center gap-3 justify-start mt-3 hidden md:flex">
+                <span className="h-px w-8 bg-gradient-to-r from-amber-500/50 to-transparent"></span>
                 <p className="text-xs font-semibold tracking-[0.2em] text-gray-500 dark:text-gray-400 uppercase">
                   Domain Liquidation Platform
                 </p>
               </div>
             </div>
 
-            <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto items-center">
+            <div className="flex flex-row gap-4 w-auto items-center">
               <div className="flex gap-2 shrink-0">
                 {session ? (
                   <Link
