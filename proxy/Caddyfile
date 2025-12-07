@@ -2,8 +2,6 @@
     # Security: Verify domain ownership before issuing SSL
     on_demand_tls {
         ask https://domainliq.com/api/verify-domain
-        interval 2m
-        burst 5
     }
 }
 
