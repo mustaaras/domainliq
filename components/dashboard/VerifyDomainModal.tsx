@@ -8,11 +8,11 @@ interface VerifyDomainModalProps {
     domain: Domain | null;
     status: 'idle' | 'loading' | 'success' | 'error';
     message: string;
-    activeMethod: 'txt' | 'ns' | null;
+    activeMethod: 'txt' | 'ns' | 'a' | null;
     copiedToken: boolean;
     onClose: () => void;
     onVerify: () => void;
-    onSetActiveMethod: (method: 'txt' | 'ns' | null) => void;
+    onSetActiveMethod: (method: 'txt' | 'ns' | 'a' | null) => void;
     onCopyToken: (text: string) => void;
 }
 
@@ -68,10 +68,19 @@ export function VerifyDomainModal({
                     </p>
                     <div className="flex gap-2">
                         <button
+                            onClick={() => onSetActiveMethod('a')}
+                            className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeMethod === 'a'
+                                ? 'bg-amber-500 text-white'
+                                : 'dark:bg-white/10 bg-gray-100 dark:text-gray-300 text-gray-600 dark:hover:bg-white/20 hover:bg-gray-200'
+                                }`}
+                        >
+                            A Record
+                        </button>
+                        <button
                             onClick={() => onSetActiveMethod('txt')}
                             className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeMethod === 'txt'
-                                    ? 'bg-amber-500 text-white'
-                                    : 'dark:bg-white/10 bg-gray-100 dark:text-gray-300 text-gray-600 dark:hover:bg-white/20 hover:bg-gray-200'
+                                ? 'bg-amber-500 text-white'
+                                : 'dark:bg-white/10 bg-gray-100 dark:text-gray-300 text-gray-600 dark:hover:bg-white/20 hover:bg-gray-200'
                                 }`}
                         >
                             TXT Record
@@ -79,8 +88,8 @@ export function VerifyDomainModal({
                         <button
                             onClick={() => onSetActiveMethod('ns')}
                             className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeMethod === 'ns'
-                                    ? 'bg-amber-500 text-white'
-                                    : 'dark:bg-white/10 bg-gray-100 dark:text-gray-300 text-gray-600 dark:hover:bg-white/20 hover:bg-gray-200'
+                                ? 'bg-amber-500 text-white'
+                                : 'dark:bg-white/10 bg-gray-100 dark:text-gray-300 text-gray-600 dark:hover:bg-white/20 hover:bg-gray-200'
                                 }`}
                         >
                             NS Records
@@ -124,6 +133,34 @@ export function VerifyDomainModal({
                         </p>
                         <p className="text-sm dark:text-gray-400 text-gray-600">
                             No action required if you own this domain. Just click "Verify Now".
+                        </p>
+                    </div>
+                )}
+
+                {/* A Record Instructions */}
+                {activeMethod === 'a' && (
+                    <div className="border dark:border-white/10 border-gray-200 rounded-lg p-4 mb-4">
+                        <h4 className="font-medium dark:text-white text-gray-900 mb-2">A Record Verification (Recommended for SSL)</h4>
+                        <ol className="text-sm dark:text-gray-400 text-gray-600 space-y-2 list-decimal list-inside mb-4">
+                            <li>Go to your domain registrar's DNS settings</li>
+                            <li>Add an <strong>A Record</strong></li>
+                            <li>Set the host to <code className="px-1 py-0.5 dark:bg-white/10 bg-gray-100 rounded">@</code></li>
+                            <li>Set the value to our Secure Proxy IP:</li>
+                        </ol>
+
+                        <div className="flex items-center gap-2 p-3 dark:bg-black/30 bg-gray-50 rounded-lg">
+                            <code className="flex-1 text-sm font-mono dark:text-amber-400 text-amber-600">
+                                128.140.116.30
+                            </code>
+                            <button
+                                onClick={() => onCopyToken('128.140.116.30')}
+                                className="p-2 dark:bg-white/10 bg-gray-200 rounded-lg dark:hover:bg-white/20 hover:bg-gray-300 transition-colors shrink-0"
+                            >
+                                {copiedToken ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 dark:text-gray-400 text-gray-500" />}
+                            </button>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">
+                            Note: This enables automatic SSL (HTTPS) for your custom domain.
                         </p>
                     </div>
                 )}
