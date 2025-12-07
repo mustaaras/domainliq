@@ -116,19 +116,27 @@ export async function verifyDomain(domainId: string) {
             }
 
             // 3. A Record Check
-            const SERVER_IP = process.env.SERVER_IP || '46.224.108.38';
+            const PROXY_IP = '128.140.116.30';
+            const MAIN_IP = '46.224.108.38';
+            const ENV_IP = process.env.SERVER_IP;
+
+            // Allow both the new Proxy IP (preferred) and the Main IP (legacy/direct)
+            const VALID_IPS = [PROXY_IP, MAIN_IP, ENV_IP].filter((ip): ip is string => !!ip);
+
             try {
                 const { resolve4 } = await import('dns/promises');
                 const aRecords = await resolve4(domain.name);
                 console.log(`[DNS] A records for ${domain.name}:`, aRecords);
-                console.log(`[DNS] Looking for server IP: ${SERVER_IP}`);
+                console.log(`[DNS] Valid IPs:`, VALID_IPS);
 
-                if (aRecords.includes(SERVER_IP)) {
-                    console.log(`[DNS] ✅ A record matches!`);
+                const isMatch = aRecords.some(r => VALID_IPS.includes(r));
+
+                if (isMatch) {
+                    console.log(`[DNS] ✅ A record matches valid IP!`);
                     await markAsVerified(domainId, domain.name, 'a');
                     return { success: true };
                 } else {
-                    console.log(`[DNS] ❌ A record found but doesn't match server IP`);
+                    console.log(`[DNS] ❌ A record found but doesn't match any valid IP`);
                 }
             } catch (aError) {
                 console.log(`[DNS] ❌ A record lookup failed:`, aError);
