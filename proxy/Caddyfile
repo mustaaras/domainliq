@@ -1,0 +1,29 @@
+{
+    # Security: Verify domain ownership before issuing SSL
+    on_demand_tls {
+        ask https://domainliq.com/api/verify-domain
+        interval 2m
+        burst 5
+    }
+}
+
+:443 {
+    tls {
+        on_demand
+    }
+
+    # Forward all traffic to Main Server (Traefik/Coolify)
+    # The Main Server's Traefik will route this based on the Host header to the correct tenant.
+    reverse_proxy 46.224.108.38:80 {
+        header_up Host {host}
+        header_up X-Real-IP {remote}
+        header_up X-Forwarded-For {remote}
+        header_up X-Forwarded-Proto https
+    }
+}
+
+:80 {
+    # Minimal HTTP->HTTPS redirect is automatic in Caddy,
+    # but we can explicitly forward if needed.
+    # For now, let's just let Caddy handle the redirect to 443 automatically.
+}
