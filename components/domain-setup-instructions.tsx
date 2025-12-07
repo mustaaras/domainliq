@@ -31,10 +31,10 @@ export function DomainSetupInstructions({ domainName, onVerify, isVerifying }: D
                         <div className="space-y-4 flex-1">
                             <div>
                                 <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                    Connect via Cloudflare (Recommended for SSL)
+                                    Connect your domain (Auto-SSL Enabled)
                                 </h4>
                                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                    We recommend using Cloudflare as your DNS provider to get <strong>free automatic SSL</strong> and DDoS protection.
+                                    Point your domain's <strong>A Record</strong> to our secure proxy server. We handle SSL certificates automatically for you.
                                 </p>
                             </div>
 
@@ -42,22 +42,22 @@ export function DomainSetupInstructions({ domainName, onVerify, isVerifying }: D
                                 <div className="flex gap-3">
                                     <div className="flex-none flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 dark:bg-white/10 text-xs font-bold text-gray-600 dark:text-gray-400">1</div>
                                     <div className="text-sm text-gray-600 dark:text-gray-400">
-                                        <p>Add your domain <strong>{domainName}</strong> to Cloudflare (Free Plan).</p>
+                                        <p>Go to your domain registrar's DNS settings (Namecheap, GoDaddy, Cloudflare, etc.).</p>
                                     </div>
                                 </div>
 
                                 <div className="flex gap-3">
                                     <div className="flex-none flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 dark:bg-white/10 text-xs font-bold text-gray-600 dark:text-gray-400">2</div>
                                     <div className="text-sm text-gray-600 dark:text-gray-400">
-                                        <p>Add an <strong>A Record</strong> pointing to our server IP:</p>
+                                        <p>Add an <strong>A Record</strong> pointing to our Secure Proxy IP:</p>
                                         <div className="mt-2 flex items-center gap-2 bg-gray-50 dark:bg-black/20 border dark:border-white/10 rounded-lg p-2 font-mono text-xs">
-                                            <span className="text-gray-500">{serverIp}</span>
+                                            <span className="text-gray-500">128.140.116.30</span>
                                             <button
-                                                onClick={() => copyToClipboard(serverIp)}
+                                                onClick={() => copyToClipboard('128.140.116.30')}
                                                 className="ml-auto p-1.5 hover:bg-gray-200 dark:hover:bg-white/10 rounded-md transition-colors"
                                                 title="Copy IP"
                                             >
-                                                {copied === serverIp ? (
+                                                {copied === '128.140.116.30' ? (
                                                     <Check className="h-3.5 w-3.5 text-green-500" />
                                                 ) : (
                                                     <Copy className="h-3.5 w-3.5 text-gray-400" />
@@ -70,8 +70,7 @@ export function DomainSetupInstructions({ domainName, onVerify, isVerifying }: D
                                 <div className="flex gap-3">
                                     <div className="flex-none flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 dark:bg-white/10 text-xs font-bold text-gray-600 dark:text-gray-400">3</div>
                                     <div className="text-sm text-gray-600 dark:text-gray-400">
-                                        <p><strong>Important:</strong> Make sure the "Proxy status" is set to <strong>Proxied</strong> (Orange Cloud icon).</p>
-                                        <p className="mt-1 text-xs text-gray-500">This enables free SSL/HTTPS for your domain automatically.</p>
+                                        <p><strong>Note:</strong> If you use Cloudflare, you can turn the "Proxy status" <strong>OFF</strong> (Grey Cloud) or leave it ON. Both work, but Grey Cloud is simpler.</p>
                                     </div>
                                 </div>
                             </div>
