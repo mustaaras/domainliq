@@ -6,6 +6,8 @@ import { WhoisLookup } from '@/components/home/whois-lookup';
 import { useSession } from 'next-auth/react';
 import { ArrowRight } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export default function WhoisPage() {
     const { data: session } = useSession();
 
