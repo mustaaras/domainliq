@@ -141,7 +141,7 @@ export default function DomainLanderClient({ domain, isOwner }: DomainLanderClie
             {/* Navigation */}
             <nav className="absolute top-0 left-0 right-0 z-50 px-6 py-6">
                 <div className="max-w-7xl mx-auto flex justify-between items-center">
-                    <Link href="/">
+                    <Link href="https://domainliq.com">
                         <Logo className="h-8 w-auto" />
                     </Link>
                     {isOwner && (

@@ -44,7 +44,15 @@ export function WhoisLookup() {
 
     return (
         <div className="dark:bg-[#0A0A0A] bg-white border dark:border-white/10 border-gray-200 rounded-xl p-6 shadow-sm mt-8">
-            <div className="flex items-center gap-2 mb-4">
+            <div
+                className="flex items-center gap-2 mb-4 cursor-pointer hover:opacity-80 transition-opacity"
+                onClick={() => {
+                    setDomain('');
+                    setResult(null);
+                    setError(null);
+                }}
+                title="Click to reset"
+            >
                 <Globe className="h-5 w-5 text-amber-500" />
                 <h2 className="text-xl font-bold dark:text-white text-gray-900">WHOIS Lookup</h2>
             </div>
