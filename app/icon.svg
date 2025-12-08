@@ -6,6 +6,6 @@
     </linearGradient>
   </defs>
   <rect width="200" height="200" rx="40" fill="#0A0A0A"/>
-  <circle cx="85" cy="108" r="45" stroke="url(#fusionGrad)" stroke-width="18"/>
-  <path d="M130 48V168" stroke="url(#fusionGrad)" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="100" cy="108" r="45" stroke="url(#fusionGrad)" stroke-width="18"/>
+  <path d="M145 48V168" stroke="url(#fusionGrad)" stroke-width="18" stroke-linecap="round"/>
 </svg>
