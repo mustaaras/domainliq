@@ -406,12 +406,10 @@ async function markAsVerified(domainId: string, domainName: string, method: 'txt
 
 /**
  * Simplified verification for Custom Domains - A Record only
- * Used by the Custom Domains settings page
+ * Uses DNS-over-HTTPS (DoH) for fast lookups
  */
 export async function verifyCustomDomain(domainId: string) {
     try {
-        const { resolve4 } = await import('dns/promises');
-
         // Get the domain from DB
         const domain = await db.domain.findUnique({
             where: { id: domainId }
@@ -425,44 +423,92 @@ export async function verifyCustomDomain(domainId: string) {
         const PROXY_IP = '128.140.116.30';
         const MAIN_IP = '46.224.108.38';
         const ENV_IP = process.env.SERVER_IP;
-        const VALID_IPS = [PROXY_IP, MAIN_IP, ENV_IP].filter((ip): ip is string => !!ip);
+        const VALID_IPS = [...new Set([PROXY_IP, MAIN_IP, ENV_IP].filter((ip): ip is string => !!ip))];
 
-        try {
-            const aRecords = await resolve4(domain.name);
-            console.log(`[Custom Domain] A records for ${domain.name}:`, aRecords);
-            console.log(`[Custom Domain] Valid IPs:`, VALID_IPS);
+        // Fast A Record lookup using DoH (Cloudflare + Google in parallel)
+        const aRecords = await fetchARecordsFast(domain.name);
 
-            const isMatch = aRecords.some(r => VALID_IPS.includes(r));
+        console.log(`[Custom Domain] A records for ${domain.name}:`, aRecords);
 
-            if (isMatch) {
-                console.log(`[Custom Domain] ✅ A record matches!`);
-                await markAsVerified(domainId, domain.name, 'a');
-                return { success: true };
-            }
-
-            // A Record exists but points to wrong IP
-            console.log(`[Custom Domain] ❌ A record found but doesn't match. Found:`, aRecords);
+        if (aRecords.length === 0) {
             return {
-                error: `Your A Record is pointing to ${aRecords[0]} instead of our server (${PROXY_IP}). Please update your DNS settings and try again.`
-            };
-
-        } catch (dnsError: any) {
-            // DNS lookup failed - likely no A record exists
-            if (dnsError.code === 'ENOTFOUND' || dnsError.code === 'ENODATA') {
-                return {
-                    error: `No A Record found for ${domain.name}. Please add an A Record pointing to ${PROXY_IP} in your domain registrar's DNS settings.`
-                };
-            }
-
-            console.error(`[Custom Domain] DNS error:`, dnsError);
-            return {
-                error: `Could not verify DNS for ${domain.name}. Please ensure the domain exists and try again in a few minutes.`
+                error: `No A Record found for ${domain.name}. Please add an A Record pointing to ${PROXY_IP} in your domain registrar's DNS settings.`
             };
         }
+
+        const isMatch = aRecords.some(r => VALID_IPS.includes(r));
+
+        if (isMatch) {
+            console.log(`[Custom Domain] ✅ A record matches!`);
+            await markAsVerified(domainId, domain.name, 'a');
+            return { success: true };
+        }
+
+        // A Record exists but points to wrong IP
+        console.log(`[Custom Domain] ❌ A record found but doesn't match. Found:`, aRecords);
+        return {
+            error: `Your A Record is pointing to ${aRecords[0]} instead of our server (${PROXY_IP}). Please update your DNS settings and try again.`
+        };
 
     } catch (error) {
         console.error('[Custom Domain] Verification error:', error);
         return { error: 'An unexpected error occurred. Please try again.' };
+    }
+}
+
+/**
+ * Fast A Record lookup using DNS-over-HTTPS
+ * Queries Cloudflare and Google DoH in parallel, returns first result
+ */
+async function fetchARecordsFast(domainName: string): Promise<string[]> {
+    const aRecords: Set<string> = new Set();
+
+    // DoH endpoints
+    const dohQueries = [
+        // Cloudflare DoH
+        fetch(`https://cloudflare-dns.com/dns-query?name=${domainName}&type=A`, {
+            headers: { 'Accept': 'application/dns-json' },
+            cache: 'no-store',
+            signal: AbortSignal.timeout(3000) // 3 second timeout
+        }).then(res => res.json()).catch(() => null),
+
+        // Google DoH
+        fetch(`https://dns.google/resolve?name=${domainName}&type=A`, {
+            headers: { 'Accept': 'application/dns-json' },
+            cache: 'no-store',
+            signal: AbortSignal.timeout(3000)
+        }).then(res => res.json()).catch(() => null),
+    ];
+
+    try {
+        // Race for the fastest response, but also collect all results
+        const results = await Promise.all(dohQueries);
+
+        for (const data of results) {
+            if (data?.Answer) {
+                for (const record of data.Answer) {
+                    // Type 1 is A record
+                    if (record.type === 1 && record.data) {
+                        aRecords.add(record.data);
+                    }
+                }
+            }
+        }
+
+        // If DoH returned results, use them
+        if (aRecords.size > 0) {
+            return Array.from(aRecords);
+        }
+
+        // Fallback to system DNS only if DoH returned nothing
+        console.log(`[Custom Domain] DoH returned no results, falling back to system DNS`);
+        const { resolve4 } = await import('dns/promises');
+        const systemRecords = await resolve4(domainName);
+        return systemRecords;
+
+    } catch (error) {
+        console.error(`[Custom Domain] DNS lookup error:`, error);
+        return [];
     }
 }
 
