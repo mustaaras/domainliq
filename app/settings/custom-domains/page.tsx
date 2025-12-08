@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Loader2, Check, AlertTriangle, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
 import { AddCustomDomainModal } from '@/components/add-custom-domain-modal';
 import { DomainSetupInstructions } from '@/components/domain-setup-instructions';
-import { verifyDomain } from '@/app/actions/verify-domain';
+import { verifyCustomDomain } from '@/app/actions/verify-domain';
 
 interface Domain {
     id: string;
@@ -60,17 +60,14 @@ export default function CustomDomainsPage() {
         setVerificationResult(null);
 
         try {
-            // Try A Record verification
-            const aRecordRes = await verifyDomain(selectedDomain.id);
-            if (aRecordRes.success) {
+            // A Record verification only for custom domains
+            const result = await verifyCustomDomain(selectedDomain.id);
+            if (result.success) {
                 setVerificationResult({ success: true });
                 fetchDomains(); // Refresh list
-                return;
+            } else {
+                setVerificationResult({ error: result.error || 'Verification failed. Please try again.' });
             }
-            setVerificationResult({
-                error: aRecordRes.error || 'A Record not found or incorrect. Please check your DNS settings.'
-            });
-
         } catch (error) {
             setVerificationResult({ error: 'An unexpected error occurred.' });
         } finally {

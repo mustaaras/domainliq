@@ -403,3 +403,66 @@ async function markAsVerified(domainId: string, domainName: string, method: 'txt
     // Just verify the domain and let Caddy do the rest.
     console.log(`ℹ️ [Verification] Domain ${domainName} verified via ${method.toUpperCase()} (Caddy handles SSL)`);
 }
+
+/**
+ * Simplified verification for Custom Domains - A Record only
+ * Used by the Custom Domains settings page
+ */
+export async function verifyCustomDomain(domainId: string) {
+    try {
+        const { resolve4 } = await import('dns/promises');
+
+        // Get the domain from DB
+        const domain = await db.domain.findUnique({
+            where: { id: domainId }
+        });
+
+        if (!domain) {
+            return { error: 'Domain not found' };
+        }
+
+        // Valid IPs: Edge Proxy (preferred) and Main Server (fallback)
+        const PROXY_IP = '128.140.116.30';
+        const MAIN_IP = '46.224.108.38';
+        const ENV_IP = process.env.SERVER_IP;
+        const VALID_IPS = [PROXY_IP, MAIN_IP, ENV_IP].filter((ip): ip is string => !!ip);
+
+        try {
+            const aRecords = await resolve4(domain.name);
+            console.log(`[Custom Domain] A records for ${domain.name}:`, aRecords);
+            console.log(`[Custom Domain] Valid IPs:`, VALID_IPS);
+
+            const isMatch = aRecords.some(r => VALID_IPS.includes(r));
+
+            if (isMatch) {
+                console.log(`[Custom Domain] ✅ A record matches!`);
+                await markAsVerified(domainId, domain.name, 'a');
+                return { success: true };
+            }
+
+            // A Record exists but points to wrong IP
+            console.log(`[Custom Domain] ❌ A record found but doesn't match. Found:`, aRecords);
+            return {
+                error: `Your A Record is pointing to ${aRecords[0]} instead of our server (${PROXY_IP}). Please update your DNS settings and try again.`
+            };
+
+        } catch (dnsError: any) {
+            // DNS lookup failed - likely no A record exists
+            if (dnsError.code === 'ENOTFOUND' || dnsError.code === 'ENODATA') {
+                return {
+                    error: `No A Record found for ${domain.name}. Please add an A Record pointing to ${PROXY_IP} in your domain registrar's DNS settings.`
+                };
+            }
+
+            console.error(`[Custom Domain] DNS error:`, dnsError);
+            return {
+                error: `Could not verify DNS for ${domain.name}. Please ensure the domain exists and try again in a few minutes.`
+            };
+        }
+
+    } catch (error) {
+        console.error('[Custom Domain] Verification error:', error);
+        return { error: 'An unexpected error occurred. Please try again.' };
+    }
+}
+
