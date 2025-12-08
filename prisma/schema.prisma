@@ -36,6 +36,13 @@ model User {
   escrowEmail       String?
   escrowTermsAccepted Boolean @default(false)
 
+  // Stripe Connect
+  stripeConnectedAccountId  String?   @unique
+  stripeOnboardingComplete  Boolean   @default(false)
+
+  // Orders (as seller)
+  orders            Order[]
+
   // Status
   lastSeen          DateTime  @default(now())
 
@@ -49,6 +56,8 @@ model User {
 
   // Portfolios
   portfolios        Portfolio[]
+
+  @@index([stripeConnectedAccountId])
 }
 
 model Domain {
@@ -77,6 +86,7 @@ model Domain {
 
   // Sales
   checkoutLink      String?
+  orders            Order[]
 
   // Chat
   chatSessions      ChatSession[]
@@ -164,4 +174,48 @@ model ProfileView {
 
   @@index([userId])
   @@index([createdAt])
+}
+
+model Order {
+  id                     String   @id @default(cuid())
+  
+  // Domain being sold
+  domainId               String
+  domain                 Domain   @relation(fields: [domainId], references: [id])
+  
+  // Buyer info (no account required)
+  buyerEmail             String
+  buyerName              String?
+  buyerConfirmationToken String   @unique @default(cuid())
+  
+  // Seller
+  sellerId               String
+  seller                 User     @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  
+  // Amounts (in cents)
+  amount                 Int
+  platformFee            Int
+  currency               String   @default("usd")
+  
+  // Stripe references
+  stripePaymentIntentId  String?  @unique
+  stripeCheckoutSessionId String? @unique
+  stripeTransferId       String?
+  
+  // Status: pending → paid → transferred → completed | refunded
+  status                 String   @default("pending")
+  
+  // Timestamps
+  paidAt                 DateTime?
+  transferredAt          DateTime?
+  completedAt            DateTime?
+  autoReleaseAt          DateTime?
+  
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  
+  @@index([sellerId])
+  @@index([domainId])
+  @@index([status])
+  @@index([buyerEmail])
 }

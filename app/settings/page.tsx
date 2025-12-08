@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Loader2, Save, User, Mail, Twitter, Phone, Linkedin, ArrowLeft, Send } from 'lucide-react';
+import { Loader2, Save, User, Mail, Twitter, Phone, Linkedin, ArrowLeft, Send, CreditCard, Check, ExternalLink } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
 export default function SettingsPage() {
@@ -38,6 +38,14 @@ export default function SettingsPage() {
     const [deleteConfirmation, setDeleteConfirmation] = useState('');
     const [isDeleting, setIsDeleting] = useState(false);
 
+    // Stripe Connect state
+    const [stripeStatus, setStripeStatus] = useState<{
+        connected: boolean;
+        onboardingComplete: boolean;
+        loading: boolean;
+    }>({ connected: false, onboardingComplete: false, loading: true });
+    const [isConnectingStripe, setIsConnectingStripe] = useState(false);
+
     const handleDeleteAccount = async () => {
         setIsDeleting(true);
         try {
@@ -64,8 +72,40 @@ export default function SettingsPage() {
 
         if (status === 'authenticated') {
             fetchUserData();
+            fetchStripeStatus();
         }
     }, [status, router]);
+
+    const fetchStripeStatus = async () => {
+        try {
+            const res = await fetch('/api/stripe/connect');
+            if (res.ok) {
+                const data = await res.json();
+                setStripeStatus({
+                    connected: data.connected,
+                    onboardingComplete: data.onboardingComplete,
+                    loading: false,
+                });
+            }
+        } catch (error) {
+            console.error('Failed to fetch Stripe status:', error);
+        } finally {
+            setStripeStatus(prev => ({ ...prev, loading: false }));
+        }
+    };
+
+    const handleConnectStripe = async () => {
+        setIsConnectingStripe(true);
+        try {
+            const res = await fetch('/api/stripe/connect', { method: 'POST' });
+            if (!res.ok) throw new Error('Failed to create Stripe link');
+            const data = await res.json();
+            window.location.href = data.url;
+        } catch (error) {
+            console.error('Stripe connect error:', error);
+            setIsConnectingStripe(false);
+        }
+    };
 
     const fetchUserData = async () => {
         try {
@@ -376,6 +416,76 @@ export default function SettingsPage() {
                         </button>
                     </div>
                 </form>
+            </div>
+
+            {/* Stripe Connect / Integrations */}
+            <div className="dark:bg-white/5 bg-white border dark:border-white/10 border-gray-200 rounded-xl p-6 space-y-6 shadow-sm">
+                <h2 className="text-xl font-semibold flex items-center gap-2 dark:text-white text-gray-900">
+                    <CreditCard className="h-5 w-5 text-indigo-500" />
+                    Payment Integration
+                </h2>
+
+                <div className="space-y-4">
+                    <div className="flex items-start justify-between gap-4">
+                        <div>
+                            <h3 className="font-medium dark:text-white text-gray-900">Stripe Connect</h3>
+                            <p className="text-sm dark:text-gray-400 text-gray-600 mt-1">
+                                Connect your Stripe account to receive payments directly when you sell domains.
+                            </p>
+                            <div className="mt-2 text-xs dark:text-gray-500 text-gray-500">
+                                <p>• 0% platform fee for sales ≤$50</p>
+                                <p>• 5% for $50-500 | 3% for $500-2000 | 2% for $2000+</p>
+                            </div>
+                        </div>
+
+                        <div className="flex-shrink-0">
+                            {stripeStatus.loading ? (
+                                <div className="px-4 py-2">
+                                    <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+                                </div>
+                            ) : stripeStatus.onboardingComplete ? (
+                                <div className="flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 rounded-lg text-sm font-medium">
+                                    <Check className="h-4 w-4" />
+                                    Connected
+                                </div>
+                            ) : stripeStatus.connected ? (
+                                <button
+                                    onClick={handleConnectStripe}
+                                    disabled={isConnectingStripe}
+                                    className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+                                >
+                                    {isConnectingStripe ? (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                        <ExternalLink className="h-4 w-4" />
+                                    )}
+                                    Complete Setup
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleConnectStripe}
+                                    disabled={isConnectingStripe}
+                                    className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+                                >
+                                    {isConnectingStripe ? (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                        <CreditCard className="h-4 w-4" />
+                                    )}
+                                    Connect Stripe
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    {stripeStatus.onboardingComplete && (
+                        <div className="p-4 bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 rounded-lg">
+                            <p className="text-sm text-green-700 dark:text-green-400">
+                                ✓ Your Stripe account is connected. You can now receive payments for domain sales.
+                            </p>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Danger Zone */}

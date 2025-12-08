@@ -19,6 +19,33 @@ export default function DomainLanderClient({ domain, isOwner }: DomainLanderClie
     const [isSaving, setIsSaving] = useState(false);
     const [showEscrowModal, setShowEscrowModal] = useState(false);
     const [showContactModal, setShowContactModal] = useState(false);
+    const [isBuying, setIsBuying] = useState(false);
+
+    // Check if seller has Stripe connected for Buy Now
+    const canBuyWithStripe = domain.isVerified && domain.user.stripeOnboardingComplete && domain.price > 0;
+
+    const handleBuyWithStripe = async () => {
+        setIsBuying(true);
+        try {
+            const res = await fetch('/api/stripe/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ domainId: domain.id }),
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.error || 'Failed to create checkout');
+            }
+
+            const { url } = await res.json();
+            window.location.href = url;
+        } catch (error: any) {
+            console.error('Checkout error:', error);
+            alert(error.message || 'Failed to start checkout. Please try again.');
+            setIsBuying(false);
+        }
+    };
 
     // Get available contact methods
     const availableMethods = [
@@ -209,7 +236,22 @@ export default function DomainLanderClient({ domain, isOwner }: DomainLanderClie
                                     <ArrowRight className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />
                                 </a>
                             )}
-                            {domain.price >= 500 && domain.isVerified && domain.user.escrowEmail && !domain.checkoutLink && (
+                            {canBuyWithStripe && !domain.checkoutLink && (
+                                <button
+                                    onClick={handleBuyWithStripe}
+                                    disabled={isBuying}
+                                    className="w-full sm:w-auto px-8 py-4 bg-green-600 hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-bold text-lg transition-all shadow-lg shadow-green-600/20 hover:shadow-green-600/30 hover:-translate-y-0.5 flex items-center justify-center gap-2 group"
+                                >
+                                    {isBuying ? (
+                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                    ) : (
+                                        <Zap className="w-5 h-5" />
+                                    )}
+                                    {isBuying ? 'Processing...' : 'Buy Now'}
+                                    {!isBuying && <ArrowRight className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />}
+                                </button>
+                            )}
+                            {domain.price >= 500 && domain.isVerified && domain.user.escrowEmail && !domain.checkoutLink && !canBuyWithStripe && (
                                 <button
                                     onClick={() => setShowEscrowModal(true)}
                                     className="w-full sm:w-auto px-8 py-4 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold text-lg transition-all shadow-lg shadow-green-600/20 hover:shadow-green-600/30 hover:-translate-y-0.5 flex items-center justify-center gap-2 group"
