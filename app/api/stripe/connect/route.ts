@@ -18,6 +18,12 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
 
+        // Beta: Only allow specific users to use Stripe Connect
+        const BETA_USERS = ['huldil@icloud.com'];
+        if (!BETA_USERS.includes(user.email)) {
+            return NextResponse.json({ error: 'Stripe Connect is currently in beta' }, { status: 403 });
+        }
+
         let accountId = user.stripeConnectedAccountId;
 
         // Create new Connect account if none exists
