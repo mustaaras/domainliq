@@ -101,7 +101,7 @@ async function handleCheckoutCompleted(session: any) {
     // Send email to seller
     try {
         await getResend().emails.send({
-            from: 'DomainLiq <noreply@domainliq.com>',
+            from: 'DomainLiq <info@noreply.domainliq.com>',
             to: seller.email,
             subject: `🎉 New Sale: ${domainName} for $${(session.amount_total / 100).toFixed(2)}`,
             html: `
@@ -126,7 +126,7 @@ async function handleCheckoutCompleted(session: any) {
     // Send email to buyer
     try {
         await getResend().emails.send({
-            from: 'DomainLiq <noreply@domainliq.com>',
+            from: 'DomainLiq <info@noreply.domainliq.com>',
             to: session.customer_details?.email || session.customer_email,
             subject: `Order Confirmed: ${domainName}`,
             html: `

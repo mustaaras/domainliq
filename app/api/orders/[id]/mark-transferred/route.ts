@@ -64,7 +64,7 @@ export async function POST(
 
         try {
             await getResend().emails.send({
-                from: 'DomainLiq <noreply@domainliq.com>',
+                from: 'DomainLiq <info@noreply.domainliq.com>',
                 to: order.buyerEmail,
                 subject: `Please confirm you received ${order.domain.name}`,
                 html: `

@@ -89,7 +89,7 @@ export async function POST(req: Request) {
         // Send payout confirmation to seller
         try {
             await getResend().emails.send({
-                from: 'DomainLiq <noreply@domainliq.com>',
+                from: 'DomainLiq <info@noreply.domainliq.com>',
                 to: order.seller.email,
                 subject: `💰 Payout sent: $${(payoutAmount / 100).toFixed(2)} for ${order.domain.name}`,
                 html: `
