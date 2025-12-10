@@ -1,13 +1,29 @@
 import Stripe from 'stripe';
 
-if (!process.env.STRIPE_SECRET_KEY) {
-    throw new Error('STRIPE_SECRET_KEY is not set');
+// Lazy initialization to avoid build-time errors
+let _stripe: Stripe | null = null;
+
+export function getStripe(): Stripe {
+    if (!_stripe) {
+        if (!process.env.STRIPE_SECRET_KEY) {
+            throw new Error('STRIPE_SECRET_KEY is not set');
+        }
+        _stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+            apiVersion: '2025-11-17.clover',
+            typescript: true,
+        });
+    }
+    return _stripe;
 }
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: '2024-11-20.acacia',
-    typescript: true,
-});
+// For backwards compatibility
+export const stripe = {
+    get accounts() { return getStripe().accounts; },
+    get accountLinks() { return getStripe().accountLinks; },
+    get checkout() { return getStripe().checkout; },
+    get transfers() { return getStripe().transfers; },
+    get webhooks() { return getStripe().webhooks; },
+};
 
 /**
  * Calculate platform fee based on tiered structure:

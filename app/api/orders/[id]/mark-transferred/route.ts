@@ -3,7 +3,14 @@ import { auth } from '@/auth';
 import { db } from '@/lib/db';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy initialization to avoid build-time errors
+let _resend: Resend | null = null;
+function getResend(): Resend {
+    if (!_resend) {
+        _resend = new Resend(process.env.RESEND_API_KEY);
+    }
+    return _resend;
+}
 
 export async function POST(
     req: Request,
@@ -56,7 +63,7 @@ export async function POST(
         const confirmUrl = `https://domainliq.com/order/confirm?token=${order.buyerConfirmationToken}`;
 
         try {
-            await resend.emails.send({
+            await getResend().emails.send({
                 from: 'DomainLiq <noreply@domainliq.com>',
                 to: order.buyerEmail,
                 subject: `Please confirm you received ${order.domain.name}`,

@@ -4,7 +4,14 @@ import { stripe, createTransferToSeller } from '@/lib/stripe';
 import { db } from '@/lib/db';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy initialization to avoid build-time errors
+let _resend: Resend | null = null;
+function getResend(): Resend {
+    if (!_resend) {
+        _resend = new Resend(process.env.RESEND_API_KEY);
+    }
+    return _resend;
+}
 
 export async function POST(req: Request) {
     const body = await req.text();
@@ -93,7 +100,7 @@ async function handleCheckoutCompleted(session: any) {
 
     // Send email to seller
     try {
-        await resend.emails.send({
+        await getResend().emails.send({
             from: 'DomainLiq <noreply@domainliq.com>',
             to: seller.email,
             subject: `🎉 New Sale: ${domainName} for $${(session.amount_total / 100).toFixed(2)}`,
@@ -118,7 +125,7 @@ async function handleCheckoutCompleted(session: any) {
 
     // Send email to buyer
     try {
-        await resend.emails.send({
+        await getResend().emails.send({
             from: 'DomainLiq <noreply@domainliq.com>',
             to: session.customer_details?.email || session.customer_email,
             subject: `Order Confirmed: ${domainName}`,

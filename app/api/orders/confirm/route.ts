@@ -3,7 +3,14 @@ import { db } from '@/lib/db';
 import { stripe, createTransferToSeller } from '@/lib/stripe';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy initialization to avoid build-time errors
+let _resend: Resend | null = null;
+function getResend(): Resend {
+    if (!_resend) {
+        _resend = new Resend(process.env.RESEND_API_KEY);
+    }
+    return _resend;
+}
 
 export async function POST(req: Request) {
     try {
@@ -81,7 +88,7 @@ export async function POST(req: Request) {
 
         // Send payout confirmation to seller
         try {
-            await resend.emails.send({
+            await getResend().emails.send({
                 from: 'DomainLiq <noreply@domainliq.com>',
                 to: order.seller.email,
                 subject: `💰 Payout sent: $${(payoutAmount / 100).toFixed(2)} for ${order.domain.name}`,
