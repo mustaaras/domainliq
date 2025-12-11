@@ -252,7 +252,7 @@ export default function Home() {
       case 'twitter':
         if (seller.twitterHandle) {
           await navigator.clipboard.writeText(message);
-          window.open(`https://twitter.com/messages/compose?recipient_id=${seller.twitterHandle}`, '_blank');
+          window.open(`https://x.com/${seller.twitterHandle}`, '_blank');
         }
         break;
 

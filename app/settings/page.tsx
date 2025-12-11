@@ -265,7 +265,14 @@ export default function SettingsPage() {
                                 <input
                                     type="text"
                                     value={formData.twitterHandle}
-                                    onChange={e => setFormData({ ...formData, twitterHandle: e.target.value.replace('@', '') })}
+                                    onChange={e => {
+                                        let value = e.target.value;
+                                        // Strip common prefixes
+                                        value = value.replace('https://', '').replace('http://', '').replace('www.', '');
+                                        value = value.replace('x.com/', '').replace('twitter.com/', '');
+                                        value = value.replace('@', '');
+                                        setFormData({ ...formData, twitterHandle: value });
+                                    }}
                                     placeholder="username"
                                     className="w-full dark:bg-black/20 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg pl-8 pr-4 py-2 dark:text-white text-gray-900 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                                 />

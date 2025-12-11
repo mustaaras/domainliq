@@ -74,7 +74,7 @@ export default function DomainLanderClient({ domain, isOwner }: DomainLanderClie
             case 'twitter':
                 if (domain.user.twitterHandle) {
                     await navigator.clipboard.writeText(message);
-                    window.open(`https://x.com/messages/compose?recipient=${domain.user.twitterHandle}`, '_blank');
+                    window.open(`https://x.com/${domain.user.twitterHandle}`, '_blank');
                 }
                 break;
             case 'whatsapp':
