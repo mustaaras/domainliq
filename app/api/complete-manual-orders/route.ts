@@ -58,6 +58,25 @@ export async function GET(request: Request) {
         }
     }
 
+    // Also verify consider.bet
+    try {
+        const domain = await db.domain.findFirst({
+            where: { name: 'consider.bet' },
+        });
+
+        if (domain) {
+            await db.domain.update({
+                where: { id: domain.id },
+                data: { isVerified: true },
+            });
+            results.push({ action: 'verify', domain: 'consider.bet', status: 'verified' });
+        } else {
+            results.push({ action: 'verify', domain: 'consider.bet', status: 'not found' });
+        }
+    } catch (error: any) {
+        results.push({ action: 'verify', domain: 'consider.bet', status: 'error', message: error.message });
+    }
+
     return NextResponse.json({
         message: 'Manual orders completed',
         results,
