@@ -135,36 +135,85 @@ export async function POST(req: NextRequest) {
                 to: email,
                 subject: 'Welcome to DomainLiq! 🎉',
                 html: `
-                    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                        <h1 style="color: #111; margin-bottom: 24px;">Welcome to DomainLiq! 🎉</h1>
-                        
-                        <p style="color: #333; font-size: 16px; line-height: 1.6;">Hi ${name || 'there'},</p>
-                        
-                        <p style="color: #333; font-size: 16px; line-height: 1.6;">Thanks for joining DomainLiq! Your seller page is now live at:</p>
-                        
-                        <p style="margin: 20px 0;">
-                            <a href="https://${subdomain.toLowerCase()}.domainliq.com" 
-                               style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">
-                                Visit Your Page
-                            </a>
-                        </p>
-                        
-                        <h2 style="color: #111; margin-top: 32px;">Get Started:</h2>
-                        <ol style="color: #333; font-size: 16px; line-height: 1.8;">
-                            <li>Add your first domain</li>
-                            <li>Verify ownership</li>
-                            <li>Set your price and start selling!</li>
-                        </ol>
-                        
-                        <p style="color: #666; font-size: 14px; margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee;">
-                            Questions? You can contact us through <a href="https://domainliq.com/dashboard/chat" style="color: #f59e0b;">Messages on your dashboard</a>.
-                        </p>
-                        
-                        <p style="color: #333; font-size: 16px; margin-top: 20px;">
-                            Happy selling!<br/>
-                            <strong>The DomainLiq Team</strong>
-                        </p>
-                    </div>
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="utf-8">
+                        <title>Welcome to DomainLiq! 🎉</title>
+                    </head>
+                    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f9fafb;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td align="center" style="padding: 40px 0;">
+                                    <table width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);">
+                                        <!-- Header -->
+                                        <tr>
+                                            <td style="padding: 32px; background-color: #000000; text-align: center;">
+                                                <img src="https://domainliq.com/icon-512.png" alt="DomainLiq" width="48" height="48" style="display: inline-block; vertical-align: middle;">
+                                                <span style="color: #ffffff; font-size: 24px; font-weight: bold; vertical-align: middle; margin-left: 12px;">DomainLiq</span>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Content -->
+                                        <tr>
+                                            <td style="padding: 40px 32px;">
+                                                <h1 style="color: #111827; font-size: 24px; font-weight: bold; margin: 0 0 24px 0; text-align: center;">Welcome to DomainLiq! 🎉</h1>
+                                                
+                                                <p style="color: #374151; font-size: 16px; line-height: 24px; margin-bottom: 24px;">
+                                                    Hi ${name || 'there'},
+                                                </p>
+                                                
+                                                <p style="color: #374151; font-size: 16px; line-height: 24px; margin-bottom: 24px;">
+                                                    Thanks for joining DomainLiq! Your seller page is now live and ready to view.
+                                                </p>
+
+                                                <div style="background-color: #FFFBEB; border: 1px solid #FCD34D; border-radius: 12px; padding: 24px; margin-bottom: 32px; text-align: center;">
+                                                    <p style="margin: 0 0 12px 0; color: #92400E; font-weight: 600;">Your Storefront URL:</p>
+                                                    <a href="https://${subdomain.toLowerCase()}.domainliq.com" style="color: #F59E0B; font-size: 18px; font-weight: bold; text-decoration: none;">https://${subdomain.toLowerCase()}.domainliq.com</a>
+                                                </div>
+                                                
+                                                <h3 style="color: #111827; font-size: 18px; font-weight: bold; margin: 0 0 16px 0;">Get Started:</h3>
+                                                
+                                                <div style="margin-bottom: 32px;">
+                                                     <div style="display: flex; margin-bottom: 16px;">
+                                                        <div style="width: 24px; height: 24px; background-color: #F3F4F6; color: #374151; border-radius: 50%; text-align: center; line-height: 24px; font-weight: bold; font-size: 14px; margin-right: 12px; flex-shrink: 0;">1</div>
+                                                        <span style="color: #374151;">Add your first domain for sale</span>
+                                                    </div>
+                                                    <div style="display: flex; margin-bottom: 16px;">
+                                                        <div style="width: 24px; height: 24px; background-color: #F3F4F6; color: #374151; border-radius: 50%; text-align: center; line-height: 24px; font-weight: bold; font-size: 14px; margin-right: 12px; flex-shrink: 0;">2</div>
+                                                        <span style="color: #374151;">Verify your ownership (via DNS)</span>
+                                                    </div>
+                                                    <div style="display: flex;">
+                                                        <div style="width: 24px; height: 24px; background-color: #F3F4F6; color: #374151; border-radius: 50%; text-align: center; line-height: 24px; font-weight: bold; font-size: 14px; margin-right: 12px; flex-shrink: 0;">3</div>
+                                                        <span style="color: #374151;">Connect Stripe to get paid</span>
+                                                    </div>
+                                                </div>
+
+                                                <div style="text-align: center;">
+                                                    <a href="https://domainliq.com/dashboard" style="display: inline-block; background-color: #F59E0B; color: #ffffff; font-weight: bold; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-size: 16px; box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.2);">
+                                                        Go to Dashboard
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Footer -->
+                                        <tr>
+                                            <td style="padding: 32px; background-color: #F3F4F6; text-align: center;">
+                                                <p style="margin: 0 0 16px 0; color: #6B7280; font-size: 14px;">
+                                                    Need help? Contact us at <a href="mailto:support@domainliq.com" style="color: #F59E0B; text-decoration: none;">support@domainliq.com</a>
+                                                </p>
+                                                <p style="margin: 0; color: #9CA3AF; font-size: 12px;">
+                                                    &copy; ${new Date().getFullYear()} DomainLiq. All rights reserved.
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </body>
+                    </html>
                 `
             });
             console.log(`[Email] Welcome email sent to: ${email}`);

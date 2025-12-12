@@ -46,43 +46,67 @@ export async function POST(req: NextRequest) {
                 to: user.email,
                 subject: 'Reset Your Password - DomainLiq',
                 html: `
-                    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                        <div style="text-align: center; margin-bottom: 30px;">
-                            <span style="color: #f59e0b; font-weight: bold; font-size: 24px;">DomainLiq</span>
-                        </div>
-                        
-                        <h1 style="color: #111; margin-bottom: 24px;">Reset Your Password</h1>
-                        
-                        <p style="color: #333; font-size: 16px; line-height: 1.6;">
-                            Hi ${user.name || 'there'},
-                        </p>
-                        
-                        <p style="color: #333; font-size: 16px; line-height: 1.6;">
-                            We received a request to reset your password. Click the button below to set a new password:
-                        </p>
-                        
-                        <p style="margin: 30px 0; text-align: center;">
-                            <a href="${resetUrl}" 
-                               style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">
-                                Reset Password
-                            </a>
-                        </p>
-                        
-                        <p style="color: #666; font-size: 14px; line-height: 1.6;">
-                            This link will expire in <strong>1 hour</strong>.
-                        </p>
-                        
-                        <p style="color: #666; font-size: 14px; line-height: 1.6;">
-                            If you didn't request this, you can safely ignore this email.
-                        </p>
-                        
-                        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
-                        
-                        <p style="color: #999; font-size: 12px;">
-                            Can't click the button? Copy and paste this link:<br/>
-                            <a href="${resetUrl}" style="color: #f59e0b; word-break: break-all;">${resetUrl}</a>
-                        </p>
-                    </div>
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="utf-8">
+                        <title>Reset Your Password 🔒</title>
+                    </head>
+                    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f9fafb;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td align="center" style="padding: 40px 0;">
+                                    <table width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);">
+                                        <!-- Header -->
+                                        <tr>
+                                            <td style="padding: 32px; background-color: #000000; text-align: center;">
+                                                <img src="https://domainliq.com/icon-512.png" alt="DomainLiq" width="48" height="48" style="display: inline-block; vertical-align: middle;">
+                                                <span style="color: #ffffff; font-size: 24px; font-weight: bold; vertical-align: middle; margin-left: 12px;">DomainLiq</span>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Content -->
+                                        <tr>
+                                            <td style="padding: 40px 32px;">
+                                                <h1 style="color: #111827; font-size: 24px; font-weight: bold; margin: 0 0 24px 0; text-align: center;">Reset Your Password 🔒</h1>
+                                                
+                                                <p style="color: #374151; font-size: 16px; line-height: 24px; margin-bottom: 24px;">
+                                                    Hi ${user.name || 'there'},
+                                                </p>
+                                                
+                                                <p style="color: #374151; font-size: 16px; line-height: 24px; margin-bottom: 32px;">
+                                                    We received a request to reset your password. Click the button below to choose a new one. This link is valid for 1 hour.
+                                                </p>
+
+                                                <div style="text-align: center; margin-bottom: 32px;">
+                                                    <a href="${resetUrl}" style="display: inline-block; background-color: #F59E0B; color: #ffffff; font-weight: bold; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-size: 16px; box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.2);">
+                                                        Reset Password
+                                                    </a>
+                                                </div>
+                                                
+                                                <p style="color: #6B7280; font-size: 14px; text-align: center;">
+                                                    If you didn't request this, you can safely ignore this email.
+                                                </p>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Footer -->
+                                        <tr>
+                                            <td style="padding: 32px; background-color: #F3F4F6; text-align: center;">
+                                                <p style="margin: 0 0 16px 0; color: #6B7280; font-size: 14px;">
+                                                    Need help? Contact us at <a href="mailto:support@domainliq.com" style="color: #F59E0B; text-decoration: none;">support@domainliq.com</a>
+                                                </p>
+                                                <p style="margin: 0; color: #9CA3AF; font-size: 12px;">
+                                                    &copy; ${new Date().getFullYear()} DomainLiq. All rights reserved.
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </body>
+                    </html>
                 `,
             });
             console.log('[Password Reset] Email sent to:', user.email);

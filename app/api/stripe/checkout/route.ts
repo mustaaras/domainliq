@@ -66,11 +66,14 @@ export async function POST(req: Request) {
                     quantity: 1,
                 },
             ],
+            // Separate Charges: Funds go to platform first, transferred to seller when buyer confirms
+            // This provides true escrow behavior for buyer protection
             customer_email: undefined, // Let buyer enter their email
             metadata: {
                 domainId: domain.id,
                 domainName: domain.name,
                 sellerId: domain.userId,
+                sellerStripeAccountId: domain.user.stripeConnectedAccountId,
                 platformFee: platformFeeCents.toString(),
             },
             success_url: `${baseUrl}/order/success?session_id={CHECKOUT_SESSION_ID}`,

@@ -72,136 +72,141 @@ export async function POST(req: NextRequest) {
         });
 
         // Send notification emails (best effort)
-        try {
-            const resend = new Resend(process.env.RESEND_API_KEY);
-            const buyerEmail = session.customer_details?.email;
-            const amountFormatted = ((session.amount_total || 0) / 100).toFixed(2);
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        const buyerEmail = session.customer_details?.email;
+        const amountFormatted = ((session.amount_total || 0) / 100).toFixed(2);
 
+        try {
             // Email to seller
             await resend.emails.send({
-                from: 'DomainLiq <info@domainliq.com>',
+                from: 'DomainLiq Orders <info@domainliq.com>',
                 to: seller.email,
-                subject: `🎉 New Sale: ${domainName} for $${amountFormatted}`,
+                subject: `You sold a domain! ${domainName}`,
                 html: `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="utf-8">
-                    <title>New Sale Notification</title>
-                </head>
-                <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f9fafb;">
-                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                        <tr>
-                            <td align="center" style="padding: 40px 0;">
-                                <table width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);">
-                                    <!-- Header -->
-                                    <tr>
-                                        <td style="padding: 32px; background-color: #000000; text-align: center;">
-                                            <img src="https://domainliq.com/icon-512.png" alt="DomainLiq" width="48" height="48" style="display: inline-block; vertical-align: middle;">
-                                            <span style="color: #ffffff; font-size: 24px; font-weight: bold; vertical-align: middle; margin-left: 12px;">DomainLiq</span>
-                                        </td>
-                                    </tr>
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="utf-8">
+                        <title>New Sale Notification</title>
+                    </head>
+                    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f9fafb;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td align="center" style="padding: 40px 0;">
+                                    <table width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);">
+                                        <!-- Header -->
+                                        <tr>
+                                            <td style="padding: 32px; background-color: #000000; text-align: center;">
+                                                <img src="https://domainliq.com/icon-512.png" alt="DomainLiq" width="48" height="48" style="display: inline-block; vertical-align: middle;">
+                                                <span style="color: #ffffff; font-size: 24px; font-weight: bold; vertical-align: middle; margin-left: 12px;">DomainLiq</span>
+                                            </td>
+                                        </tr>
 
-                                    <!-- Content -->
-                                    <tr>
-                                        <td style="padding: 40px 32px;">
-                                            <h1 style="color: #111827; font-size: 24px; font-weight: bold; margin: 0 0 24px 0; text-align: center;">Congratulation! You made a sale! 🎉</h1>
-                                            
-                                            <div style="background-color: #FFFBEB; border: 1px solid #FCD34D; border-radius: 12px; padding: 24px; margin-bottom: 32px;">
-                                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                        <!-- Content -->
+                                        <tr>
+                                            <td style="padding: 40px 32px;">
+                                                <h1 style="color: #111827; font-size: 24px; font-weight: bold; margin: 0 0 24px 0; text-align: center;">Congratulations! You made a sale! 🎉</h1>
+                                                
+                                                <div style="background-color: #FFFBEB; border: 1px solid #FCD34D; border-radius: 12px; padding: 24px; margin-bottom: 32px;">
+                                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                                        <tr>
+                                                            <td style="padding-bottom: 8px;">
+                                                                <p style="margin: 0; color: #92400E; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Domain Sold</p>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding-bottom: 16px;">
+                                                                <p style="margin: 0; color: #111827; font-size: 20px; font-weight: bold;">${domainName}</p>
+                                                            </td>
+                                                        </tr>
+                                                         <tr>
+                                                            <td style="padding-bottom: 8px;">
+                                                                <p style="margin: 0; color: #92400E; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Sale Price</p>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <p style="margin: 0; color: #059669; font-size: 24px; font-weight: bold;">$${amountFormatted}</p>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+
+                                                <p style="color: #374151; font-size: 16px; line-height: 24px; margin-bottom: 24px;">
+                                                    The buyer has completed payment. Now proceed to your dashboard to complete the transfer.
+                                                </p>
+
+                                                <h3 style="color: #111827; font-size: 18px; font-weight: bold; margin: 0 0 16px 0;">Next Steps:</h3>
+
+                                                <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 32px;">
                                                     <tr>
-                                                        <td style="padding-bottom: 8px;">
-                                                            <p style="margin: 0; color: #92400E; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Domain Sold</p>
+                                                        <td width="32" valign="top" style="padding-bottom: 24px;">
+                                                            <div style="width: 24px; height: 24px; background-color: #F59E0B; color: white; border-radius: 50%; text-align: center; line-height: 24px; font-weight: bold; font-size: 14px;">1</div>
+                                                        </td>
+                                                        <td style="padding-left: 16px; padding-bottom: 24px;">
+                                                            <strong style="display: block; color: #111827; margin-bottom: 4px;">Unlock Your Domain</strong>
+                                                            <span style="color: #4B5563; font-size: 14px;">Log in to your registrar and unlock ${domainName}.</span>
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td style="padding-bottom: 16px;">
-                                                            <p style="margin: 0; color: #111827; font-size: 20px; font-weight: bold;">${domainName}</p>
+                                                        <td width="32" valign="top" style="padding-bottom: 24px;">
+                                                            <div style="width: 24px; height: 24px; background-color: #F59E0B; color: white; border-radius: 50%; text-align: center; line-height: 24px; font-weight: bold; font-size: 14px;">2</div>
+                                                        </td>
+                                                        <td style="padding-left: 16px; padding-bottom: 24px;">
+                                                            <strong style="display: block; color: #111827; margin-bottom: 4px;">Get Auth Code</strong>
+                                                            <span style="color: #4B5563; font-size: 14px;">Get the EPP/Auth code from your registrar.</span>
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td style="padding-bottom: 8px;">
-                                                            <p style="margin: 0; color: #92400E; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Sale Price</p>
+                                                        <td width="32" valign="top">
+                                                            <div style="width: 24px; height: 24px; background-color: #F59E0B; color: white; border-radius: 50%; text-align: center; line-height: 24px; font-weight: bold; font-size: 14px;">3</div>
                                                         </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <p style="margin: 0; color: #059669; font-size: 24px; font-weight: bold;">$${amountFormatted}</p>
+                                                        <td style="padding-left: 16px;">
+                                                            <strong style="display: block; color: #111827; margin-bottom: 4px;">Complete Transfer</strong>
+                                                            <span style="color: #4B5563; font-size: 14px;">Enter the code in your dashboard to start the transfer.</span>
                                                         </td>
                                                     </tr>
                                                 </table>
-                                            </div>
 
-                                            <p style="color: #374151; font-size: 16px; line-height: 24px; margin-bottom: 24px;">
-                                                The buyer has completed payment. Now proceed to your dashboard to complete the transfer.
-                                            </p>
+                                                <div style="text-align: center;">
+                                                    <a href="https://domainliq.com/dashboard/orders" style="display: inline-block; background-color: #F59E0B; color: #ffffff; font-weight: bold; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-size: 16px; box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.2);">
+                                                        Go to Orders Dashboard
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
 
-                                            <h3 style="color: #111827; font-size: 18px; font-weight: bold; margin: 0 0 16px 0;">Next Steps:</h3>
-
-                                            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 32px;">
-                                                <tr>
-                                                    <td width="32" valign="top" style="padding-bottom: 24px;">
-                                                        <div style="width: 24px; height: 24px; background-color: #F59E0B; color: white; border-radius: 50%; text-align: center; line-height: 24px; font-weight: bold; font-size: 14px;">1</div>
-                                                    </td>
-                                                    <td style="padding-left: 16px; padding-bottom: 24px;">
-                                                        <strong style="display: block; color: #111827; margin-bottom: 4px;">Unlock Your Domain</strong>
-                                                        <span style="color: #4B5563; font-size: 14px;">Log in to your registrar and unlock ${domainName}.</span>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td width="32" valign="top" style="padding-bottom: 24px;">
-                                                        <div style="width: 24px; height: 24px; background-color: #F59E0B; color: white; border-radius: 50%; text-align: center; line-height: 24px; font-weight: bold; font-size: 14px;">2</div>
-                                                    </td>
-                                                    <td style="padding-left: 16px; padding-bottom: 24px;">
-                                                        <strong style="display: block; color: #111827; margin-bottom: 4px;">Get Auth Code</strong>
-                                                        <span style="color: #4B5563; font-size: 14px;">Get the EPP/Auth code from your registrar.</span>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td width="32" valign="top">
-                                                        <div style="width: 24px; height: 24px; background-color: #F59E0B; color: white; border-radius: 50%; text-align: center; line-height: 24px; font-weight: bold; font-size: 14px;">3</div>
-                                                    </td>
-                                                    <td style="padding-left: 16px;">
-                                                        <strong style="display: block; color: #111827; margin-bottom: 4px;">Complete Transfer</strong>
-                                                        <span style="color: #4B5563; font-size: 14px;">Enter the code in your dashboard to start the transfer.</span>
-                                                    </td>
-                                                </tr>
-                                            </table>
-
-                                            <div style="text-align: center;">
-                                                <a href="https://domainliq.com/dashboard/orders" style="display: inline-block; background-color: #F59E0B; color: #ffffff; font-weight: bold; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-size: 16px; box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.2);">
-                                                    Go to Orders Dashboard
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-
-                                    <!-- Footer -->
-                                    <tr>
-                                        <td style="padding: 32px; background-color: #F3F4F6; text-align: center;">
-                                            <p style="margin: 0 0 16px 0; color: #6B7280; font-size: 14px;">
-                                                <strong>Seller Protection:</strong> Funds are automatically released to you if the buyer does not confirm receipt within 7 days.
-                                            </p>
-                                            <p style="margin: 0; color: #9CA3AF; font-size: 12px;">
-                                                &copy; ${new Date().getFullYear()} DomainLiq. All rights reserved.
-                                            </p>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </table>
-                </body>
-                </html>
+                                        <!-- Footer -->
+                                        <tr>
+                                            <td style="padding: 32px; background-color: #F3F4F6; text-align: center;">
+                                                <p style="margin: 0 0 16px 0; color: #6B7280; font-size: 14px;">
+                                                    <strong>Seller Protection:</strong> Funds are automatically released to you if the buyer does not confirm receipt within 7 days.
+                                                </p>
+                                                <p style="margin: 0; color: #9CA3AF; font-size: 12px;">
+                                                    &copy; ${new Date().getFullYear()} DomainLiq. All rights reserved.
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </body>
+                    </html>
                 `,
             });
+            console.log(`[Order Sync] Seller notification email sent for order ${order.id}`);
+        } catch (emailError) {
+            console.error('[Order Sync] Failed to send seller email:', emailError);
+        }
 
-            // Email to buyer
+        // Send Email to Buyer
+        try {
             if (buyerEmail) {
                 await resend.emails.send({
-                    from: 'DomainLiq <info@domainliq.com>',
+                    from: 'DomainLiq Orders <info@domainliq.com>',
                     to: buyerEmail,
-                    subject: `✅ Order Confirmed: ${domainName}`,
+                    subject: `Order Confirmed: ${domainName}`,
                     html: `
                     <!DOCTYPE html>
                     <html>
@@ -313,7 +318,7 @@ export async function POST(req: NextRequest) {
                 });
             }
         } catch (emailError) {
-            console.error('[Order Sync] Email failed:', emailError);
+            console.error('[Order Sync] Failed to send buyer email:', emailError);
         }
 
         return NextResponse.json({ success: true, orderId: order.id, status: 'created' });

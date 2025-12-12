@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { stripe, createTransferToSeller } from '@/lib/stripe';
 import { Resend } from 'resend';
 
 // Lazy initialization to avoid build-time errors
@@ -62,15 +61,35 @@ export async function POST(req: Request) {
         // Calculate payout amount (total - platform fee)
         const payoutAmount = order.amount - order.platformFee;
 
-        // Create transfer to seller
+        // Create transfer to seller using source_transaction
+        // This links the transfer to the original charge, fixing "insufficient funds" error
         let transferId = null;
-        if (order.seller.stripeConnectedAccountId && payoutAmount > 0) {
+        if (order.seller.stripeConnectedAccountId && payoutAmount > 0 && order.stripePaymentIntentId) {
             try {
-                transferId = await createTransferToSeller(
-                    payoutAmount,
-                    order.seller.stripeConnectedAccountId,
-                    order.id
-                );
+                const Stripe = (await import('stripe')).default;
+                const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
+                // Get the charge from the payment intent
+                const paymentIntent = await stripe.paymentIntents.retrieve(order.stripePaymentIntentId);
+                const chargeId = typeof paymentIntent.latest_charge === 'string'
+                    ? paymentIntent.latest_charge
+                    : paymentIntent.latest_charge?.id;
+
+                if (!chargeId) {
+                    throw new Error('Could not find charge for payment');
+                }
+
+                // Create transfer with source_transaction to link to original charge
+                const transfer = await stripe.transfers.create({
+                    amount: payoutAmount,
+                    currency: 'usd',
+                    destination: order.seller.stripeConnectedAccountId,
+                    source_transaction: chargeId, // This is the key! Links to original charge
+                    metadata: {
+                        orderId: order.id,
+                    },
+                });
+                transferId = transfer.id;
             } catch (transferError: any) {
                 console.error('[Order Confirm] Transfer failed:', transferError);
                 return NextResponse.json(
@@ -99,18 +118,87 @@ export async function POST(req: Request) {
         // Send payout confirmation to seller
         try {
             await getResend().emails.send({
-                from: 'DomainLiq <info@domainliq.com>',
+                from: 'DomainLiq Orders <info@domainliq.com>',
                 to: order.seller.email,
-                subject: `💰 Payout sent: $${(payoutAmount / 100).toFixed(2)} for ${order.domain.name}`,
+                subject: `Payout Sent! Your funds are on the way 💸`,
                 html: `
-                    <h2>Your payout has been sent!</h2>
-                    <p><strong>Domain:</strong> ${order.domain.name}</p>
-                    <p><strong>Sale Amount:</strong> $${(order.amount / 100).toFixed(2)}</p>
-                    <p><strong>Platform Fee:</strong> $${(order.platformFee / 100).toFixed(2)}</p>
-                    <p><strong>Your Payout:</strong> $${(payoutAmount / 100).toFixed(2)}</p>
-                    <hr>
-                    <p>The funds will be available in your Stripe account within 2-3 business days.</p>
-                    <p>Thank you for selling on DomainLiq! 🎉</p>
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="utf-8">
+                        <title>Payout Sent</title>
+                    </head>
+                    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f9fafb;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td align="center" style="padding: 40px 0;">
+                                    <table width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);">
+                                        <!-- Header -->
+                                        <tr>
+                                            <td style="padding: 32px; background-color: #000000; text-align: center;">
+                                                <img src="https://domainliq.com/icon-512.png" alt="DomainLiq" width="48" height="48" style="display: inline-block; vertical-align: middle;">
+                                                <span style="color: #ffffff; font-size: 24px; font-weight: bold; vertical-align: middle; margin-left: 12px;">DomainLiq</span>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Content -->
+                                        <tr>
+                                            <td style="padding: 40px 32px;">
+                                                <h1 style="color: #111827; font-size: 24px; font-weight: bold; margin: 0 0 24px 0; text-align: center;">Funds Released! 💸</h1>
+                                                
+                                                <p style="color: #374151; font-size: 16px; line-height: 24px; margin-bottom: 24px;">
+                                                    Great news! The buyer has confirmed the transfer of <strong>${order.domain.name}</strong>, and your funds have been released.
+                                                </p>
+
+                                                <div style="background-color: #ECFDF5; border: 1px solid #6EE7B7; border-radius: 12px; padding: 24px; margin-bottom: 32px;">
+                                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                                        <tr>
+                                                            <td style="padding-bottom: 8px;">
+                                                                <p style="margin: 0; color: #065F46; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Payout Amount</p>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <p style="margin: 0; color: #059669; font-size: 32px; font-weight: bold;">$${(payoutAmount / 100).toFixed(2)}</p>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding-top: 8px;">
+                                                                 <p style="margin: 0; color: #065F46; font-size: 12px;">(After platform fees)</p>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+
+                                                <p style="color: #374151; font-size: 16px; line-height: 24px; margin-bottom: 32px;">
+                                                    The funds typically arrive in your connected Stripe bank account within <strong>1-2 business days</strong> (depending on your bank).
+                                                </p>
+                                                
+                                                <div style="text-align: center;">
+                                                    <a href="https://domainliq.com/dashboard/orders" style="display: inline-block; background-color: #F59E0B; color: #ffffff; font-weight: bold; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-size: 16px; box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.2);">
+                                                        View Details
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Footer -->
+                                        <tr>
+                                            <td style="padding: 32px; background-color: #F3F4F6; text-align: center;">
+                                                <p style="margin: 0 0 16px 0; color: #6B7280; font-size: 14px;">
+                                                    Need help? Contact us at <a href="mailto:support@domainliq.com" style="color: #F59E0B; text-decoration: none;">support@domainliq.com</a>
+                                                </p>
+                                                <p style="margin: 0; color: #9CA3AF; font-size: 12px;">
+                                                    &copy; ${new Date().getFullYear()} DomainLiq. All rights reserved.
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </body>
+                    </html>
                 `,
             });
         } catch (emailError) {
