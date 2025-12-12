@@ -74,19 +74,64 @@ export async function POST(req: NextRequest) {
         // Send notification emails (best effort)
         try {
             const resend = new Resend(process.env.RESEND_API_KEY);
+            const buyerEmail = session.customer_details?.email;
+            const amountFormatted = ((session.amount_total || 0) / 100).toFixed(2);
 
+            // Email to seller
             await resend.emails.send({
                 from: 'DomainLiq <noreply@domainliq.com>',
                 to: seller.email,
-                subject: `🎉 New Sale: ${domainName} for $${((session.amount_total || 0) / 100).toFixed(2)}`,
+                subject: `🎉 New Sale: ${domainName} for $${amountFormatted}`,
                 html: `
                     <h2>Congratulations! You made a sale! 🎉</h2>
                     <p><strong>Domain:</strong> ${domainName}</p>
-                    <p><strong>Amount:</strong> $${((session.amount_total || 0) / 100).toFixed(2)}</p>
+                    <p><strong>Amount:</strong> $${amountFormatted}</p>
                     <p>Please go to your <a href="https://domainliq.com/dashboard/orders">Orders Dashboard</a> to provide the authorization code.</p>
                     <p>You have 48 hours to complete the transfer.</p>
                 `,
             });
+
+            // Email to buyer
+            if (buyerEmail) {
+                await resend.emails.send({
+                    from: 'DomainLiq <noreply@domainliq.com>',
+                    to: buyerEmail,
+                    subject: `✅ Order Confirmed: ${domainName}`,
+                    html: `
+                        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
+                            <h2 style="color: #10B981;">✅ Your order has been confirmed!</h2>
+                            
+                            <div style="background: #f3f4f6; padding: 16px; border-radius: 8px; margin: 16px 0;">
+                                <p style="margin: 4px 0;"><strong>Domain:</strong> ${domainName}</p>
+                                <p style="margin: 4px 0;"><strong>Amount Paid:</strong> $${amountFormatted}</p>
+                            </div>
+                            
+                            <h3 style="color: #374151; margin-top: 24px;">📋 What happens next?</h3>
+                            
+                            <div style="background: #DBEAFE; border-left: 4px solid #3B82F6; padding: 12px 16px; margin: 16px 0;">
+                                <strong>Step 1: Wait for the Auth Code</strong>
+                                <p style="margin: 8px 0 0 0; color: #1E40AF;">The seller will unlock the domain and send us the Authorization Code. We'll email it to you as soon as we receive it.</p>
+                            </div>
+                            
+                            <div style="background: #D1FAE5; border-left: 4px solid #10B981; padding: 12px 16px; margin: 16px 0;">
+                                <strong>Step 2: Transfer the Domain</strong>
+                                <p style="margin: 8px 0 0 0; color: #065F46;">Use the auth code to initiate a transfer at your preferred registrar (Namecheap, GoDaddy, Cloudflare, etc.).</p>
+                            </div>
+                            
+                            <div style="background: #EDE9FE; border-left: 4px solid #8B5CF6; padding: 12px 16px; margin: 16px 0;">
+                                <strong>Step 3: Confirm Receipt</strong>
+                                <p style="margin: 8px 0 0 0; color: #5B21B6;">Once the transfer is complete, click the confirmation link in the email to release payment to the seller.</p>
+                            </div>
+                            
+                            <hr style="border: none; border-top: 1px solid #E5E7EB; margin: 24px 0;" />
+                            
+                            <p style="color: #6B7280; font-size: 14px;">
+                                <strong>🔒 Buyer Protection:</strong> Your funds are held securely until you confirm the domain transfer. If something goes wrong, contact us at support@domainliq.com.
+                            </p>
+                        </div>
+                    `,
+                });
+            }
         } catch (emailError) {
             console.error('[Order Sync] Email failed:', emailError);
         }
