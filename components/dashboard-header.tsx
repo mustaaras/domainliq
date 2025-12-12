@@ -11,6 +11,7 @@ import { Logo } from '@/components/logo';
 export function DashboardHeader() {
     const { data: session } = useSession();
     const [unreadCount, setUnreadCount] = useState(0);
+    const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [userSubdomain, setUserSubdomain] = useState('');
 
@@ -39,10 +40,26 @@ export function DashboardHeader() {
             }
         };
 
+        const fetchPendingOrders = async () => {
+            try {
+                const res = await fetch('/api/user/orders/pending');
+                const data = await res.json();
+                if (typeof data.count === 'number') {
+                    setPendingOrdersCount(data.count);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
         if (session) {
             fetchUserData();
             fetchUnread();
-            const interval = setInterval(fetchUnread, 5000);
+            fetchPendingOrders();
+            const interval = setInterval(() => {
+                fetchUnread();
+                fetchPendingOrders();
+            }, 10000); // Check every 10 seconds
             return () => clearInterval(interval);
         }
     }, [session]);
@@ -76,10 +93,15 @@ export function DashboardHeader() {
                     </Link>
                     <Link
                         href="/dashboard/orders"
-                        className="px-3 py-2 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2"
+                        className="relative px-3 py-2 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2"
                     >
                         <ShoppingBag className="h-4 w-4" />
                         Orders
+                        {pendingOrdersCount > 0 && (
+                            <span className="absolute -top-1 -right-1 h-5 w-5 bg-amber-500 text-black text-[10px] font-bold flex items-center justify-center rounded-full animate-pulse">
+                                {pendingOrdersCount}
+                            </span>
+                        )}
                     </Link>
                     <Link
                         href="/dashboard/statistics"
@@ -157,6 +179,11 @@ export function DashboardHeader() {
                         >
                             <ShoppingBag className="h-4 w-4" />
                             Orders
+                            {pendingOrdersCount > 0 && (
+                                <span className="ml-auto bg-amber-500 text-black text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">
+                                    {pendingOrdersCount}
+                                </span>
+                            )}
                         </Link>
                         <Link
                             href="/dashboard/statistics"
