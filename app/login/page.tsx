@@ -95,6 +95,14 @@ export default function LoginPage() {
                             className="w-full dark:bg-black/50 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg p-3 dark:text-white text-gray-900 dark:placeholder-gray-600 placeholder-gray-400 focus:outline-none focus:border-amber-500"
                             required
                         />
+                        <div className="mt-2 text-right">
+                            <Link
+                                href="/forgot-password"
+                                className="text-sm dark:text-amber-500 text-amber-600 hover:underline"
+                            >
+                                Forgot Password?
+                            </Link>
+                        </div>
                     </div>
                     {error && (
                         <div className="dark:bg-red-500/10 bg-red-50 border dark:border-red-500/20 border-red-300 dark:text-red-400 text-red-700 p-3 rounded-lg text-sm">

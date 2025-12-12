@@ -32,6 +32,10 @@ model User {
   // Verification
   verificationToken String? @unique
 
+  // Password Reset
+  passwordResetToken   String?   @unique
+  passwordResetExpires DateTime?
+
   // Integrations
   escrowEmail       String?
   escrowTermsAccepted Boolean @default(false)
