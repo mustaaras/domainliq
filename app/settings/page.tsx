@@ -98,11 +98,24 @@ export default function SettingsPage() {
         setIsConnectingStripe(true);
         try {
             const res = await fetch('/api/stripe/connect', { method: 'POST' });
-            if (!res.ok) throw new Error('Failed to create Stripe link');
             const data = await res.json();
-            window.location.href = data.url;
+            if (data.url) window.location.href = data.url;
         } catch (error) {
-            console.error('Stripe connect error:', error);
+            console.error('Failed to connect Stripe:', error);
+        } finally {
+            setIsConnectingStripe(false);
+        }
+    };
+
+    const handleDisconnectStripe = async () => {
+        if (!confirm('Are you sure? This is for testing only.')) return;
+        setIsConnectingStripe(true);
+        try {
+            await fetch('/api/stripe/connect', { method: 'DELETE' });
+            window.location.reload();
+        } catch (error) {
+            alert('Failed to disconnect');
+        } finally {
             setIsConnectingStripe(false);
         }
     };
@@ -453,9 +466,17 @@ export default function SettingsPage() {
                                         <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
                                     </div>
                                 ) : stripeStatus.onboardingComplete ? (
-                                    <div className="flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 rounded-lg text-sm font-medium">
-                                        <Check className="h-4 w-4" />
-                                        Connected
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-3 py-1.5 rounded-full text-sm font-medium">
+                                            <Check className="h-4 w-4" />
+                                            Connected
+                                        </div>
+                                        <button
+                                            onClick={handleDisconnectStripe}
+                                            className="text-xs text-red-500 hover:text-red-600 underline"
+                                        >
+                                            Reset (Test Mode)
+                                        </button>
                                     </div>
                                 ) : stripeStatus.connected ? (
                                     <button

@@ -100,6 +100,7 @@ export async function GET(request: NextRequest) {
               telegramUsername: true,
               preferredContact: true,
               escrowEmail: true,
+              stripeOnboardingComplete: true,
             },
           },
         },

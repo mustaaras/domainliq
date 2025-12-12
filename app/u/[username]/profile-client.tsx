@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import { MessageCircle, Check, ShieldCheck, Search, Filter, X, Loader2 } from 'lucide-react';
+import { MessageCircle, Check, ShieldCheck, Search, Filter, X, Loader2, ExternalLink, Zap } from 'lucide-react';
 import { useDebounce } from '@/hooks/use-debounce';
 import { getMainDomainUrl } from '@/lib/utils';
 import { Logo } from '@/components/logo';
@@ -27,6 +27,7 @@ interface User {
     linkedinProfile: string | null;
     telegramUsername: string | null;
     preferredContact: string;
+    stripeOnboardingComplete?: boolean;
 }
 
 interface Portfolio {
@@ -529,7 +530,6 @@ export default function ProfileClient({ user, initialDomains, initialPortfolios,
                                                         </div>
                                                     </div>
 
-                                                    {/* Bottom: Status/Meta and Actions */}
                                                     <div className="mt-auto pt-3 sm:pt-4 border-t dark:border-white/5 border-black/5 flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-2">
                                                         <div className="flex flex-col gap-1">
                                                             {domain.isVerified && (
@@ -548,18 +548,29 @@ export default function ProfileClient({ user, initialDomains, initialPortfolios,
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
                                                                     onClick={(e) => e.stopPropagation()}
-                                                                    className="flex items-center justify-center gap-1 px-2 py-1.5 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-bold bg-green-500 hover:bg-green-600 text-white rounded-lg transition-all shadow-sm hover:shadow-md backdrop-blur-sm flex-1 sm:flex-none"
+                                                                    className="flex items-center justify-center gap-1 px-2 py-0.5 text-[9px] font-bold text-white rounded-md bg-gradient-to-r from-[#00A4A6] to-[#00B8BA] hover:from-[#00B8BA] hover:to-[#00CDD0] transition-all hover:-translate-y-0.5 shadow-sm hover:shadow-lg hover:shadow-[#00A4A6]/30 flex-1 sm:flex-none uppercase tracking-wide"
                                                                 >
-                                                                    Buy Now
+                                                                    GoDaddy
+                                                                    <ExternalLink className="w-2 h-2 opacity-70" />
                                                                 </a>
+                                                            )}
+                                                            {!domain.checkoutLink && user.stripeOnboardingComplete && (
+                                                                <Link
+                                                                    href={`${getMainDomainUrl()}/d/${domain.name}`}
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                    className="flex items-center justify-center gap-1 px-2 py-0.5 text-[9px] font-bold text-white rounded-md bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 transition-all hover:-translate-y-0.5 shadow-sm hover:shadow-lg hover:shadow-green-500/30 flex-1 sm:flex-none uppercase tracking-wide"
+                                                                >
+                                                                    <Zap className="w-2 h-2 fill-white/20" />
+                                                                    Buy Now
+                                                                </Link>
                                                             )}
                                                             <Link
                                                                 href={`${getMainDomainUrl()}/d/${domain.name}`}
                                                                 onClick={(e) => e.stopPropagation()}
-                                                                className="flex items-center justify-center gap-1 px-2 py-1.5 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-bold dark:bg-white/10 bg-white/60 dark:hover:bg-white/20 hover:bg-white dark:text-gray-200 text-gray-800 dark:hover:text-white hover:text-black rounded-lg transition-all shadow-sm hover:shadow-md backdrop-blur-sm flex-1 sm:flex-none"
+                                                                className="flex items-center justify-center gap-1 px-2 py-0.5 text-[9px] font-bold dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 dark:text-gray-400 text-gray-600 dark:hover:text-white hover:text-gray-900 rounded-md border dark:border-white/5 border-gray-200 dark:hover:border-white/20 hover:border-gray-300 transition-all flex-1 sm:flex-none uppercase tracking-wide"
                                                             >
                                                                 Details
-                                                                <span className="text-base sm:text-lg leading-none mb-0.5 ml-0.5">→</span>
+                                                                <span className="text-xs leading-none mb-0.5 ml-0.5">→</span>
                                                             </Link>
                                                         </div>
                                                     </div>

@@ -223,51 +223,61 @@ export default function DomainLanderClient({ domain, isOwner }: DomainLanderClie
                             ${domain.price.toLocaleString()}
                         </div>
 
-                        <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-                            {domain.checkoutLink && (
-                                <a
-                                    href={domain.checkoutLink}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="w-full sm:w-auto px-8 py-4 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold text-lg transition-all shadow-lg shadow-green-600/20 hover:shadow-green-600/30 hover:-translate-y-0.5 flex items-center justify-center gap-2 group"
-                                >
-                                    <Zap className="w-5 h-5" />
-                                    Buy Now
-                                    <ArrowRight className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />
-                                </a>
-                            )}
-                            {canBuyWithStripe && !domain.checkoutLink && (
+                        {domain.status === 'sold' ? (
+                            <div className="flex flex-col items-center gap-4">
+                                <div className="px-6 py-3 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-xl font-bold text-lg flex items-center gap-2">
+                                    <Check className="w-5 h-5" />
+                                    SOLD
+                                </div>
+                                <p className="text-gray-500 dark:text-gray-400">This domain has been sold.</p>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+                                {domain.checkoutLink && (
+                                    <a
+                                        href={domain.checkoutLink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="w-full sm:w-auto px-8 py-4 bg-[#00A4A6] hover:bg-[#00B8BA] text-white rounded-xl font-bold text-lg transition-all shadow-lg shadow-[#00A4A6]/20 hover:shadow-[#00A4A6]/30 hover:-translate-y-0.5 flex items-center justify-center gap-2 group"
+                                    >
+                                        <ExternalLink className="w-5 h-5" />
+                                        Buy with GoDaddy
+                                        <ArrowRight className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />
+                                    </a>
+                                )}
+                                {canBuyWithStripe && !domain.checkoutLink && (
+                                    <button
+                                        onClick={handleBuyWithStripe}
+                                        disabled={isBuying}
+                                        className="w-full sm:w-auto px-8 py-4 bg-green-600 hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-bold text-lg transition-all shadow-lg shadow-green-600/20 hover:shadow-green-600/30 hover:-translate-y-0.5 flex items-center justify-center gap-2 group"
+                                    >
+                                        {isBuying ? (
+                                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                        ) : (
+                                            <Zap className="w-5 h-5" />
+                                        )}
+                                        {isBuying ? 'Processing...' : 'Buy Now'}
+                                        {!isBuying && <ArrowRight className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />}
+                                    </button>
+                                )}
+                                {domain.price >= 500 && domain.isVerified && domain.user.escrowEmail && !domain.checkoutLink && !canBuyWithStripe && (
+                                    <button
+                                        onClick={() => setShowEscrowModal(true)}
+                                        className="w-full sm:w-auto px-8 py-4 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold text-lg transition-all shadow-lg shadow-green-600/20 hover:shadow-green-600/30 hover:-translate-y-0.5 flex items-center justify-center gap-2 group"
+                                    >
+                                        <ShieldCheck className="w-5 h-5" />
+                                        Buy Securely
+                                        <ArrowRight className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />
+                                    </button>
+                                )}
                                 <button
-                                    onClick={handleBuyWithStripe}
-                                    disabled={isBuying}
-                                    className="w-full sm:w-auto px-8 py-4 bg-green-600 hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-bold text-lg transition-all shadow-lg shadow-green-600/20 hover:shadow-green-600/30 hover:-translate-y-0.5 flex items-center justify-center gap-2 group"
+                                    onClick={handleContact}
+                                    className="w-full sm:w-auto px-8 py-4 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/10 text-gray-900 dark:text-white rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2"
                                 >
-                                    {isBuying ? (
-                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                    ) : (
-                                        <Zap className="w-5 h-5" />
-                                    )}
-                                    {isBuying ? 'Processing...' : 'Buy Now'}
-                                    {!isBuying && <ArrowRight className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />}
+                                    Contact Seller
                                 </button>
-                            )}
-                            {domain.price >= 500 && domain.isVerified && domain.user.escrowEmail && !domain.checkoutLink && !canBuyWithStripe && (
-                                <button
-                                    onClick={() => setShowEscrowModal(true)}
-                                    className="w-full sm:w-auto px-8 py-4 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold text-lg transition-all shadow-lg shadow-green-600/20 hover:shadow-green-600/30 hover:-translate-y-0.5 flex items-center justify-center gap-2 group"
-                                >
-                                    <ShieldCheck className="w-5 h-5" />
-                                    Buy Securely
-                                    <ArrowRight className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />
-                                </button>
-                            )}
-                            <button
-                                onClick={handleContact}
-                                className="w-full sm:w-auto px-8 py-4 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/10 text-gray-900 dark:text-white rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2"
-                            >
-                                Contact Seller
-                            </button>
-                        </div>
+                            </div>
+                        )}
 
                         <div className="flex items-center gap-6 text-sm text-gray-500 dark:text-gray-400">
                             {domain.isVerified && (

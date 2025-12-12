@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
-import { ExternalLink, MessageCircle, Settings, LogOut, Menu, X, Globe, LayoutDashboard, BarChart3 } from 'lucide-react';
+import { ExternalLink, MessageCircle, Settings, LogOut, Menu, X, Globe, LayoutDashboard, BarChart3, ShoppingBag } from 'lucide-react';
+
 import { getProfileUrl } from '@/lib/utils';
 import { Logo } from '@/components/logo';
 
@@ -74,6 +75,13 @@ export function DashboardHeader() {
                         Overview
                     </Link>
                     <Link
+                        href="/dashboard/orders"
+                        className="px-3 py-2 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2"
+                    >
+                        <ShoppingBag className="h-4 w-4" />
+                        Orders
+                    </Link>
+                    <Link
                         href="/dashboard/statistics"
                         className="px-3 py-2 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2"
                     >
@@ -84,9 +92,9 @@ export function DashboardHeader() {
                     <Link
                         href={getProfileUrl(userSubdomain)}
                         target="_blank"
-                        className="px-3 py-2 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2"
+                        className="px-3 py-2 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2 whitespace-nowrap"
                     >
-                        <ExternalLink className="h-4 w-4" />
+                        <Globe className="h-4 w-4" />
                         My Page
                     </Link>
                     <Link
@@ -143,6 +151,14 @@ export function DashboardHeader() {
                             Overview
                         </Link>
                         <Link
+                            href="/dashboard/orders"
+                            className="px-4 py-3 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:hover:bg-white/5 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-3"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                            <ShoppingBag className="h-4 w-4" />
+                            Orders
+                        </Link>
+                        <Link
                             href="/dashboard/statistics"
                             className="px-4 py-3 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:hover:bg-white/5 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-3"
                             onClick={() => setIsMobileMenuOpen(false)}
@@ -157,7 +173,7 @@ export function DashboardHeader() {
                             className="px-4 py-3 text-sm font-medium dark:text-gray-300 text-gray-700 dark:hover:text-white hover:text-gray-900 dark:hover:bg-white/5 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-3"
                             onClick={() => setIsMobileMenuOpen(false)}
                         >
-                            <ExternalLink className="h-4 w-4" />
+                            <Globe className="h-4 w-4" />
                             My Page
                         </Link>
                         <Link

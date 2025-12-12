@@ -14,8 +14,18 @@ function getResend(): Resend {
 
 export async function POST(req: Request) {
     try {
-        const body = await req.json();
-        const { token } = body;
+        // Get token from query string or body
+        const url = new URL(req.url);
+        let token = url.searchParams.get('token');
+
+        if (!token) {
+            try {
+                const body = await req.json();
+                token = body.token;
+            } catch {
+                // No body, that's fine
+            }
+        }
 
         if (!token) {
             return NextResponse.json({ error: 'Confirmation token required' }, { status: 400 });
@@ -61,10 +71,10 @@ export async function POST(req: Request) {
                     order.seller.stripeConnectedAccountId,
                     order.id
                 );
-            } catch (transferError) {
+            } catch (transferError: any) {
                 console.error('[Order Confirm] Transfer failed:', transferError);
                 return NextResponse.json(
-                    { error: 'Failed to process payout. Please contact support.' },
+                    { error: `Payout Failed: ${transferError.message || 'Unknown Stripe Error'}` },
                     { status: 500 }
                 );
             }
@@ -89,7 +99,7 @@ export async function POST(req: Request) {
         // Send payout confirmation to seller
         try {
             await getResend().emails.send({
-                from: 'DomainLiq <info@noreply.domainliq.com>',
+                from: 'DomainLiq <info@domainliq.com>',
                 to: order.seller.email,
                 subject: `💰 Payout sent: $${(payoutAmount / 100).toFixed(2)} for ${order.domain.name}`,
                 html: `

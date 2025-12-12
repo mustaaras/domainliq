@@ -107,6 +107,7 @@ export default async function UserProfilePage({ params }: PageProps) {
         linkedinProfile: user.linkedinProfile,
         telegramUsername: user.telegramUsername,
         preferredContact: user.preferredContact,
+        stripeOnboardingComplete: user.stripeOnboardingComplete,
     };
 
     const serializedDomains = user.domains.map(domain => ({

@@ -27,10 +27,10 @@ export const stripe = {
 
 /**
  * Calculate platform fee based on tiered structure:
- * - $0-50: 0%
- * - $50-500: 5%
- * - $500-2000: 3%
- * - $2000+: 2%
+ * - $1-10: FREE (no platform fee)
+ * - $10-50: $1 flat fee
+ * - $51-100: $1.50 flat fee
+ * - $100+: 2%
  * 
  * @param amountCents - Amount in cents
  * @returns Platform fee in cents
@@ -38,10 +38,10 @@ export const stripe = {
 export function calculatePlatformFee(amountCents: number): number {
     const amount = amountCents / 100; // Convert to dollars
 
-    if (amount <= 50) return 0;
-    if (amount <= 500) return Math.round(amountCents * 0.05);  // 5%
-    if (amount <= 2000) return Math.round(amountCents * 0.03); // 3%
-    return Math.round(amountCents * 0.02);                      // 2%
+    if (amount < 10) return 0;                                    // FREE for $1-10
+    if (amount <= 50) return 100;                                 // $1 flat fee for $10-50
+    if (amount <= 100) return 150;                                // $1.50 flat fee for $51-100
+    return Math.round(amountCents * 0.02);                        // 2% for $100+
 }
 
 /**
@@ -50,9 +50,9 @@ export function calculatePlatformFee(amountCents: number): number {
 export function getFeeTierDescription(amountCents: number): string {
     const amount = amountCents / 100;
 
-    if (amount <= 50) return 'Free (no platform fee)';
-    if (amount <= 500) return '5% platform fee';
-    if (amount <= 2000) return '3% platform fee';
+    if (amount < 10) return 'No platform fee';
+    if (amount <= 50) return '$1 platform fee';
+    if (amount <= 100) return '$1.50 platform fee';
     return '2% platform fee';
 }
 

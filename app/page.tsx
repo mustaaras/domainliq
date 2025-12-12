@@ -30,6 +30,7 @@ interface Domain {
     telegramUsername: string | null;
     preferredContact: string;
     escrowEmail: string | null;
+    stripeOnboardingComplete?: boolean;
   };
   isVerified?: boolean;
   expiresAt?: string | null;
@@ -683,20 +684,6 @@ export default function Home() {
                           }
                         `}
                       >
-                        {/* Selection Indicator */}
-                        {!isSold && (
-                          <div className={`
-                            absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all z-20
-                            ${isSelected
-                              ? 'bg-amber-500 border-amber-500 scale-100 opacity-100'
-                              : 'dark:border-white/20 border-gray-300 dark:bg-black/40 bg-white/60 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 backdrop-blur-sm'
-                            }
-                          `}>
-                            {isSelected && (
-                              <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
-                            )}
-                          </div>
-                        )}
 
                         <div className="flex flex-col gap-3 h-full justify-between">
                           {/* Top Row: Name and Price */}
@@ -736,19 +723,6 @@ export default function Home() {
                                     SOLD
                                   </span>
                                 )}
-                                {!isSold && domain.price >= 500 && domain.isVerified && domain.user.escrowEmail && (
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setSelectedEscrowDomain(domain);
-                                      setShowEscrowModal(true);
-                                    }}
-                                    className="px-1.5 py-0.5 text-[9px] font-medium bg-green-500/20 text-green-500 dark:text-green-400 hover:bg-green-500/30 rounded-full border border-green-500/20 transition-colors flex items-center gap-1"
-                                  >
-                                    <ShieldCheck className="w-2.5 h-2.5" />
-                                    Buy with Escrow
-                                  </button>
-                                )}
                               </div>
                             </div>
 
@@ -759,10 +733,42 @@ export default function Home() {
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   onClick={(e) => e.stopPropagation()}
-                                  className="px-2 py-0.5 text-[9px] font-medium bg-green-600 hover:bg-green-500 text-white rounded-full transition-colors shadow-sm hover:shadow-md"
+                                  className="group/btn relative px-2 py-0.5 text-[9px] font-bold text-white rounded-lg overflow-hidden transition-all hover:-translate-y-0.5 shadow-sm hover:shadow-lg hover:shadow-[#00A4A6]/30"
                                 >
-                                  Buy Now
+                                  <div className="absolute inset-0 bg-gradient-to-r from-[#00A4A6] to-[#00B8BA] group-hover/btn:scale-105 transition-transform" />
+                                  <div className="relative flex items-center gap-1">
+                                    <span className="uppercase tracking-wide">GoDaddy</span>
+                                    <ExternalLink className="w-2 h-2 opacity-70 group-hover/btn:opacity-100 transition-opacity" />
+                                  </div>
                                 </a>
+                              )}
+                              {!domain.checkoutLink && domain.user?.stripeOnboardingComplete && (
+                                <Link
+                                  href={`/d/${domain.name}`}
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="group/btn relative px-2 py-0.5 text-[9px] font-bold text-white rounded-lg overflow-hidden transition-all hover:-translate-y-0.5 shadow-sm hover:shadow-lg hover:shadow-green-500/30"
+                                >
+                                  <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-emerald-500 group-hover/btn:scale-105 transition-transform" />
+                                  <div className="relative flex items-center gap-1">
+                                    <Zap className="w-2 h-2 fill-white/20" />
+                                    <span className="uppercase tracking-wide">Buy Now</span>
+                                  </div>
+                                </Link>
+                              )}
+                              {!isSold && domain.price >= 500 && domain.isVerified && domain.user.escrowEmail && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedEscrowDomain(domain);
+                                    setShowEscrowModal(true);
+                                  }}
+                                  className="group/btn relative px-2 py-0.5 text-[9px] font-bold text-amber-500 dark:text-amber-400 rounded-lg overflow-hidden transition-all hover:-translate-y-0.5 border border-amber-500/20 hover:border-amber-500/40 hover:bg-amber-500/10"
+                                >
+                                  <div className="relative flex items-center gap-1">
+                                    <ShieldCheck className="w-2 h-2" />
+                                    <span className="uppercase tracking-wide">Escrow</span>
+                                  </div>
+                                </button>
                               )}
                               <Link
                                 href={`/d/${domain.name}`}

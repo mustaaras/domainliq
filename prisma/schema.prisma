@@ -202,6 +202,9 @@ model Order {
   stripeCheckoutSessionId String? @unique
   stripeTransferId       String?
   
+  // Transfer Details
+  authCode               String? // EPP / Auth code for domain transfer
+  
   // Status: pending → paid → transferred → completed | refunded
   status                 String   @default("pending")
   

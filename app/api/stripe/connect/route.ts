@@ -60,8 +60,10 @@ export async function POST(req: Request) {
 
 // Check Connect account status
 export async function GET(req: Request) {
+    console.log('[Stripe Connect GET] Starting request...');
     try {
         const session = await auth();
+        console.log('[Stripe Connect GET] Session:', session?.user?.email);
         if (!session?.user?.email) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -86,7 +88,25 @@ export async function GET(req: Request) {
         }
 
         // Check actual status from Stripe
-        const account = await stripe.accounts.retrieve(user.stripeConnectedAccountId);
+        let account;
+        try {
+            account = await stripe.accounts.retrieve(user.stripeConnectedAccountId);
+        } catch (err: any) {
+            console.error('Stripe retrieve error:', err);
+            // If account doesn't exist or any other error, reset it to allow re-connection
+            await db.user.update({
+                where: { email: session.user.email },
+                data: {
+                    stripeConnectedAccountId: null,
+                    stripeOnboardingComplete: false
+                },
+            });
+            return NextResponse.json({
+                connected: false,
+                onboardingComplete: false,
+            });
+        }
+
         const isComplete = account.charges_enabled && account.payouts_enabled;
 
         // Update DB if status changed
@@ -103,11 +123,32 @@ export async function GET(req: Request) {
             accountId: user.stripeConnectedAccountId,
         });
 
-    } catch (error) {
+    } catch (error: any) {
         console.error('[Stripe Connect] Status check error:', error);
         return NextResponse.json(
-            { error: 'Failed to check Stripe status' },
+            { error: `Debug Error: ${error.message}` },
             { status: 500 }
         );
+    }
+}
+
+export async function DELETE(req: Request) {
+    try {
+        const session = await auth();
+        if (!session?.user?.email) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        await db.user.update({
+            where: { email: session.user.email },
+            data: {
+                stripeConnectedAccountId: null,
+                stripeOnboardingComplete: false,
+            },
+        });
+
+        return NextResponse.json({ success: true, message: 'Stripe account reset' });
+    } catch (error) {
+        return NextResponse.json({ error: 'Failed to reset account' }, { status: 500 });
     }
 }

@@ -12,6 +12,7 @@ function getResend(): Resend {
     return _resend;
 }
 
+
 export async function POST(
     req: Request,
     { params }: { params: Promise<{ id: string }> }
@@ -23,6 +24,8 @@ export async function POST(
         }
 
         const { id: orderId } = await params;
+        const body = await req.json();
+        const { authCode } = body;
 
         // Get order with domain and seller
         const order = await db.order.findUnique({
@@ -56,33 +59,50 @@ export async function POST(
                 status: 'transferred',
                 transferredAt: new Date(),
                 autoReleaseAt,
+                authCode: authCode || null,
             },
         });
 
         // Send confirmation email to buyer
-        const confirmUrl = `https://domainliq.com/order/confirm?token=${order.buyerConfirmationToken}`;
+        const baseUrl = process.env.NEXTAUTH_URL || 'https://domainliq.com';
+        const revealUrl = `${baseUrl}/order/reveal?token=${order.buyerConfirmationToken}`;
 
         try {
             await getResend().emails.send({
-                from: 'DomainLiq <info@noreply.domainliq.com>',
+                from: 'DomainLiq <info@domainliq.com>',
                 to: order.buyerEmail,
-                subject: `Please confirm you received ${order.domain.name}`,
+                subject: `🔑 Action Required: Your domain ${order.domain.name} is ready`,
                 html: `
-                    <h2>The seller has transferred your domain!</h2>
-                    <p><strong>Domain:</strong> ${order.domain.name}</p>
-                    <p>Please check your domain registrar account. You should have received the domain transfer.</p>
-                    <hr>
-                    <h3>Confirm Receipt</h3>
-                    <p>Once you've verified the domain is in your account, please confirm receipt:</p>
-                    <a href="${confirmUrl}" style="display: inline-block; padding: 12px 24px; background: #4F46E5; color: white; text-decoration: none; border-radius: 8px; margin: 16px 0;">
-                        Confirm Receipt
-                    </a>
-                    <p style="color: #666; font-size: 14px;">
-                        If you don't confirm within 7 days, the funds will be released automatically to the seller.
-                    </p>
-                    <p style="color: #666; font-size: 14px;">
-                        Having issues? Reply to this email or contact support@domainliq.com
-                    </p>
+                    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
+                        <h2 style="color: #10B981;">🎉 Great news! Your domain is ready.</h2>
+                        
+                        <div style="background: #f3f4f6; padding: 16px; border-radius: 8px; margin: 16px 0;">
+                            <p style="margin: 4px 0;"><strong>Domain:</strong> ${order.domain.name}</p>
+                            <p style="margin: 4px 0;"><strong>Amount:</strong> $${(order.amount / 100).toFixed(2)}</p>
+                        </div>
+                        
+                        <p style="color: #374151;">The seller has unlocked the domain and provided the transfer details. Click the button below to:</p>
+                        
+                        <ul style="color: #4B5563;">
+                            <li>Securely reveal your Authorization Code</li>
+                            <li>Get transfer instructions</li>
+                            <li>Confirm receipt once transferred</li>
+                        </ul>
+                        
+                        <a href="${revealUrl}" style="display: inline-block; padding: 14px 28px; background: #4F46E5; color: white; text-decoration: none; border-radius: 8px; margin: 20px 0; font-weight: bold;">
+                            View Transfer Details →
+                        </a>
+                        
+                        <hr style="border: none; border-top: 1px solid #E5E7EB; margin: 24px 0;">
+                        
+                        <p style="color: #6B7280; font-size: 14px;">
+                            <strong>Why click the link?</strong> For your security, the authorization code is only shown on our website, not in this email.
+                        </p>
+                        
+                        <p style="color: #6B7280; font-size: 14px;">
+                            If you don't confirm within 7 days, the funds will be released automatically to the seller.
+                        </p>
+                    </div>
                 `,
             });
         } catch (emailError) {
@@ -103,3 +123,4 @@ export async function POST(
         );
     }
 }
+
