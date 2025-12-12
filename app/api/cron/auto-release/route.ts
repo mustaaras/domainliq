@@ -52,9 +52,12 @@ export async function GET(req: Request) {
                         : paymentIntent.latest_charge?.id;
 
                     if (chargeId) {
+                        // Get the charge to determine its currency
+                        const charge = await stripe.charges.retrieve(chargeId);
+
                         const transfer = await stripe.transfers.create({
                             amount: payoutAmount,
-                            currency: 'usd',
+                            currency: charge.currency, // Use the charge's currency
                             destination: order.seller.stripeConnectedAccountId,
                             source_transaction: chargeId,
                             metadata: {

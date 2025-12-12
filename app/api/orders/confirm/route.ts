@@ -79,12 +79,16 @@ export async function POST(req: Request) {
                     throw new Error('Could not find charge for payment');
                 }
 
+                // Get the charge to determine its currency
+                const charge = await stripe.charges.retrieve(chargeId);
+
                 // Create transfer with source_transaction to link to original charge
+                // Currency MUST match the original charge currency
                 const transfer = await stripe.transfers.create({
                     amount: payoutAmount,
-                    currency: 'usd',
+                    currency: charge.currency, // Use the charge's currency, not hardcoded USD
                     destination: order.seller.stripeConnectedAccountId,
-                    source_transaction: chargeId, // This is the key! Links to original charge
+                    source_transaction: chargeId,
                     metadata: {
                         orderId: order.id,
                     },
