@@ -12,33 +12,36 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const orderIds = [
-        'cmj34mxiz0002emzlc0kfm8is', // possible.bet
-        'cmj34mxja0006emzldmnjt3gw', // whatever.bet
-    ];
-
     const results = [];
 
-    for (const orderId of orderIds) {
+    // Complete orders for these domains
+    const domainNames = ['possible.bet', 'whatever.bet'];
+
+    for (const domainName of domainNames) {
         try {
-            const order = await db.order.findUnique({
-                where: { id: orderId },
+            // Find the order by domain name
+            const order = await db.order.findFirst({
+                where: {
+                    domain: { name: domainName },
+                    status: { not: 'completed' },
+                },
                 include: { domain: true },
             });
 
             if (!order) {
-                results.push({ orderId, status: 'error', message: 'Order not found' });
-                continue;
-            }
-
-            if (order.status === 'completed') {
-                results.push({ orderId, domain: order.domain.name, status: 'skipped', message: 'Already completed' });
+                // Maybe already completed, check domain
+                const domain = await db.domain.findFirst({ where: { name: domainName } });
+                if (domain?.status === 'sold') {
+                    results.push({ domain: domainName, status: 'already_done' });
+                } else {
+                    results.push({ domain: domainName, status: 'no_order_found' });
+                }
                 continue;
             }
 
             // Mark order as completed
             await db.order.update({
-                where: { id: orderId },
+                where: { id: order.id },
                 data: {
                     status: 'completed',
                     completedAt: new Date(),
@@ -52,13 +55,13 @@ export async function GET(request: Request) {
                 data: { status: 'sold' },
             });
 
-            results.push({ orderId, domain: order.domain.name, status: 'completed' });
+            results.push({ domain: domainName, orderId: order.id, status: 'completed' });
         } catch (error: any) {
-            results.push({ orderId, status: 'error', message: error.message });
+            results.push({ domain: domainName, status: 'error', message: error.message });
         }
     }
 
-    // Also verify consider.bet
+    // Verify consider.bet
     try {
         const domain = await db.domain.findFirst({
             where: { name: 'consider.bet' },
@@ -71,14 +74,14 @@ export async function GET(request: Request) {
             });
             results.push({ action: 'verify', domain: 'consider.bet', status: 'verified' });
         } else {
-            results.push({ action: 'verify', domain: 'consider.bet', status: 'not found' });
+            results.push({ action: 'verify', domain: 'consider.bet', status: 'not_found' });
         }
     } catch (error: any) {
         results.push({ action: 'verify', domain: 'consider.bet', status: 'error', message: error.message });
     }
 
     return NextResponse.json({
-        message: 'Manual orders completed',
+        message: 'Manual operations completed',
         results,
     });
 }
