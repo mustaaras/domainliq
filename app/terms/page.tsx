@@ -11,103 +11,140 @@ export default function TermsPage() {
                     </Link>
                 </div>
                 <h1 className="text-4xl font-bold mb-4 dark:text-white text-gray-900">Terms of Service</h1>
-                <p className="dark:text-gray-400 text-gray-600 mb-8">Last Updated: November 29, 2025</p>
+                <p className="dark:text-gray-400 text-gray-600 mb-8">Last Updated: December 12, 2025</p>
 
-                <h2 className="text-2xl font-bold mt-8 mb-4">Welcome to DomainLiq</h2>
+                <h2 className="text-2xl font-bold mt-8 mb-4">1. Welcome to DomainLiq</h2>
                 <p className="dark:text-gray-300 text-gray-700 mb-4">
                     These Terms of Service ("Terms") govern your use of DomainLiq ("Service", "Platform", "we", "us", or "our"),
-                    a Domain Liquidation Platform. By accessing or using our Service, you agree to be bound by these Terms.
+                    a domain marketplace platform. By accessing or using our Service, you agree to be bound by these Terms.
                 </p>
 
-                <h2 className="text-2xl font-bold mt-8 mb-4">1. Service Description</h2>
+                <h2 className="text-2xl font-bold mt-8 mb-4">2. Service Description</h2>
                 <p className="dark:text-gray-300 text-gray-700 mb-4">
-                    DomainLiq is a free, open marketplace platform that connects domain sellers with potential buyers. We provide:
+                    DomainLiq is a marketplace platform that:
                 </p>
                 <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
-                    <li>A listing platform for domain sellers</li>
-                    <li>A browsing and search interface for buyers</li>
-                    <li>Contact facilitation between parties</li>
+                    <li>Allows sellers to list domains for sale</li>
+                    <li>Provides buyers with a browsing and search interface</li>
+                    <li>Processes payments through Stripe</li>
+                    <li>Holds funds securely until domain transfer is confirmed</li>
+                    <li>Facilitates domain verification and ownership display</li>
                 </ul>
 
+                <h2 className="text-2xl font-bold mt-8 mb-4">3. Platform Fees</h2>
+                <div className="dark:bg-white/5 bg-gray-100 rounded-lg p-6 my-6">
+                    <table className="w-full text-left">
+                        <thead>
+                            <tr className="border-b dark:border-white/10 border-gray-300">
+                                <th className="pb-2 dark:text-gray-300 text-gray-700">Domain Price</th>
+                                <th className="pb-2 dark:text-gray-300 text-gray-700">DomainLiq Fee</th>
+                            </tr>
+                        </thead>
+                        <tbody className="dark:text-gray-300 text-gray-700">
+                            <tr><td className="py-2">$1 - $9.99</td><td className="py-2">FREE</td></tr>
+                            <tr><td className="py-2">$10 - $50</td><td className="py-2">$1.00</td></tr>
+                            <tr><td className="py-2">$51 - $100</td><td className="py-2">$1.50</td></tr>
+                            <tr><td className="py-2">$100+</td><td className="py-2">2%</td></tr>
+                        </tbody>
+                    </table>
+                    <p className="text-sm dark:text-gray-500 text-gray-500 mt-4">
+                        Stripe payment processing fees (~2.9% + $0.30) are separate and charged by Stripe.
+                    </p>
+                </div>
+
+                <h2 className="text-2xl font-bold mt-8 mb-4">4. Payment Processing</h2>
+                <p className="dark:text-gray-300 text-gray-700 mb-4">
+                    All payments are processed through Stripe. By using our Service:
+                </p>
+                <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
+                    <li>Buyer payments are held securely until transfer is confirmed</li>
+                    <li>Sellers must connect a Stripe account to receive payments</li>
+                    <li>Payouts are processed to seller's Stripe account after buyer confirmation</li>
+                    <li>If buyer doesn't confirm within 7 days, funds auto-release to seller</li>
+                </ul>
+
+                <h2 className="text-2xl font-bold mt-8 mb-4">5. Seller Obligations</h2>
+                <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
+                    <li>You must own or be authorized to sell listed domains</li>
+                    <li>You must provide the Authorization Code within <strong>48 hours</strong> of receiving payment</li>
+                    <li>You must ensure the domain is unlocked and ready for transfer</li>
+                    <li>You are responsible for accurate listing information</li>
+                    <li>Failure to provide a valid Authorization Code within 48 hours results in full refund to buyer</li>
+                </ul>
+
+                <h2 className="text-2xl font-bold mt-8 mb-4">6. Buyer Obligations</h2>
+                <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
+                    <li>Confirm receipt of domain promptly after transfer completes</li>
+                    <li>If you don't confirm within <strong>7 days</strong>, funds are auto-released to seller</li>
+                    <li>Report issues with the Authorization Code immediately via support</li>
+                    <li>Do not complete transactions outside of the DomainLiq/Stripe system</li>
+                </ul>
+
+                <h2 className="text-2xl font-bold mt-8 mb-4">7. Refund Policy</h2>
                 <div className="dark:bg-amber-500/10 bg-amber-50 border dark:border-amber-500/30 border-amber-300 rounded-lg p-6 my-6">
-                    <p className="font-bold dark:text-amber-400 text-amber-700 mb-2">IMPORTANT: DomainLiq does NOT:</p>
                     <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700">
-                        <li>Process payments directly</li>
-                        <li>Hold funds (we use Escrow.com for this)</li>
-                        <li>Guarantee legal ownership title (Verification via TXT/A record proves DNS control only)</li>
-                        <li>Mediate disputes (handled by Escrow.com for secured transactions)</li>
+                        <li><strong>Seller doesn't provide Auth Code in 48 hours:</strong> Full refund to buyer</li>
+                        <li><strong>Authorization Code is invalid, fake, or expired:</strong> Full refund after investigation</li>
+                        <li><strong>Buyer doesn't confirm in 7 days:</strong> No refund (funds release to seller)</li>
+                        <li><strong>Successful transfer completed:</strong> No refund</li>
                     </ul>
                 </div>
 
-                <h2 className="text-2xl font-bold mt-8 mb-4">2. User Responsibilities</h2>
-
-                <h3 className="text-xl font-semibold mt-6 mb-3">For Sellers:</h3>
-                <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
-                    <li>You must have legitimate ownership or authorization to sell listed domains</li>
-                    <li>You are responsible for all domain listings and pricing</li>
-                    <li>You must respond to legitimate buyer inquiries</li>
-                    <li>You must complete transactions independently or via our Escrow.com integration</li>
-                    <li>You are solely responsible for domain transfers</li>
-                    <li><strong>Homepage Listing:</strong> Only domains priced under $1,000 are eligible for homepage featuring. All domains remain visible on your profile page.</li>
-                </ul>
-
-                <h3 className="text-xl font-semibold mt-6 mb-3">For Buyers:</h3>
-                <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
-                    <li className="font-bold text-amber-400">ONLY PURCHASE FROM TRUSTED SELLERS</li>
-                    <li>Verify domain ownership before making any payment</li>
-                    <li>Conduct all due diligence independently</li>
-                    <li><strong>Use our "Buy with Escrow" feature</strong> for secure transactions via Escrow.com</li>
-                    <li>Never share payment information outside of the secure Escrow.com environment</li>
-                </ul>
-
-                <h2 className="text-2xl font-bold mt-8 mb-4">3. Payment & Escrow</h2>
-                <div className="dark:bg-green-500/10 bg-green-50 border dark:border-green-500/30 border-green-300 rounded-lg p-6 my-6">
-                    <p className="font-bold dark:text-green-400 text-green-700 mb-2">SECURE TRANSACTIONS:</p>
-                    <p className="dark:text-gray-300 text-gray-700">
-                        DomainLiq integrates with <strong>Escrow.com</strong> to facilitate secure domain purchases.
-                        When you use "Buy with Escrow", a transaction is created on Escrow.com, and you are redirected
-                        to their secure platform to complete payment.
-                    </p>
-                    <p className="dark:text-gray-300 text-gray-700 mt-4">
-                        DomainLiq does not touch your funds. All payments are held by Escrow.com until the domain transfer is verified.
-                    </p>
-                </div>
-
-                <h2 className="text-2xl font-bold mt-8 mb-4">4. Privacy & Data Usage</h2>
-                <p className="dark:text-gray-300 text-gray-700 mb-4">DomainLiq respects your privacy:</p>
-                <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
-                    <li>We collect minimal information (email, username, domain listings)</li>
-                    <li>We DO NOT sell your information to third parties</li>
-                    <li>We DO NOT use your data for advertising</li>
-                    <li>We DO NOT share your contact information without your consent</li>
-                    <li>See our Privacy Policy for full details</li>
-                </ul>
-
-                <h2 className="text-2xl font-bold mt-8 mb-4">5. Prohibited Activities</h2>
-                <p className="dark:text-gray-300 text-gray-700 mb-4">Users may NOT:</p>
-                <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
-                    <li>List domains they don't own or have authority to sell</li>
-                    <li>Engage in fraudulent activities</li>
-                    <li>Harass other users</li>
-                    <li>Spam or send unsolicited messages</li>
-                    <li>Violate any laws or regulations</li>
-                </ul>
-
-                <h2 className="text-2xl font-bold mt-8 mb-4">6. Disclaimers</h2>
+                <h2 className="text-2xl font-bold mt-8 mb-4">8. Dispute Resolution</h2>
                 <p className="dark:text-gray-300 text-gray-700 mb-4">
-                    DomainLiq is provided "AS IS" without warranties of any kind. We disclaim all warranties regarding
-                    merchantability, fitness for a particular purpose, and accuracy of listings.
+                    Disputes are handled on a case-by-case basis:
+                </p>
+                <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
+                    <li>Contact support at <a href="mailto:support@domainliq.com" className="text-amber-500">support@domainliq.com</a></li>
+                    <li>Or use the Messages feature on your dashboard to contact admin</li>
+                    <li>Provide transaction details and evidence of the issue</li>
+                    <li>We will investigate and resolve within 5 business days</li>
+                </ul>
+
+                <h2 className="text-2xl font-bold mt-8 mb-4">9. Prohibited Activities</h2>
+                <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
+                    <li>Listing domains you don't own or have authority to sell</li>
+                    <li>Providing false ownership information</li>
+                    <li>Fraudulent activities or scams</li>
+                    <li>Harassment of other users</li>
+                    <li>Requesting payment outside of DomainLiq/Stripe</li>
+                    <li>Using invalid or fake Authorization Codes</li>
+                    <li>Spam or unsolicited messages</li>
+                </ul>
+
+                <h2 className="text-2xl font-bold mt-8 mb-4">10. Domain Verification</h2>
+                <p className="dark:text-gray-300 text-gray-700 mb-4">
+                    Domain verification (TXT, A, or NS record) demonstrates DNS control only.
+                    It does not guarantee legal ownership or freedom from trademark issues.
+                    Buyers should conduct their own due diligence.
                 </p>
 
-                <h2 className="text-2xl font-bold mt-8 mb-4">7. Limitation of Liability</h2>
+                <h2 className="text-2xl font-bold mt-8 mb-4">11. Limitation of Liability</h2>
                 <p className="dark:text-gray-300 text-gray-700 mb-4">
-                    TO THE MAXIMUM EXTENT PERMITTED BY LAW, we are not liable for any damages arising from use of the Service,
-                    user transactions, or domain transfer failures.
+                    TO THE MAXIMUM EXTENT PERMITTED BY LAW:
+                </p>
+                <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
+                    <li>DomainLiq is provided "AS IS" without warranties</li>
+                    <li>We are not liable for third-party actions or domain value disputes</li>
+                    <li>We are not liable for domain transfer failures outside our control</li>
+                    <li>Our liability is limited to the platform fees collected</li>
+                </ul>
+
+                <h2 className="text-2xl font-bold mt-8 mb-4">12. Account Termination</h2>
+                <p className="dark:text-gray-300 text-gray-700 mb-4">
+                    We reserve the right to suspend or terminate accounts that violate these Terms.
+                    Users may delete their accounts at any time through Settings.
+                </p>
+
+                <h2 className="text-2xl font-bold mt-8 mb-4">13. Changes to Terms</h2>
+                <p className="dark:text-gray-300 text-gray-700 mb-4">
+                    We may update these Terms from time to time. Continued use of the Service after changes
+                    constitutes acceptance of the modified Terms.
                 </p>
 
                 <div className="mt-12 pt-8 border-t dark:border-white/10 border-gray-200">
                     <p className="dark:text-gray-400 text-gray-600 text-sm">
-                        For questions about these Terms, please contact us through our support channels.
+                        For questions about these Terms, contact us at <a href="mailto:support@domainliq.com" className="text-amber-500">support@domainliq.com</a>
                     </p>
                 </div>
             </div>

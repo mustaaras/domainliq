@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Logo } from '@/components/logo';
 
-export default function UserGuidePage() {
+export default function BuyerGuidePage() {
     return (
         <div className="min-h-screen dark:bg-[#050505] bg-gray-50 dark:text-white text-gray-900 p-8">
             <div className="max-w-4xl mx-auto prose dark:prose-invert">
@@ -13,94 +13,106 @@ export default function UserGuidePage() {
                 <h1 className="text-4xl font-bold mb-4 dark:text-white text-gray-900">Buyer's Guide</h1>
                 <p className="dark:text-gray-400 text-gray-600 mb-8">How to safely buy domains on DomainLiq</p>
 
-                <div className="dark:bg-amber-500/10 bg-amber-50 border dark:border-amber-500/30 border-amber-300 rounded-lg p-6 my-6">
-                    <p className="font-bold dark:text-amber-400 text-amber-700 mb-2">⚠️ Safety First!</p>
+                <div className="dark:bg-green-500/10 bg-green-50 border dark:border-green-500/30 border-green-300 rounded-lg p-6 my-6">
+                    <p className="font-bold dark:text-green-400 text-green-700 mb-2">🔒 Secure Payments</p>
                     <p className="dark:text-gray-300 text-gray-700">
-                        DomainLiq does NOT process payments or act as escrow. Always use trusted third-party escrow services for transactions.
+                        Your payment is held securely until you receive and confirm the domain transfer.
+                        The seller only gets paid after you confirm receipt.
                     </p>
                 </div>
 
-                <h2 className="text-2xl font-bold mt-8 mb-4 dark:text-white text-gray-900">Step 1: Browse Domains</h2>
+                <h2 className="text-2xl font-bold mt-8 mb-4">Step 1: Browse Domains</h2>
                 <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
-                    <li>Visit the homepage to see all recently added domains (priced under $1,000 for quick liquidation)</li>
+                    <li>Visit the homepage to see available domains</li>
                     <li>Use the search bar to find specific domains</li>
-                    <li><strong>Direct Access:</strong> Type the domain name in your browser - if it's verified via A record, you'll see a "For Sale" landing page!</li>
-                    <li><strong>Look for the Green Shield:</strong> Domains with a green shield badge have verified ownership!</li>
-                    <li>Check domain prices and seller information</li>
-                    <li>Look at seller profiles (click on username) to see all their listings</li>
+                    <li>Look for the <span className="text-green-500">green shield badge</span> = verified ownership</li>
+                    <li>Check seller profiles to see all their listings</li>
+                    <li><strong>Tip:</strong> Type a verified domain directly in your browser to see its landing page!</li>
                 </ul>
 
-                <h2 className="text-2xl font-bold mt-8 mb-4 dark:text-white text-gray-900">Step 2: Select Domains</h2>
-                <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
-                    <li>On a seller's profile page, click domains to select them</li>
-                    <li>Selected domains show a checkmark and gold highlight</li>
-                    <li>You can select multiple domains at once</li>
-                    <li>A floating "Contact Seller" button appears when domains are selected</li>
-                </ul>
-
-                <h2 className="text-2xl font-bold mt-8 mb-4 dark:text-white text-gray-900">Step 3: Contact the Seller</h2>
-                <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
-                    <li>Click the "Contact Seller" button</li>
-                    <li>Choose your preferred contact method (Email, X/Twitter, WhatsApp, LinkedIn, Telegram)</li>
-                    <li>A pre-filled message with selected domains will be prepared</li>
-                    <li>Introduce yourself and express interest professionally</li>
-                </ul>
-
-                <h2 className="text-2xl font-bold mt-8 mb-4 dark:text-white text-gray-900">Step 4: Negotiate</h2>
-                <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
-                    <li>Discuss price, transfer terms, and timeline</li>
-                    <li>Ask for proof of domain ownership</li>
-                    <li>Verify the domain is unlocked and ready for transfer</li>
-                    <li>Get details about the domain's history and traffic (if relevant)</li>
-                </ul>
-
-                <h2 className="text-2xl font-bold mt-8 mb-4 dark:text-white text-gray-900">Step 5: Use "Buy with Escrow"</h2>
-                <div className="dark:bg-green-500/10 bg-green-50 border dark:border-green-500/30 border-green-300 rounded-lg p-6 my-6">
-                    <p className="font-bold dark:text-green-400 text-green-700 mb-2">Secure Integrated Payments:</p>
-                    <p className="dark:text-gray-300 text-gray-700 mb-4">
-                        We have integrated directly with <strong>Escrow.com</strong> for seamless security.
-                    </p>
+                <h2 className="text-2xl font-bold mt-8 mb-4">Step 2: Purchase with "Buy Now"</h2>
+                <div className="dark:bg-blue-500/10 bg-blue-50 border dark:border-blue-500/30 border-blue-300 rounded-lg p-6 my-6">
+                    <p className="font-bold dark:text-blue-400 text-blue-700 mb-2">⚡ Instant Checkout</p>
                     <ol className="list-decimal pl-6 dark:text-gray-300 text-gray-700 space-y-2">
-                        <li>Click the <strong>"Buy with Escrow"</strong> button on any domain listing</li>
-                        <li>Enter your email address in the secure pop-up</li>
-                        <li>You will be automatically redirected to Escrow.com</li>
-                        <li>Complete your payment securely on their platform</li>
+                        <li>Click the <strong>"Buy Now"</strong> button on any domain</li>
+                        <li>Enter your email and payment details</li>
+                        <li>Complete the secure Stripe checkout</li>
+                        <li>You'll receive a confirmation email immediately</li>
                     </ol>
                 </div>
 
-                <h2 className="text-2xl font-bold mt-8 mb-4 dark:text-white text-gray-900">Step 6: Complete Transfer</h2>
+                <h2 className="text-2xl font-bold mt-8 mb-4">Step 3: Receive the Domain</h2>
                 <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
-                    <li>Follow escrow service instructions</li>
-                    <li>Provide payment through escrow</li>
-                    <li>Seller initiates domain transfer</li>
-                    <li>Confirm receipt of domain before escrow releases funds</li>
+                    <li>The seller will be notified instantly of your purchase</li>
+                    <li>They have <strong>48 hours</strong> to provide the Authorization Code</li>
+                    <li>You'll receive a secure email with a link to claim your domain</li>
+                    <li>The email contains the Authorization Code needed for transfer</li>
                 </ul>
 
-                <h2 className="text-2xl font-bold mt-8 mb-4 dark:text-white text-gray-900">Red Flags to Watch For</h2>
+                <h2 className="text-2xl font-bold mt-8 mb-4">Step 4: Transfer the Domain</h2>
+                <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
+                    <li>Log into your domain registrar (GoDaddy, Namecheap, etc.)</li>
+                    <li>Start a domain transfer using the Authorization Code</li>
+                    <li>The transfer typically takes 5-7 days to complete</li>
+                    <li>Some registrars offer instant transfers if both accounts are on the same platform</li>
+                </ul>
+
+                <h2 className="text-2xl font-bold mt-8 mb-4">Step 5: Confirm Receipt</h2>
+                <div className="dark:bg-amber-500/10 bg-amber-50 border dark:border-amber-500/30 border-amber-300 rounded-lg p-6 my-6">
+                    <p className="font-bold dark:text-amber-400 text-amber-700 mb-2">⚠️ Important: Confirm Within 7 Days</p>
+                    <p className="dark:text-gray-300 text-gray-700 mb-4">
+                        Once you've received the domain, click the "Confirm Receipt" button in your email.
+                        This releases the payment to the seller.
+                    </p>
+                    <p className="dark:text-gray-300 text-gray-700">
+                        <strong>Note:</strong> If you don't confirm within 7 days, funds are automatically released to the seller.
+                        Only leave unconfirmed if there's an issue with the transfer.
+                    </p>
+                </div>
+
+                <h2 className="text-2xl font-bold mt-8 mb-4">Refund Policy</h2>
+                <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
+                    <li><strong>Seller doesn't respond in 48 hours:</strong> Full refund</li>
+                    <li><strong>Authorization Code doesn't work:</strong> Contact support, we'll investigate and issue a refund if the code is invalid</li>
+                    <li><strong>You don't act within 7 days:</strong> Funds are released to seller (no refund)</li>
+                </ul>
+
+                <h2 className="text-2xl font-bold mt-8 mb-4">Alternative: Escrow.com</h2>
+                <p className="dark:text-gray-300 text-gray-700 mb-4">
+                    For high-value domains or if you prefer traditional escrow, look for the "Escrow" button.
+                    This redirects you to Escrow.com for a secure third-party transaction.
+                </p>
+
+                <h2 className="text-2xl font-bold mt-8 mb-4">Red Flags to Watch For</h2>
                 <div className="dark:bg-red-500/10 bg-red-50 border dark:border-red-500/30 border-red-300 rounded-lg p-6 my-6">
                     <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700">
-                        <li>Seller refuses to use escrow</li>
-                        <li>Demands payment via cryptocurrency, gift cards, or wire transfer</li>
+                        <li>Seller asks for payment outside DomainLiq/Stripe</li>
+                        <li>Demands payment via cryptocurrency or gift cards</li>
                         <li>Can't provide proof of ownership</li>
                         <li>Price is too good to be true</li>
                         <li>Pressures you to act quickly</li>
-                        <li>Won't communicate through DomainLiq contact methods</li>
+                        <li>Domain is not verified (no green shield)</li>
                     </ul>
                 </div>
 
-                <h2 className="text-2xl font-bold mt-8 mb-4 dark:text-white text-gray-900">Tips for Success</h2>
+                <h2 className="text-2xl font-bold mt-8 mb-4">Tips for Success</h2>
                 <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
-                    <li>Research the domain's history using WHOIS lookup</li>
-                    <li>Check domain age and previous ownership</li>
+                    <li>Check the domain's WHOIS history</li>
                     <li>Verify there are no trademark issues</li>
-                    <li>Understand transfer fees from your registrar</li>
+                    <li>Prefer verified domains with the green shield</li>
+                    <li>Contact the seller with questions before buying</li>
                     <li>Keep all communication documented</li>
-                    <li>Be patient - good deals take time</li>
                 </ul>
+
+                <h2 className="text-2xl font-bold mt-8 mb-4">Need Help?</h2>
+                <p className="dark:text-gray-300 text-gray-700 mb-4">
+                    Contact us at <a href="mailto:support@domainliq.com" className="text-amber-500">support@domainliq.com</a> for
+                    any questions or issues with your purchase.
+                </p>
 
                 <div className="mt-12 pt-8 border-t dark:border-white/10 border-gray-200 text-center">
                     <p className="dark:text-gray-400 text-gray-600">
-                        Need help? Have questions? Contact us through our support channels.
+                        Ready to find your perfect domain?
                     </p>
                     <p className="dark:text-gray-500 text-gray-500 mt-4">
                         Happy domain hunting! 🎯

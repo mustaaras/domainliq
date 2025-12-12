@@ -14,9 +14,30 @@ export default function SellerGuidePage() {
                 <p className="dark:text-gray-400 text-gray-600 mb-8">How to successfully sell domains on DomainLiq</p>
 
                 <div className="dark:bg-green-500/10 bg-green-50 border dark:border-green-500/30 border-green-300 rounded-lg p-6 my-6">
-                    <p className="font-bold dark:text-green-400 text-green-700 mb-2">✓ Free Platform!</p>
+                    <p className="font-bold dark:text-green-400 text-green-700 mb-2">💰 Get Paid Directly!</p>
                     <p className="dark:text-gray-300 text-gray-700">
-                        DomainLiq is completely free to use. No listing fees, no commission, no hidden costs.
+                        DomainLiq handles payments through Stripe. Connect your account, and buyers can purchase your domains instantly with credit card. Funds are held securely until the buyer confirms receipt.
+                    </p>
+                </div>
+
+                <h2 className="text-2xl font-bold mt-8 mb-4">Platform Fees</h2>
+                <div className="dark:bg-white/5 bg-gray-100 rounded-lg p-6 my-6">
+                    <table className="w-full text-left">
+                        <thead>
+                            <tr className="border-b dark:border-white/10 border-gray-300">
+                                <th className="pb-2 dark:text-gray-300 text-gray-700">Domain Price</th>
+                                <th className="pb-2 dark:text-gray-300 text-gray-700">Platform Fee</th>
+                            </tr>
+                        </thead>
+                        <tbody className="dark:text-gray-300 text-gray-700">
+                            <tr><td className="py-2">$1 - $9.99</td><td className="py-2 text-green-500 font-bold">FREE</td></tr>
+                            <tr><td className="py-2">$10 - $50</td><td className="py-2">$1.00 flat</td></tr>
+                            <tr><td className="py-2">$51 - $100</td><td className="py-2">$1.50 flat</td></tr>
+                            <tr><td className="py-2">$100+</td><td className="py-2">2%</td></tr>
+                        </tbody>
+                    </table>
+                    <p className="text-sm dark:text-gray-500 text-gray-500 mt-4">
+                        Note: Stripe also charges ~2.9% + $0.30 per transaction for payment processing.
                     </p>
                 </div>
 
@@ -24,143 +45,91 @@ export default function SellerGuidePage() {
                 <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
                     <li>Click "Sign Up" in the top navigation</li>
                     <li>Provide your name, email, and password</li>
-                    <li>Choose a username (this becomes your store URL: domainliq.com/u/yourname)</li>
-                    <li>Accept Terms of Service and Privacy Policy</li>
-                    <li>Verify your email address</li>
+                    <li>Choose a username (this becomes your store URL)</li>
+                    <li>You'll receive a welcome email with getting started tips</li>
                 </ul>
 
-                <h2 className="text-2xl font-bold mt-8 mb-4">Step 2: Configure Your Profile</h2>
-                <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
-                    <li>Go to Settings from your dashboard</li>
-                    <li>Add your contact information (email, X/Twitter, WhatsApp, LinkedIn, Telegram)</li>
-                    <li>Set your preferred contact method</li>
-                    <li>Update your display name if desired</li>
-                </ul>
+                <h2 className="text-2xl font-bold mt-8 mb-4">Step 2: Connect Stripe (Required to Accept Payments)</h2>
+                <div className="dark:bg-amber-500/10 bg-amber-50 border dark:border-amber-500/30 border-amber-300 rounded-lg p-6 my-6">
+                    <p className="font-bold dark:text-amber-400 text-amber-700 mb-2">⚡ Enable "Buy Now" Button</p>
+                    <ol className="list-decimal pl-6 dark:text-gray-300 text-gray-700">
+                        <li>Go to <strong>Settings → Payment Integration</strong></li>
+                        <li>Click <strong>"Connect with Stripe"</strong></li>
+                        <li>Complete Stripe's onboarding (takes ~5 minutes)</li>
+                        <li>Once connected, a "Buy Now" button appears on all your domains!</li>
+                    </ol>
+                </div>
 
                 <h2 className="text-2xl font-bold mt-8 mb-4">Step 3: Add Domains</h2>
-
-                <h3 className="text-xl font-semibold mt-6 mb-3">Single Domain:</h3>
                 <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
-                    <li>Enter the domain name (e.g., example.com)</li>
-                    <li>Set your asking price in USD</li>
+                    <li>Go to your Dashboard</li>
+                    <li>Enter the domain name and price</li>
                     <li>Click "Add Domain"</li>
-                    <li><strong>Note:</strong> Only domains priced under <strong>$1,000</strong> are featured on the homepage to encourage liquidation. Higher-priced domains appear on your profile page.</li>
-                </ul>
-
-                <h3 className="text-xl font-semibold mt-6 mb-3">Bulk Upload (up to 50):</h3>
-                <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
-                    <li>Use the bulk upload textarea</li>
-                    <li>Format: one domain per line as "domain.com price"</li>
-                    <li>Example:
-                        <pre className="bg-black/40 p-3 rounded mt-2 text-sm">
-                            example.com 1000{'\n'}
-                            test.com 500{'\n'}
-                            domain.com 2500
-                        </pre>
-                    </li>
-                    <li>Click "Upload Domains"</li>
+                    <li><strong>Homepage:</strong> Only domains priced under $1,000 appear on the homepage</li>
                 </ul>
 
                 <h2 className="text-2xl font-bold mt-8 mb-4">Step 4: Verify Ownership (Recommended)</h2>
                 <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
-                    <li>Go to your Dashboard</li>
-                    <li>Click the "Verify" button next to your domain</li>
-                    <li><strong>Option 1 (TXT Record):</strong> Add a TXT record with the provided token to your DNS.</li>
-                    <li><strong>Option 2 (A Record):</strong> Point your domain's A record to our server IP (46.224.108.38).</li>
-                    <li><strong>Option 3 (NS Record):</strong> Point your NS records to ns3verify.domainliq.com.</li>
-                    <li>Click "Check Now" to verify</li>
-                    <li><strong>Benefit:</strong> Verified domains get a green shield badge, increasing buyer trust!</li>
+                    <li>Click "Verify" next to your domain</li>
+                    <li>Choose TXT, A record, or NS record verification</li>
+                    <li>Verified domains get a <span className="text-green-500">green shield badge</span> = more buyer trust!</li>
+                    <li><strong>Bonus:</strong> A record verification gives you a free "For Sale" landing page</li>
                 </ul>
 
+                <h2 className="text-2xl font-bold mt-8 mb-4">Step 5: When You Make a Sale</h2>
                 <div className="dark:bg-blue-500/10 bg-blue-50 border dark:border-blue-500/30 border-blue-300 rounded-lg p-6 my-6">
-                    <p className="font-bold dark:text-blue-400 text-blue-700 mb-2">🚀 Free Domain Landers!</p>
+                    <p className="font-bold dark:text-blue-400 text-blue-700 mb-2">📧 You'll Be Notified!</p>
+                    <p className="dark:text-gray-300 text-gray-700 mb-4">
+                        When a buyer purchases your domain, you'll receive an email notification instantly.
+                    </p>
+                    <ol className="list-decimal pl-6 dark:text-gray-300 text-gray-700 space-y-2">
+                        <li>Go to <strong>Dashboard → Orders</strong></li>
+                        <li>Find the order and click <strong>"Transfer Now"</strong></li>
+                        <li>Enter the domain's <strong>Authorization Code (EPP Code)</strong></li>
+                        <li>The buyer will receive a secure link to claim their domain</li>
+                    </ol>
+                </div>
+
+                <h2 className="text-2xl font-bold mt-8 mb-4">Step 6: Getting Paid</h2>
+                <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
+                    <li>Funds are held securely until the buyer confirms receipt</li>
+                    <li>Once confirmed, payout is sent to your connected Stripe account</li>
+                    <li>If the buyer doesn't confirm within <strong>7 days</strong>, funds auto-release to you</li>
+                    <li>Payouts typically arrive in 2-3 business days</li>
+                </ul>
+
+                <div className="dark:bg-red-500/10 bg-red-50 border dark:border-red-500/30 border-red-300 rounded-lg p-6 my-6">
+                    <p className="font-bold dark:text-red-400 text-red-700 mb-2">⚠️ Important: 48-Hour Rule</p>
                     <p className="dark:text-gray-300 text-gray-700">
-                        If you verify via <strong>Option 2 (A Record)</strong>, your domain will automatically display a beautiful "For Sale" landing page hosted by us for free!
-                        This page directs buyers straight to your listing.
+                        You must provide the Authorization Code within <strong>48 hours</strong> of receiving payment.
+                        If you don't, the buyer is entitled to a full refund.
                     </p>
                 </div>
 
-                <h2 className="text-2xl font-bold mt-8 mb-4">Step 5: Manage Your Listings</h2>
-                <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
-                    <li><strong>Mark as Sold:</strong> Click the gold ✓ button when a domain sells</li>
-                    <li><strong>Mark as Available:</strong> Click the green ↺ button to relist</li>
-                    <li><strong>Delete:</strong> Use the trash icon to remove a domain permanently</li>
-                    <li>Sold domains stay visible but are grayed out and marked "SOLD"</li>
-                </ul>
-
-                <h2 className="text-2xl font-bold mt-8 mb-4">Step 5: Share Your Store</h2>
-                <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
-                    <li>Your unique URL: domainliq.com/u/yourname</li>
-                    <li>Share on social media (X, LinkedIn, Reddit, etc.)</li>
-                    <li>When shared, a preview shows your domain list automatically!</li>
-                    <li>Add to your email signature</li>
-                    <li>Include in domain forums and communities</li>
-                </ul>
-
-                <h2 className="text-2xl font-bold mt-8 mb-4">Step 6: Respond to Inquiries</h2>
-                <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
-                    <li>Buyers will contact you through your preferred method</li>
-                    <li>Respond promptly and professionally</li>
-                    <li>Provide proof of ownership if requested</li>
-                    <li>Be clear about transfer process and timeline</li>
-                </ul>
-
-                <h2 className="text-2xl font-bold mt-8 mb-4">Step 7: Complete the Sale</h2>
-                <div className="dark:bg-amber-500/10 bg-amber-50 border dark:border-amber-500/30 border-amber-300 rounded-lg p-6 my-6">
-                    <p className="font-bold dark:text-amber-400 text-amber-700 mb-2">⚠️ Use Escrow!</p>
-                    <p className="dark:text-gray-300 text-gray-700 mb-2">
-                        Always recommend escrow services to buyers for safe transactions:
-                    </p>
-                    <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700">
-                        <li>Escrow.com (most trusted)</li>
-                        <li>Afternic.com</li>
-                        <li>Sedo.com</li>
-                    </ul>
-                </div>
-
-                <h2 className="text-2xl font-bold mt-8 mb-4">Pricing Tips</h2>
-                <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
-                    <li>Research similar domain sales</li>
-                    <li>Consider domain length, keywords, extension (.com is premium)</li>
-                    <li>Be realistic but don't undersell</li>
-                    <li>You can update prices anytime by deleting and re-adding</li>
-                    <li>Bundle discounts can attract buyers</li>
-                </ul>
+                <h2 className="text-2xl font-bold mt-8 mb-4">Alternative: Escrow.com</h2>
+                <p className="dark:text-gray-300 text-gray-700 mb-4">
+                    For buyers who prefer traditional escrow, you can also accept offers through Escrow.com integration.
+                    This is useful for high-value domains or international transactions.
+                </p>
 
                 <h2 className="text-2xl font-bold mt-8 mb-4">Best Practices</h2>
                 <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
-                    <li>Keep your domain list updated</li>
-                    <li>Mark sold domains promptly</li>
-                    <li>Respond to all legitimate inquiries</li>
-                    <li>Be transparent about domain history</li>
-                    <li>Unlock domains before negotiating</li>
-                    <li>Have authorization codes ready</li>
-                    <li>Set realistic transfer timelines</li>
+                    <li>Keep your domains unlocked and ready for transfer</li>
+                    <li>Have Authorization Codes ready before listing</li>
+                    <li>Respond to orders within 48 hours</li>
+                    <li>Mark domains as sold after completing transfers</li>
+                    <li>Check your Messages for buyer inquiries</li>
                 </ul>
 
-                <h2 className="text-2xl font-bold mt-8 mb-4">What NOT to Do</h2>
-                <div className="dark:bg-red-500/10 bg-red-50 border dark:border-red-500/30 border-red-300 rounded-lg p-6 my-6">
-                    <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700">
-                        <li>Don't list domains you don't own</li>
-                        <li>Don't refuse escrow services</li>
-                        <li>Don't request payment outside escrow</li>
-                        <li>Don't provide false ownership information</li>
-                        <li>Don't spam or harass buyers</li>
-                    </ul>
-                </div>
-
-                <h2 className="text-2xl font-bold mt-8 mb-4">Security & Privacy</h2>
-                <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
-                    <li>We NEVER sell or share your contact information</li>
-                    <li>Only buyers who select your domains see your contact info</li>
-                    <li>Change your password regularly</li>
-                    <li>Use strong, unique passwords</li>
-                    <li>Enable 2FA on your email account</li>
-                </ul>
+                <h2 className="text-2xl font-bold mt-8 mb-4">Need Help?</h2>
+                <p className="dark:text-gray-300 text-gray-700 mb-4">
+                    Contact us at <a href="mailto:support@domainliq.com" className="text-amber-500">support@domainliq.com</a> or
+                    through the Messages feature in your dashboard.
+                </p>
 
                 <div className="mt-12 pt-8 border-t dark:border-white/10 border-gray-200 text-center">
                     <p className="dark:text-gray-400 text-gray-600">
-                        Ready to start selling? Create your account today!
+                        Ready to start selling? Connect your Stripe account today!
                     </p>
                     <p className="dark:text-gray-500 text-gray-500 mt-4">
                         Happy selling! 🚀

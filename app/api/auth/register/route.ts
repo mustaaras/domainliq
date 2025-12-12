@@ -1,6 +1,7 @@
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
+import { Resend } from 'resend';
 
 export async function POST(req: NextRequest) {
     try {
@@ -124,6 +125,52 @@ export async function POST(req: NextRequest) {
         } catch (coolifyError) {
             console.error('[Coolify] Error registering subdomain:', coolifyError);
             // Don't fail registration if Coolify fails
+        }
+
+        // Send Welcome Email
+        try {
+            const resend = new Resend(process.env.RESEND_API_KEY);
+            await resend.emails.send({
+                from: 'DomainLiq <noreply@domainliq.com>',
+                to: email,
+                subject: 'Welcome to DomainLiq! 🎉',
+                html: `
+                    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                        <h1 style="color: #111; margin-bottom: 24px;">Welcome to DomainLiq! 🎉</h1>
+                        
+                        <p style="color: #333; font-size: 16px; line-height: 1.6;">Hi ${name || 'there'},</p>
+                        
+                        <p style="color: #333; font-size: 16px; line-height: 1.6;">Thanks for joining DomainLiq! Your seller page is now live at:</p>
+                        
+                        <p style="margin: 20px 0;">
+                            <a href="https://${subdomain.toLowerCase()}.domainliq.com" 
+                               style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                                Visit Your Page
+                            </a>
+                        </p>
+                        
+                        <h2 style="color: #111; margin-top: 32px;">Get Started:</h2>
+                        <ol style="color: #333; font-size: 16px; line-height: 1.8;">
+                            <li>Add your first domain</li>
+                            <li>Verify ownership</li>
+                            <li>Set your price and start selling!</li>
+                        </ol>
+                        
+                        <p style="color: #666; font-size: 14px; margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee;">
+                            Questions? You can contact us through <a href="https://domainliq.com/dashboard/chat" style="color: #f59e0b;">Messages on your dashboard</a>.
+                        </p>
+                        
+                        <p style="color: #333; font-size: 16px; margin-top: 20px;">
+                            Happy selling!<br/>
+                            <strong>The DomainLiq Team</strong>
+                        </p>
+                    </div>
+                `
+            });
+            console.log(`[Email] Welcome email sent to: ${email}`);
+        } catch (emailError) {
+            console.error('[Email] Failed to send welcome email:', emailError);
+            // Don't fail registration if email fails
         }
 
         const { password: _, ...userWithoutPassword } = user;

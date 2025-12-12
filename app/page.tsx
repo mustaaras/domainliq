@@ -359,23 +359,23 @@ export default function Home() {
 
             return (
               <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowContactModal(false)}>
-                <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
-                  <h3 className="text-xl font-bold text-white mb-4">Choose Contact Method</h3>
+                <div className="dark:bg-[#0A0A0A] bg-white border dark:border-white/10 border-gray-200 rounded-xl p-6 max-w-sm w-full shadow-xl" onClick={(e) => e.stopPropagation()}>
+                  <h3 className="text-xl font-bold dark:text-white text-gray-900 mb-4">Choose Contact Method</h3>
                   <div className="space-y-2">
                     {availableMethods.map((method) => (
                       <button
                         key={method.type}
                         onClick={() => contactViaMethod(method.type)}
-                        className="w-full flex items-center gap-3 p-4 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-500/50 transition-all text-left"
+                        className="w-full flex items-center gap-3 p-4 rounded-lg dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 border dark:border-white/10 border-gray-200 hover:border-amber-500/50 transition-all text-left"
                       >
                         <span className="text-2xl">{method.icon}</span>
-                        <span className="text-white font-medium">{method.label}</span>
+                        <span className="dark:text-white text-gray-900 font-medium">{method.label}</span>
                       </button>
                     ))}
                   </div>
                   <button
                     onClick={() => setShowContactModal(false)}
-                    className="mt-4 w-full py-2 text-gray-400 hover:text-white transition-colors"
+                    className="mt-4 w-full py-2 dark:text-gray-400 text-gray-500 dark:hover:text-white hover:text-gray-900 transition-colors"
                   >
                     Cancel
                   </button>
@@ -387,23 +387,23 @@ export default function Home() {
           {/* Escrow Modal */}
           {showEscrowModal && selectedEscrowDomain && (
             <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowEscrowModal(false)}>
-              <div className="bg-[#0A0A0A] border border-white/10 rounded-xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
+              <div className="dark:bg-[#0A0A0A] bg-white border dark:border-white/10 border-gray-200 rounded-xl max-w-md w-full p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center border border-green-500/20">
                     <ShieldCheck className="h-5 w-5 text-green-500" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-white">Buy with Escrow.com</h3>
-                    <p className="text-xs text-gray-400">Secure transaction for {selectedEscrowDomain.name}</p>
+                    <h3 className="text-xl font-bold dark:text-white text-gray-900">Buy with Escrow.com</h3>
+                    <p className="text-xs dark:text-gray-400 text-gray-500">Secure transaction for {selectedEscrowDomain.name}</p>
                   </div>
                 </div>
 
                 <div className="space-y-4 mb-6">
-                  <div className="bg-white/5 rounded-lg p-4 border border-white/5">
-                    <p className="text-sm text-gray-300 mb-2">
-                      This domain is listed for <span className="text-white font-bold">${selectedEscrowDomain.price.toLocaleString()}</span>.
+                  <div className="dark:bg-white/5 bg-gray-100 rounded-lg p-4 border dark:border-white/5 border-gray-200">
+                    <p className="text-sm dark:text-gray-300 text-gray-700 mb-2">
+                      This domain is listed for <span className="dark:text-white text-gray-900 font-bold">${selectedEscrowDomain.price.toLocaleString()}</span>.
                     </p>
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm dark:text-gray-400 text-gray-500">
                       Enter your email address to start a secure transaction on Escrow.com. You will be redirected to complete the purchase.
                     </p>
                   </div>
@@ -449,13 +449,13 @@ export default function Home() {
                     }}
                   >
                     <div className="mb-4">
-                      <label className="block text-xs font-medium text-gray-500 mb-1">Your Email Address</label>
+                      <label className="block text-xs font-medium dark:text-gray-500 text-gray-600 mb-1">Your Email Address</label>
                       <input
                         type="email"
                         name="buyerEmail"
                         required
                         placeholder="you@example.com"
-                        className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-green-500/50"
+                        className="w-full dark:bg-black/40 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-3 py-2 dark:text-white text-gray-900 focus:outline-none focus:ring-1 focus:ring-green-500/50"
                       />
                     </div>
 
@@ -470,7 +470,7 @@ export default function Home() {
                       <button
                         type="button"
                         onClick={() => setShowEscrowModal(false)}
-                        className="w-full py-2 text-gray-400 hover:text-white transition-colors"
+                        className="w-full py-2 dark:text-gray-400 text-gray-500 dark:hover:text-white hover:text-gray-900 transition-colors"
                       >
                         Cancel
                       </button>

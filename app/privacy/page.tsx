@@ -11,7 +11,7 @@ export default function PrivacyPage() {
                     </Link>
                 </div>
                 <h1 className="text-4xl font-bold mb-4 dark:text-white text-gray-900">Privacy Policy</h1>
-                <p className="dark:text-gray-400 text-gray-600 mb-8">Last Updated: November 29, 2025</p>
+                <p className="dark:text-gray-400 text-gray-600 mb-8">Last Updated: December 12, 2025</p>
 
                 <h2 className="text-2xl font-bold mt-8 mb-4">Our Commitment to Privacy</h2>
                 <p className="dark:text-gray-300 text-gray-700 mb-4">
@@ -52,6 +52,15 @@ export default function PrivacyPage() {
                     <li>Domain descriptions (optional)</li>
                     <li>Domain status (available/sold)</li>
                     <li>DNS verification records (TXT, A, or NS records accessed publicly to verify ownership)</li>
+                </ul>
+
+                <h3 className="text-xl font-semibold mt-6 mb-3">Payment Information (When You Buy or Sell):</h3>
+                <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
+                    <li>Buyer email address (for order confirmation)</li>
+                    <li>Billing address (collected by Stripe)</li>
+                    <li>Payment method details (processed by Stripe, we don't store card numbers)</li>
+                    <li>Transaction history (order amounts, dates, status)</li>
+                    <li>Seller payout information (stored by Stripe Connect)</li>
                 </ul>
 
                 <h2 className="text-2xl font-bold mt-8 mb-4">2. How We Use Your Information</h2>
@@ -121,9 +130,14 @@ export default function PrivacyPage() {
                 </p>
 
                 <h2 className="text-2xl font-bold mt-8 mb-4">9. Third-Party Services</h2>
+                <p className="dark:text-gray-300 text-gray-700 mb-4">We share data with these services:</p>
+                <ul className="list-disc pl-6 dark:text-gray-300 text-gray-700 mb-4">
+                    <li><strong>Stripe:</strong> Payment processing - they receive buyer email, billing address, and payment details</li>
+                    <li><strong>Resend:</strong> Email delivery - they receive email addresses to send transactional emails</li>
+                    <li><strong>Escrow.com:</strong> When you use "Buy with Escrow", your email is shared to facilitate the transaction</li>
+                </ul>
                 <p className="dark:text-gray-300 text-gray-700 mb-4">
-                    When you choose to contact sellers via X, WhatsApp, LinkedIn, or Telegram, you're using their services
-                    and their privacy policies apply. We do not control or access those communications.
+                    When you contact sellers via X, WhatsApp, LinkedIn, or Telegram, their privacy policies apply.
                 </p>
 
                 <h2 className="text-2xl font-bold mt-8 mb-4">10. Changes to This Policy</h2>

@@ -106,7 +106,7 @@ export default function Footer() {
                     <div>
                         <h3 className="font-semibold mb-4 dark:text-white text-gray-900">Important</h3>
                         <ul className="space-y-2 text-xs dark:text-gray-400 text-gray-600">
-                            <li>✓ Non-Transactional Platform</li>
+                            <li>✓ Secure Payments via Stripe</li>
                             <li>✓ Privacy-First & Ad-Free</li>
                             <li>✓ 100% Free Listing Service</li>
                             <li className="text-amber-500">⚠ Secure Escrow Recommended</li>
@@ -116,7 +116,7 @@ export default function Footer() {
 
                 <div className="mt-8 pt-8 border-t dark:border-white/10 border-gray-200 text-center dark:text-gray-500 text-gray-600 text-xs">
                     <p>© {new Date().getFullYear()} DomainLiq. All rights reserved.</p>
-                    <p className="mt-2">A free, open platform for domain liquidation listing.</p>
+                    <p className="mt-2">A free, open platform for domain liquidation.</p>
                 </div>
             </div>
         </footer>
