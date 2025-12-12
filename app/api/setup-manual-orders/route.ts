@@ -1,6 +1,5 @@
 import { db } from '@/lib/db';
 import { NextResponse } from 'next/server';
-import crypto from 'crypto';
 
 // ONE-TIME SCRIPT: Delete this file after running!
 // Visit: https://domainliq.com/api/setup-manual-orders?secret=domainliq2024
@@ -23,7 +22,7 @@ export async function GET(request: Request) {
 
     for (const o of orders) {
         try {
-            const domain = await db.domain.findUnique({
+            const domain = await db.domain.findFirst({
                 where: { name: o.domain },
                 include: { user: true },
             });
@@ -44,7 +43,6 @@ export async function GET(request: Request) {
             }
 
             const platformFee = o.amount < 1000 ? 0 : 100;
-            const stripeFee = Math.round(o.amount * 0.029) + 30;
 
             const order = await db.order.create({
                 data: {
@@ -53,11 +51,9 @@ export async function GET(request: Request) {
                     buyerEmail: o.email,
                     amount: o.amount,
                     platformFee,
-                    stripeFee,
-                    sellerPayout: o.amount - platformFee - stripeFee,
                     stripePaymentIntentId: o.paymentId,
                     status: 'paid',
-                    revealToken: crypto.randomBytes(32).toString('hex'),
+                    paidAt: new Date(),
                 },
             });
 
