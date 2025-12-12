@@ -14,50 +14,65 @@ export async function GET(request: Request) {
 
     const results = [];
 
-    // Complete orders for these domains
-    const domainNames = ['possible.bet', 'whatever.bet'];
+    // Orders to create/complete
+    const ordersToProcess = [
+        { domain: 'possible.bet', buyerEmail: 'stanley@watterson.ca', amount: 800, paymentIntent: 'pm_1SdOC6FasmoHOTtlhuWzLFQL' },
+        { domain: 'whatever.bet', buyerEmail: 'stanley@watterson.ca', amount: 1500, paymentIntent: 'pm_1SdODtFasmoHOTtltPssoIkS' },
+        { domain: 'consider.bet', buyerEmail: 'stanley@watterson.ca', amount: 1000, paymentIntent: 'pi_3SddtAFasmoHOTtl0e2VVI5s' },
+    ];
 
-    for (const domainName of domainNames) {
+    for (const orderData of ordersToProcess) {
         try {
-            // Find the order by domain name
-            const order = await db.order.findFirst({
-                where: {
-                    domain: { name: domainName },
-                    status: { not: 'completed' },
-                },
-                include: { domain: true },
+            // Find the domain
+            const domain = await db.domain.findFirst({
+                where: { name: orderData.domain },
             });
 
-            if (!order) {
-                // Maybe already completed, check domain
-                const domain = await db.domain.findFirst({ where: { name: domainName } });
-                if (domain?.status === 'sold') {
-                    results.push({ domain: domainName, status: 'already_done' });
-                } else {
-                    results.push({ domain: domainName, status: 'no_order_found' });
-                }
+            if (!domain) {
+                results.push({ domain: orderData.domain, status: 'domain_not_found' });
                 continue;
             }
 
-            // Mark order as completed
-            await db.order.update({
-                where: { id: order.id },
-                data: {
-                    status: 'completed',
-                    completedAt: new Date(),
-                    stripeTransferId: 'manual_payout_already_received',
-                },
+            // Check if order exists
+            let order = await db.order.findFirst({
+                where: { domainId: domain.id },
             });
 
-            // Mark domain as sold
-            await db.domain.update({
-                where: { id: order.domainId },
-                data: { status: 'sold' },
-            });
-
-            results.push({ domain: domainName, orderId: order.id, status: 'completed' });
+            if (!order) {
+                // Create the order
+                order = await db.order.create({
+                    data: {
+                        domainId: domain.id,
+                        sellerId: domain.userId,
+                        buyerEmail: orderData.buyerEmail,
+                        amount: orderData.amount,
+                        platformFee: orderData.amount < 1000 ? 0 : 100,
+                        stripePaymentIntentId: orderData.paymentIntent,
+                        status: 'paid',
+                        paidAt: new Date(),
+                    },
+                });
+                results.push({ domain: orderData.domain, orderId: order.id, status: 'order_created' });
+            } else if (order.status === 'completed') {
+                results.push({ domain: orderData.domain, orderId: order.id, status: 'already_completed' });
+            } else {
+                // Complete existing order
+                await db.order.update({
+                    where: { id: order.id },
+                    data: {
+                        status: 'completed',
+                        completedAt: new Date(),
+                        stripeTransferId: 'manual_completed',
+                    },
+                });
+                await db.domain.update({
+                    where: { id: domain.id },
+                    data: { status: 'sold' },
+                });
+                results.push({ domain: orderData.domain, orderId: order.id, status: 'completed' });
+            }
         } catch (error: any) {
-            results.push({ domain: domainName, status: 'error', message: error.message });
+            results.push({ domain: orderData.domain, status: 'error', message: error.message });
         }
     }
 
@@ -67,14 +82,12 @@ export async function GET(request: Request) {
             where: { name: 'consider.bet' },
         });
 
-        if (domain) {
+        if (domain && !domain.isVerified) {
             await db.domain.update({
                 where: { id: domain.id },
                 data: { isVerified: true },
             });
             results.push({ action: 'verify', domain: 'consider.bet', status: 'verified' });
-        } else {
-            results.push({ action: 'verify', domain: 'consider.bet', status: 'not_found' });
         }
     } catch (error: any) {
         results.push({ action: 'verify', domain: 'consider.bet', status: 'error', message: error.message });
