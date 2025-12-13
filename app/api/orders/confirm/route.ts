@@ -79,19 +79,48 @@ export async function POST(req: Request) {
                     throw new Error('Could not find charge for payment');
                 }
 
-                // Get the charge to determine its currency
-                const charge = await stripe.charges.retrieve(chargeId);
-                console.log(`[Order Confirm] Retrieved charge: ${charge.id}, Currency: ${charge.currency}, Amount: ${charge.amount}`);
+                // Get the charge and expand balance_transaction to see settlement currency
+                const charge = await stripe.charges.retrieve(chargeId, {
+                    expand: ['balance_transaction'],
+                });
 
-                // Create transfer with source_transaction to link to original charge
-                // Currency MUST match the original charge currency
+                let transferCurrency = charge.currency;
+                let transferAmount = payoutAmount;
+
+                // Handle currency conversion (e.g., Charge in USD -> Settled in AUD)
+                // If funds were settled in a different currency, we must transfer in that currency
+                if (charge.balance_transaction && typeof charge.balance_transaction !== 'string') {
+                    const bt = charge.balance_transaction;
+                    if (bt.currency !== charge.currency) {
+                        console.log(`[Order Confirm] Currency mismatch detected. Charge: ${charge.currency}, Settlement: ${bt.currency}`);
+                        transferCurrency = bt.currency;
+
+                        // Calculate proportional amount to transfer
+                        // (Payout / Total Charge) * Settlement Amount
+                        // We use the net settlement amount (what actually landed in the balance)
+                        // Note: This treats the Stripe processing fee as shared/already deducted from the total pie
+                        const ratio = payoutAmount / charge.amount;
+                        // bt.amount is the net amount (after Stripe fees)
+                        // bt.amount + bt.fee = gross amount in settlement currency
+                        const grossSettlementAmount = bt.amount + bt.fee;
+                        transferAmount = Math.floor(grossSettlementAmount * ratio);
+
+                        console.log(`[Order Confirm] Converted transfer amount: ${transferAmount} ${transferCurrency} (Ratio: ${ratio})`);
+                    }
+                }
+
+                console.log(`[Order Confirm] Transferring ${transferAmount} ${transferCurrency} using source ${chargeId}`);
+
+                // Create transfer linked to the original charge
                 const transfer = await stripe.transfers.create({
-                    amount: payoutAmount,
-                    currency: charge.currency, // Use the charge's currency, not hardcoded USD
+                    amount: transferAmount,
+                    currency: transferCurrency,
                     destination: order.seller.stripeConnectedAccountId,
                     source_transaction: chargeId,
                     metadata: {
                         orderId: order.id,
+                        originalAmount: payoutAmount, // Keep track of original USD amount intended
+                        originalCurrency: 'usd'
                     },
                 });
                 transferId = transfer.id;
