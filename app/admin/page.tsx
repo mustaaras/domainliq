@@ -14,13 +14,14 @@ export default function Admin() {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
 
-  useEffect(() => {
-    fetchDomains();
-  }, []);
-
   const fetchDomains = () => {
     fetch('/api/domains').then(res => res.json()).then(setDomains);
   };
+
+  useEffect(() => {
+    fetchDomains();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleAdd = async (e: any) => {
     e.preventDefault();
