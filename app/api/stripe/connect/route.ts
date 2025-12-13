@@ -92,18 +92,36 @@ export async function GET(req: Request) {
         try {
             account = await stripe.accounts.retrieve(user.stripeConnectedAccountId);
         } catch (err: any) {
-            console.error('Stripe retrieve error:', err);
-            // If account doesn't exist or any other error, reset it to allow re-connection
-            await db.user.update({
-                where: { email: session.user.email },
-                data: {
-                    stripeConnectedAccountId: null,
-                    stripeOnboardingComplete: false
-                },
-            });
+            console.error('Stripe retrieve error:', err?.code, err?.message);
+
+            // Only reset if the account genuinely doesn't exist
+            // Don't reset for transient errors (network, rate limits, etc.)
+            const shouldReset = err?.code === 'account_invalid' ||
+                err?.code === 'resource_missing' ||
+                err?.statusCode === 404;
+
+            if (shouldReset) {
+                console.log('[Stripe Connect] Account does not exist, resetting connection');
+                await db.user.update({
+                    where: { email: session.user.email },
+                    data: {
+                        stripeConnectedAccountId: null,
+                        stripeOnboardingComplete: false
+                    },
+                });
+                return NextResponse.json({
+                    connected: false,
+                    onboardingComplete: false,
+                });
+            }
+
+            // For transient errors, return cached status from DB
+            console.log('[Stripe Connect] Transient error, using cached status');
             return NextResponse.json({
-                connected: false,
-                onboardingComplete: false,
+                connected: true,
+                onboardingComplete: user.stripeOnboardingComplete,
+                accountId: user.stripeConnectedAccountId,
+                cached: true, // Flag to indicate this is cached data
             });
         }
 
