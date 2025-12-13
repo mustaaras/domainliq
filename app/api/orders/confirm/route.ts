@@ -81,6 +81,7 @@ export async function POST(req: Request) {
 
                 // Get the charge to determine its currency
                 const charge = await stripe.charges.retrieve(chargeId);
+                console.log(`[Order Confirm] Retrieved charge: ${charge.id}, Currency: ${charge.currency}, Amount: ${charge.amount}`);
 
                 // Create transfer with source_transaction to link to original charge
                 // Currency MUST match the original charge currency
