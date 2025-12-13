@@ -31,6 +31,14 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Domain not found' }, { status: 404 });
         }
 
+        // Prevent purchasing domains that are already sold or in progress
+        if (domain.status === 'sold') {
+            return NextResponse.json({ error: 'This domain has already been sold' }, { status: 400 });
+        }
+        if (domain.status === 'pending_transfer') {
+            return NextResponse.json({ error: 'This domain is currently being transferred to another buyer' }, { status: 400 });
+        }
+
         if (!domain.isVerified) {
             return NextResponse.json({ error: 'Domain must be verified for sale' }, { status: 400 });
         }

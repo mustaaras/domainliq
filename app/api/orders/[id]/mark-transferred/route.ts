@@ -63,6 +63,12 @@ export async function POST(
             },
         });
 
+        // Mark domain as pending_transfer to prevent duplicate purchases
+        await db.domain.update({
+            where: { id: order.domainId },
+            data: { status: 'pending_transfer' },
+        });
+
         // Send confirmation email to buyer
         const baseUrl = process.env.NEXTAUTH_URL || 'https://domainliq.com';
         const revealUrl = `${baseUrl}/order/reveal?token=${order.buyerConfirmationToken}`;
