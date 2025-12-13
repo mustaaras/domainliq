@@ -88,24 +88,31 @@ export async function POST(req: Request) {
                 let transferAmount = payoutAmount;
 
                 // Handle currency conversion (e.g., Charge in USD -> Settled in AUD)
-                // If funds were settled in a different currency, we must transfer in that currency
+                // Also handle same-currency but need to respect Stripe fee deductions
                 if (charge.balance_transaction && typeof charge.balance_transaction !== 'string') {
                     const bt = charge.balance_transaction;
+
+                    // Always use the NET settlement amount (after Stripe processing fees)
+                    // This is the maximum we can transfer from this charge
+                    const netSettlementAmount = bt.amount; // What's actually available
+
                     if (bt.currency !== charge.currency) {
-                        console.log(`[Order Confirm] Currency mismatch detected. Charge: ${charge.currency}, Settlement: ${bt.currency}`);
+                        // Currency conversion case (e.g., USD charge -> AUD settlement)
+                        console.log(`[Order Confirm] Currency mismatch. Charge: ${charge.currency}, Settlement: ${bt.currency}`);
                         transferCurrency = bt.currency;
 
-                        // Calculate proportional amount to transfer
-                        // (Payout / Total Charge) * Settlement Amount
-                        // We use the net settlement amount (what actually landed in the balance)
-                        // Note: This treats the Stripe processing fee as shared/already deducted from the total pie
+                        // Calculate seller's proportional share of the NET settlement
                         const ratio = payoutAmount / charge.amount;
-                        // bt.amount is the net amount (after Stripe fees)
-                        // bt.amount + bt.fee = gross amount in settlement currency
-                        const grossSettlementAmount = bt.amount + bt.fee;
-                        transferAmount = Math.floor(grossSettlementAmount * ratio);
+                        transferAmount = Math.floor(netSettlementAmount * ratio);
 
-                        console.log(`[Order Confirm] Converted transfer amount: ${transferAmount} ${transferCurrency} (Ratio: ${ratio})`);
+                        console.log(`[Order Confirm] Converted: ${transferAmount} ${transferCurrency} (ratio: ${ratio.toFixed(4)}, net available: ${netSettlementAmount})`);
+                    } else {
+                        // Same currency - just ensure we don't exceed what's available
+                        // transferAmount is already set to payoutAmount, but cap it
+                        if (transferAmount > netSettlementAmount) {
+                            console.log(`[Order Confirm] Capping transfer from ${transferAmount} to ${netSettlementAmount} (net available)`);
+                            transferAmount = netSettlementAmount;
+                        }
                     }
                 }
 

@@ -60,14 +60,21 @@ export async function GET(req: Request) {
                         let transferCurrency = charge.currency;
                         let transferAmount = payoutAmount;
 
-                        // Handle currency conversion
+                        // Handle currency conversion and respect Stripe fee deductions
                         if (charge.balance_transaction && typeof charge.balance_transaction !== 'string') {
                             const bt = charge.balance_transaction;
+                            const netSettlementAmount = bt.amount; // Max we can transfer
+
                             if (bt.currency !== charge.currency) {
+                                // Currency conversion case
                                 transferCurrency = bt.currency;
                                 const ratio = payoutAmount / charge.amount;
-                                const grossSettlementAmount = bt.amount + bt.fee;
-                                transferAmount = Math.floor(grossSettlementAmount * ratio);
+                                transferAmount = Math.floor(netSettlementAmount * ratio);
+                            } else {
+                                // Same currency - cap to what's available
+                                if (transferAmount > netSettlementAmount) {
+                                    transferAmount = netSettlementAmount;
+                                }
                             }
                         }
 
