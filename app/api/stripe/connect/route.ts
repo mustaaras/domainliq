@@ -94,34 +94,18 @@ export async function GET(req: Request) {
         } catch (err: any) {
             console.error('Stripe retrieve error:', err?.code, err?.message);
 
-            // Only reset if the account genuinely doesn't exist
-            // Don't reset for transient errors (network, rate limits, etc.)
-            const shouldReset = err?.code === 'account_invalid' ||
-                err?.code === 'resource_missing' ||
-                err?.statusCode === 404;
-
-            if (shouldReset) {
-                console.log('[Stripe Connect] Account does not exist, resetting connection');
-                await db.user.update({
-                    where: { email: session.user.email },
-                    data: {
-                        stripeConnectedAccountId: null,
-                        stripeOnboardingComplete: false
-                    },
-                });
-                return NextResponse.json({
-                    connected: false,
-                    onboardingComplete: false,
-                });
-            }
-
-            // For transient errors, return cached status from DB
-            console.log('[Stripe Connect] Transient error, using cached status');
+            // NEVER auto-reset! This could be caused by:
+            // 1. Test keys trying to access live account (cross-environment)
+            // 2. Transient network errors
+            // 3. Rate limiting
+            // Only manual disconnect (DELETE endpoint) should clear the connection
+            console.log('[Stripe Connect] Error retrieving account, returning cached status');
             return NextResponse.json({
                 connected: true,
                 onboardingComplete: user.stripeOnboardingComplete,
                 accountId: user.stripeConnectedAccountId,
-                cached: true, // Flag to indicate this is cached data
+                cached: true,
+                warning: 'Could not verify with Stripe, using cached status',
             });
         }
 
