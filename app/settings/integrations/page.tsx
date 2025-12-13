@@ -176,81 +176,90 @@ export default function IntegrationsPage() {
     return (
         <div className="space-y-6">
             {/* Stripe Connect / Integrations - Beta: Only for specific users */}
+            {/* Stripe Connect / Integrations - Beta: Only for specific users */}
             {userEmail === 'huldil@icloud.com' && (
-                <div className="dark:bg-white/5 bg-white border dark:border-white/10 border-gray-200 rounded-xl p-6 space-y-6 shadow-sm">
-                    <h2 className="text-xl font-semibold flex items-center gap-2 dark:text-white text-gray-900">
-                        <CreditCard className="h-5 w-5 text-indigo-500" />
-                        Payment Integration
-                        <span className="text-xs bg-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded-full">Beta</span>
-                    </h2>
+                <div className="dark:bg-white/5 bg-white border dark:border-white/10 border-gray-200 rounded-xl p-6 shadow-sm">
+                    <div className="flex items-start justify-between mb-6">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 dark:bg-indigo-500/10 bg-indigo-50 rounded-xl flex items-center justify-center border dark:border-indigo-500/20 border-indigo-200">
+                                <CreditCard className="h-6 w-6 text-indigo-500" />
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-bold flex items-center gap-2 dark:text-white text-gray-900">
+                                    Stripe Integration
+                                    <span className="text-xs bg-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded-full font-medium">Beta</span>
+                                </h2>
+                                <p className="text-sm dark:text-gray-400 text-gray-600 mt-1">Receive payments directly when you sell domains</p>
+                            </div>
+                        </div>
+                        {stripeStatus.onboardingComplete && (
+                            <span className="px-3 py-1 dark:bg-green-500/20 bg-green-50 dark:text-green-400 text-green-700 text-xs font-medium rounded-full border dark:border-green-500/20 border-green-300 flex items-center gap-1.5">
+                                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                                Connected
+                            </span>
+                        )}
+                    </div>
 
                     <div className="space-y-4">
-                        <div className="flex items-start justify-between gap-4">
-                            <div>
-                                <h3 className="font-medium dark:text-white text-gray-900">Stripe Connect</h3>
-                                <p className="text-sm dark:text-gray-400 text-gray-600 mt-1">
-                                    Connect your Stripe account to receive payments directly when you sell domains.
-                                </p>
-                                <div className="mt-2 text-xs dark:text-gray-500 text-gray-500">
-                                    <p>• 0% platform fee for sales ≤$50</p>
-                                    <p>• 5% for $50-500 | 3% for $500-2000 | 2% for $2000+</p>
-                                </div>
-                            </div>
-
-                            <div className="flex-shrink-0">
-                                {stripeStatus.loading ? (
-                                    <div className="px-4 py-2">
-                                        <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-                                    </div>
-                                ) : stripeStatus.onboardingComplete ? (
-                                    <div className="flex items-center gap-2">
-                                        <div className="flex items-center gap-2 text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-3 py-1.5 rounded-full text-sm font-medium">
-                                            <Check className="h-4 w-4" />
-                                            Connected
-                                        </div>
-                                        <button
-                                            onClick={handleDisconnectStripe}
-                                            className="text-xs text-red-500 hover:text-red-600 underline"
-                                        >
-                                            Reset (Test Mode)
-                                        </button>
-                                    </div>
-                                ) : stripeStatus.connected ? (
-                                    <button
-                                        onClick={handleConnectStripe}
-                                        disabled={isConnectingStripe}
-                                        className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
-                                    >
-                                        {isConnectingStripe ? (
-                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                        ) : (
-                                            <ExternalLink className="h-4 w-4" />
-                                        )}
-                                        Complete Setup
-                                    </button>
-                                ) : (
-                                    <button
-                                        onClick={handleConnectStripe}
-                                        disabled={isConnectingStripe}
-                                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
-                                    >
-                                        {isConnectingStripe ? (
-                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                        ) : (
-                                            <CreditCard className="h-4 w-4" />
-                                        )}
-                                        Connect Stripe
-                                    </button>
-                                )}
+                        <div className="dark:text-gray-300 text-gray-700 text-sm leading-relaxed">
+                            <p>Connect your Stripe account to automatically receive payouts when a domain is sold.</p>
+                            <div className="mt-3 text-xs dark:text-gray-400 text-gray-600 bg-gray-50 dark:bg-white/5 p-3 rounded-lg border dark:border-white/5 border-gray-100 space-y-1">
+                                <p className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> Free for sales &lt; $10</p>
+                                <p className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span> $1 fee for $10-50 | $1.50 for $51-100</p>
+                                <p className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span> 2% for sales &gt; $100</p>
                             </div>
                         </div>
 
-                        {stripeStatus.onboardingComplete && (
-                            <div className="p-4 bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 rounded-lg">
-                                <p className="text-sm text-green-700 dark:text-green-400">
-                                    ✓ Your Stripe account is connected. You can now receive payments for domain sales.
-                                </p>
+                        {stripeStatus.loading ? (
+                            <div className="px-4 py-2">
+                                <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
                             </div>
+                        ) : stripeStatus.onboardingComplete ? (
+                            <div className="dark:bg-black/20 bg-gray-100 rounded-lg p-4 border dark:border-white/5 border-gray-200">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <div className="p-1.5 bg-green-100 dark:bg-green-900/30 rounded-full">
+                                            <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-medium dark:text-white text-gray-900">Stripe Connected</p>
+                                            <p className="text-xs dark:text-gray-500 text-gray-600">Ready to accept payments</p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={handleDisconnectStripe}
+                                        className="text-xs dark:text-red-400 text-red-600 dark:hover:text-red-300 hover:text-red-700 underline"
+                                    >
+                                        Reset (Test Mode)
+                                    </button>
+                                </div>
+                            </div>
+                        ) : stripeStatus.connected ? (
+                            <button
+                                onClick={handleConnectStripe}
+                                disabled={isConnectingStripe}
+                                className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+                            >
+                                {isConnectingStripe ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                    <ExternalLink className="h-4 w-4" />
+                                )}
+                                Complete Setup
+                            </button>
+                        ) : (
+                            <button
+                                onClick={handleConnectStripe}
+                                disabled={isConnectingStripe}
+                                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+                            >
+                                {isConnectingStripe ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                    <CreditCard className="h-4 w-4" />
+                                )}
+                                Connect Stripe
+                            </button>
                         )}
                     </div>
                 </div>
@@ -286,7 +295,7 @@ export default function IntegrationsPage() {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs dark:text-gray-500 text-gray-600 mb-1">Connected Account</p>
-                                    <p className="dark:text-white text-gray-900 font-mono">{escrowEmail}</p>
+                                    <p className="dark:text-white text-gray-900 font-medium">{escrowEmail}</p>
                                 </div>
                                 <button
                                     onClick={handleDisconnect}
