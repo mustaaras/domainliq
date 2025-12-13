@@ -37,24 +37,26 @@ export async function GET() {
         });
 
         // Get sold count for each seller (count domains with status 'sold')
-        const sellersWithSoldCount = await Promise.all(
-            topSellers.map(async (seller) => {
-                const soldCount = await db.domain.count({
-                    where: {
-                        userId: seller.id,
-                        status: 'sold'
-                    }
-                });
+        // Get sold count for all these sellers in one query
+        const soldCounts = await db.domain.groupBy({
+            by: ['userId'],
+            where: {
+                userId: { in: topSellers.map(s => s.id) },
+                status: 'sold'
+            },
+            _count: true
+        });
 
-                return {
-                    id: seller.id,
-                    name: seller.name || seller.subdomain,
-                    subdomain: seller.subdomain,
-                    domainCount: seller._count.domains,
-                    soldCount
-                };
-            })
-        );
+        // Create a map for easy lookup
+        const soldMap = new Map(soldCounts.map(item => [item.userId, item._count]));
+
+        const sellersWithSoldCount = topSellers.map(seller => ({
+            id: seller.id,
+            name: seller.name || seller.subdomain,
+            subdomain: seller.subdomain,
+            domainCount: seller._count.domains,
+            soldCount: soldMap.get(seller.id) || 0
+        }));
 
         return NextResponse.json(sellersWithSoldCount);
     } catch (error) {

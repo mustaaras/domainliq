@@ -6,6 +6,7 @@ import { auth } from "@/auth";
 import Script from "next/script";
 import Footer from "@/components/footer";
 import CookieConsent from "@/components/cookie-consent";
+import ChatNotificationBanner from "@/components/chat-notification-banner";
 import { headers } from "next/headers";
 
 const geistSans = Geist({
@@ -71,6 +72,7 @@ export default async function RootLayout({
           {children}
           {!isCustomDomain && <Footer />}
           <CookieConsent />
+          <ChatNotificationBanner />
         </Providers>
       </body>
     </html>

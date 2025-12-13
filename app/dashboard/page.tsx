@@ -337,7 +337,20 @@ export default function DashboardPage() {
     const fetchUserSettings = async () => {
         try {
             const res = await fetch('/api/user/settings');
-            if (!res.ok) throw new Error('Failed to fetch user data');
+
+            if (res.status === 401) {
+                // Session invalid, redirect to login
+                router.push('/login');
+                return;
+            }
+
+            if (!res.ok) {
+                // If it's a 404 or other error, just return (or log a warning) 
+                // but don't throw to avoid noise if it's a transient issue
+                console.warn(`[Dashboard] Failed to fetch settings: ${res.status}`);
+                return;
+            }
+
             const data = await res.json();
             setUserSubdomain(data.subdomain || '');
 
@@ -351,7 +364,7 @@ export default function DashboardPage() {
             );
             setHasContactInfo(hasContact);
         } catch (error) {
-            console.error(error);
+            console.error('Error fetching user settings:', error);
         }
     };
 
