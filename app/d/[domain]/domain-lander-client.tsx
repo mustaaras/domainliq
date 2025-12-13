@@ -219,9 +219,12 @@ export default function DomainLanderClient({ domain, isOwner }: DomainLanderClie
                     </p>
 
                     <div className="flex flex-col items-center gap-8">
-                        <div className="text-4xl md:text-5xl font-bold text-amber-500">
-                            ${domain.price.toLocaleString()}
-                        </div>
+                        {/* Hide price when domain is sold */}
+                        {domain.status !== 'sold' && (
+                            <div className="text-4xl md:text-5xl font-bold text-amber-500">
+                                ${domain.price.toLocaleString()}
+                            </div>
+                        )}
 
                         {domain.status === 'sold' ? (
                             <div className="flex flex-col items-center gap-4">

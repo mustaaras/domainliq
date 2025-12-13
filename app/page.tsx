@@ -42,6 +42,7 @@ interface TopSeller {
   name: string;
   subdomain: string;
   domainCount: number;
+  soldCount: number;
 }
 
 interface Portfolio {
@@ -951,7 +952,12 @@ export default function Home() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2 dark:text-gray-400 text-gray-600 dark:group-hover:text-white group-hover:text-gray-900 transition-colors">
-                        <span className="text-sm font-medium">{seller.domainCount}</span>
+                        <div className="text-right">
+                          <span className="text-sm font-medium">{seller.domainCount}</span>
+                          {seller.soldCount > 0 && (
+                            <span className="text-xs text-green-500 ml-1">({seller.soldCount} sold)</span>
+                          )}
+                        </div>
                         <ExternalLink className="h-3 w-3" />
                       </div>
                     </Link>

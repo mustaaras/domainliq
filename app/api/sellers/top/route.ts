@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
+        // Get top sellers with available domain count
         const topSellers = await db.user.findMany({
             where: {
                 domains: {
@@ -35,14 +36,27 @@ export async function GET() {
             take: 10
         });
 
-        const formattedSellers = topSellers.map(seller => ({
-            id: seller.id,
-            name: seller.name || seller.subdomain,
-            subdomain: seller.subdomain,
-            domainCount: seller._count.domains
-        }));
+        // Get sold count for each seller (count domains with status 'sold')
+        const sellersWithSoldCount = await Promise.all(
+            topSellers.map(async (seller) => {
+                const soldCount = await db.domain.count({
+                    where: {
+                        userId: seller.id,
+                        status: 'sold'
+                    }
+                });
 
-        return NextResponse.json(formattedSellers);
+                return {
+                    id: seller.id,
+                    name: seller.name || seller.subdomain,
+                    subdomain: seller.subdomain,
+                    domainCount: seller._count.domains,
+                    soldCount
+                };
+            })
+        );
+
+        return NextResponse.json(sellersWithSoldCount);
     } catch (error) {
         console.error('Failed to fetch top sellers:', error);
         return NextResponse.json({ error: 'Failed to fetch top sellers' }, { status: 500 });
