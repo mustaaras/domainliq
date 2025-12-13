@@ -90,6 +90,7 @@ model Domain {
 
   // Sales
   checkoutLink      String?
+  showPriceOnLanding Boolean @default(true) // Seller can hide price from public landing page
   orders            Order[]
 
   // Chat

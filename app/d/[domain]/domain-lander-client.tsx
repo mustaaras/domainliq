@@ -219,11 +219,17 @@ export default function DomainLanderClient({ domain, isOwner }: DomainLanderClie
                     </p>
 
                     <div className="flex flex-col items-center gap-8">
-                        {/* Hide price when domain is sold */}
+                        {/* Show price based on seller's preference (showPriceOnLanding setting) */}
                         {domain.status !== 'sold' && (
-                            <div className="text-4xl md:text-5xl font-bold text-amber-500">
-                                ${domain.price.toLocaleString()}
-                            </div>
+                            domain.showPriceOnLanding !== false ? (
+                                <div className="text-4xl md:text-5xl font-bold text-amber-500">
+                                    ${domain.price.toLocaleString()}
+                                </div>
+                            ) : (
+                                <div className="text-2xl md:text-3xl font-bold text-gray-600 dark:text-gray-400">
+                                    Contact for Price
+                                </div>
+                            )
                         )}
 
                         {domain.status === 'sold' ? (
@@ -545,7 +551,7 @@ function EscrowModal({ domain, onClose }: { domain: any; onClose: () => void }) 
                 <div className="space-y-4 mb-6">
                     <div className="bg-gray-50 dark:bg-white/5 rounded-lg p-4 border border-gray-200 dark:border-white/5">
                         <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
-                            This domain is listed for <span className="text-gray-900 dark:text-white font-bold">${domain.price.toLocaleString()}</span>.
+                            Listing Price: <span className="text-gray-900 dark:text-white font-bold">${domain.price.toLocaleString()}</span>
                         </p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                             Enter your email address to start a secure transaction on Escrow.com. You will be redirected to complete the purchase.

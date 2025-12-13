@@ -13,7 +13,7 @@ export async function PATCH(
         }
 
         const { id } = await params;
-        const { status, price, checkoutLink } = await req.json();
+        const { status, price, checkoutLink, showPriceOnLanding } = await req.json();
 
         // Verify ownership
         const domain = await db.domain.findUnique({
@@ -33,6 +33,7 @@ export async function PATCH(
         const updateData: any = {};
         if (status) updateData.status = status;
         if (price !== undefined) updateData.price = price;
+        if (showPriceOnLanding !== undefined) updateData.showPriceOnLanding = showPriceOnLanding;
 
         // Handle checkout link update
         if (checkoutLink !== undefined) {

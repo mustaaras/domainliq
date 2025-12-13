@@ -24,6 +24,7 @@ interface Domain {
     verificationToken: string | null;
     expiresAt: string | null;
     checkoutLink: string | null;
+    showPriceOnLanding?: boolean;
 }
 
 export default function DashboardPage() {
@@ -72,7 +73,7 @@ export default function DashboardPage() {
     const [isLoadingPortfolios, setIsLoadingPortfolios] = useState(false);
 
     const [editingDomainId, setEditingDomainId] = useState<string | null>(null);
-    const [editDomainData, setEditDomainData] = useState({ price: '', checkoutLink: '', status: '' });
+    const [editDomainData, setEditDomainData] = useState({ price: '', checkoutLink: '', status: '', showPriceOnLanding: true });
     const [isEditingDomain, setIsEditingDomain] = useState(false);
     const [showBulkEditPriceModal, setShowBulkEditPriceModal] = useState(false);
     const [bulkEditPriceValue, setBulkEditPriceValue] = useState('');
@@ -235,6 +236,7 @@ export default function DashboardPage() {
             const body: any = {};
             if (editDomainData.price) body.price = parseFloat(editDomainData.price);
             if (editDomainData.checkoutLink !== undefined) body.checkoutLink = editDomainData.checkoutLink;
+            body.showPriceOnLanding = editDomainData.showPriceOnLanding;
 
             const res = await fetch(`/api/user/domains/${editingDomainId}`, {
                 method: 'PATCH',
@@ -251,11 +253,11 @@ export default function DashboardPage() {
 
             // Update local state
             setDomains(domains.map(d =>
-                d.id === editingDomainId ? { ...d, price: updatedDomain.price, checkoutLink: updatedDomain.checkoutLink } : d
+                d.id === editingDomainId ? { ...d, price: updatedDomain.price, checkoutLink: updatedDomain.checkoutLink, showPriceOnLanding: updatedDomain.showPriceOnLanding } : d
             ));
 
             setEditingDomainId(null);
-            setEditDomainData({ price: '', checkoutLink: '', status: '' });
+            setEditDomainData({ price: '', checkoutLink: '', status: '', showPriceOnLanding: true });
         } catch (error: any) {
             console.error(error);
             alert(error.message || 'Failed to update domain');
@@ -269,7 +271,8 @@ export default function DashboardPage() {
         setEditDomainData({
             price: domain.price.toString(),
             checkoutLink: domain.checkoutLink || '',
-            status: domain.status
+            status: domain.status,
+            showPriceOnLanding: domain.showPriceOnLanding ?? true
         });
     };
 
@@ -1636,6 +1639,25 @@ export default function DashboardPage() {
                                     Checkout links are only available for domains priced $99 or more.
                                 </div>
                             )}
+
+                            {/* Show Price Toggle */}
+                            <div className="flex items-center justify-between p-3 dark:bg-white/5 bg-gray-50 rounded-lg border dark:border-white/10 border-gray-200">
+                                <div>
+                                    <p className="text-sm font-medium dark:text-white text-gray-900">Show Price on Landing Page</p>
+                                    <p className="text-xs dark:text-gray-500 text-gray-600">Hide price to protect multi-platform listings</p>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setEditDomainData({ ...editDomainData, showPriceOnLanding: !editDomainData.showPriceOnLanding })}
+                                    className={`relative w-11 h-6 rounded-full transition-colors ${editDomainData.showPriceOnLanding
+                                        ? 'bg-green-500'
+                                        : 'bg-gray-300 dark:bg-gray-600'
+                                        }`}
+                                >
+                                    <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${editDomainData.showPriceOnLanding ? 'translate-x-5' : 'translate-x-0'
+                                        }`} />
+                                </button>
+                            </div>
 
                             <div className="pt-2">
                                 <button

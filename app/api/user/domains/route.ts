@@ -24,6 +24,7 @@ export async function GET() {
                 verificationMethod: true,
                 checkoutLink: true,
                 expiresAt: true,
+                showPriceOnLanding: true,
             },
         });
 
