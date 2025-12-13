@@ -71,8 +71,11 @@ export async function GET(request: NextRequest) {
     }
 
     // Sorting
-    let orderBy: Prisma.DomainOrderByWithRelationInput = { createdAt: 'desc' };
-    if (sort === 'price_asc') {
+    let orderBy: Prisma.DomainOrderByWithRelationInput | Prisma.DomainOrderByWithRelationInput[] = { createdAt: 'desc' };
+    if (sort === 'verified_first') {
+      // Sort by isVerified desc (true first), then by createdAt desc
+      orderBy = [{ isVerified: 'desc' }, { createdAt: 'desc' }];
+    } else if (sort === 'price_asc') {
       orderBy = { price: 'asc' };
     } else if (sort === 'price_desc') {
       orderBy = { price: 'desc' };

@@ -634,6 +634,7 @@ export default function Home() {
                         className="w-full dark:bg-white/5 bg-gray-50 border dark:border-white/10 border-gray-300 rounded-lg px-3 py-1.5 text-sm dark:text-white text-gray-900 focus:outline-none focus:ring-1 focus:ring-amber-500/50"
                       >
                         <option value="newest">Newest Listed</option>
+                        <option value="verified_first">Verified First</option>
                         <option value="price_asc">Price: Low to High</option>
                         <option value="price_desc">Price: High to Low</option>
                         <option value="expires_asc">Expiring Soon</option>
