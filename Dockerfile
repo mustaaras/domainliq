@@ -60,15 +60,9 @@ COPY --from=builder /app/public ./public
 
 # Copy Prisma files for migrations
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
 
-# Copy Prisma CLI binary and make it executable
-RUN mkdir -p node_modules/.bin
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
-RUN chmod +x ./node_modules/.bin/prisma
-RUN chown -R nextjs:nodejs ./node_modules
+# Copy the entire node_modules with generated Prisma client (pnpm structure)
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 
 # Set the correct permission for prerender cache
 RUN mkdir .next
