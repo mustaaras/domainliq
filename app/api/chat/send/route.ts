@@ -1,5 +1,6 @@
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
+import { sendChatNotification } from '@/lib/sendgrid';
 
 export async function POST(req: NextRequest) {
     try {
@@ -16,6 +17,8 @@ export async function POST(req: NextRequest) {
                 visitorId,
             },
         });
+
+        const isNewSession = !session;
 
         if (!session) {
             session = await db.chatSession.create({
@@ -53,6 +56,38 @@ export async function POST(req: NextRequest) {
             where: { id: session.id },
             data: { updatedAt: new Date() },
         });
+
+        // Send email notification on first message (new session only)
+        if (isNewSession && domainId) {
+            // Get domain and seller info
+            const domain = await db.domain.findUnique({
+                where: { id: domainId },
+                include: {
+                    user: {
+                        select: {
+                            email: true,
+                            name: true,
+                            subdomain: true,
+                        },
+                    },
+                },
+            });
+
+            if (domain?.user?.email) {
+                const baseUrl = process.env.NEXTAUTH_URL || 'https://domainliq.com';
+
+                // Fire and forget - don't block the response
+                sendChatNotification({
+                    sellerEmail: domain.user.email,
+                    sellerName: domain.user.name || domain.user.subdomain || 'Seller',
+                    domainName: domain.name,
+                    visitorName: visitorName || undefined,
+                    visitorEmail: visitorEmail || undefined,
+                    messagePreview: content,
+                    chatUrl: `${baseUrl}/dashboard?tab=chats`,
+                }).catch(err => console.error('[Chat] Email notification failed:', err));
+            }
+        }
 
         return NextResponse.json({ message, session });
     } catch (error) {
