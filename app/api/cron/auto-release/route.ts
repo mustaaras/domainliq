@@ -52,17 +52,34 @@ export async function GET(req: Request) {
                         : paymentIntent.latest_charge?.id;
 
                     if (chargeId) {
-                        // Get the charge to determine its currency
-                        const charge = await stripe.charges.retrieve(chargeId);
+                        // Get the charge and expand balance_transaction to see settlement currency
+                        const charge = await stripe.charges.retrieve(chargeId, {
+                            expand: ['balance_transaction'],
+                        });
+
+                        let transferCurrency = charge.currency;
+                        let transferAmount = payoutAmount;
+
+                        // Handle currency conversion
+                        if (charge.balance_transaction && typeof charge.balance_transaction !== 'string') {
+                            const bt = charge.balance_transaction;
+                            if (bt.currency !== charge.currency) {
+                                transferCurrency = bt.currency;
+                                const ratio = payoutAmount / charge.amount;
+                                const grossSettlementAmount = bt.amount + bt.fee;
+                                transferAmount = Math.floor(grossSettlementAmount * ratio);
+                            }
+                        }
 
                         const transfer = await stripe.transfers.create({
-                            amount: payoutAmount,
-                            currency: charge.currency, // Use the charge's currency
+                            amount: transferAmount,
+                            currency: transferCurrency,
                             destination: order.seller.stripeConnectedAccountId,
                             source_transaction: chargeId,
                             metadata: {
                                 orderId: order.id,
                                 autoRelease: 'true',
+                                originalAmount: payoutAmount,
                             },
                         });
                         transferId = transfer.id;
